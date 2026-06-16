@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Renegades Sports Arena is Bengaluru's premier cricket training academy and sports facility. Elevate your skills with certified coaches, astro-turf nets, and direct pathways to KSCA clubs.">
+  <meta name="keywords"
+    content="cricket academy bengaluru, sports facility bangalore, KSCA division club trial, cricket coaching hsr layout, cricket turf box nets bengaluru">
+  <meta name="author" content="Renegades Sports Arena">
+  <meta property="og:title" content="Renegades Sports Arena | Elite Cricket Academy Bengaluru">
+  <meta property="og:description"
+    content="Train like a champion. Play like a renegade. Professional coaching, box nets, and pathways into KSCA-affiliated cricket clubs.">
+  <meta property="og:image" content="assets/images/logo.png">
+  <meta property="og:type" content="website">
+
+  <title>RENEGADES SPORTS ARENA | Train Like a Champion. Play Like a Renegade.</title>
+
+  <!-- Style Sheets -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/mlb_tournaments.css">
+
+  <!-- Favicon Mock -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       DYNAMIC ANNOUNCEMENT BANNER
+       ========================================================================== -->
+  <div id="announcementBanner" class="announcement-banner" style="display: none;">
+    <div class="container announcement-container">
+      <span class="announcement-text" id="announcementText"></span>
+      <a href="#" class="announcement-link" id="announcementLink" style="display: none;"></a>
+      <button class="announcement-close" id="announcementClose" aria-label="Close Announcement">&times;</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CINEMATIC LOADER
+       ========================================================================== -->
+  <div id="loader" aria-hidden="true">
+    <img src="assets/images/logo.png" alt="Renegades Sports Arena Logo" class="loader-logo">
+    <div class="loader-bar">
+      <div class="loader-progress"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       HEADER / NAVIGATION
+       ========================================================================== -->
+  <header class="header" id="home">
+    <div class="container header-container">
+      <a href="#home" class="logo-wrapper scroll-link" aria-label="Renegades Sports Arena Home">
+        <img src="assets/images/logo.png" alt="Renegades Emblem" class="logo-img">
+        <span class="logo-text">RENEGADES <span>SPORTS ARENA</span></span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="nav" aria-label="Main Navigation">
+        <a href="#home" class="nav-link active scroll-link">Home</a>
+        <a href="#programs" class="nav-link scroll-link">Programs</a>
+        <a href="#pathway" class="nav-link scroll-link">Cricket Academy</a>
+        <a href="#mlb-baseball" class="nav-link scroll-link">⚾ MLB Baseball Program</a>
+        <a href="#facilities" class="nav-link scroll-link">Facilities</a>
+        <a href="#gallery" class="nav-link scroll-link">Gallery</a>
+        <a href="#shop" class="nav-link scroll-link">Shop</a>
+        <a href="#tournaments" class="nav-link scroll-link">🏆 Tournaments</a>
+        <a href="portal.html" class="nav-link" style="color: var(--accent-primary); font-weight: 700;">Portal Login</a>
+        <a href="#contact" class="btn btn-outline-orange header-cta scroll-link">Contact</a>
+      </nav>
+
+      <!-- Mobile Nav Trigger -->
+      <button class="mobile-nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       HERO SECTION
+       ========================================================================== -->
+  <section class="hero" id="hero-section">
+    <!-- Cinematic loop video -->
+    <video class="hero-video-bg" autoplay loop muted playsinline
+      poster="https://images.unsplash.com/photo-1531415080290-bc9854593f6f?auto=format&fit=crop&w=1920&q=80">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-cricket-batsman-hitting-a-ball-40294-large.mp4"
+        type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <h1 class="hero-title">RENEGADES SPORTS ARENA</h1>
+      <p class="hero-sub">Train. Get Exposure. Get Equipped. Get Opportunities.</p>
+      <div class="hero-tagline"
+        style="font-family: var(--font-display); font-size: 1.15rem; color: var(--text-secondary); margin-bottom: 2.5rem; text-transform: uppercase; letter-spacing: 1px;">
+        Building Cricketers. Creating Opportunities. Connecting Talent to Competitive Cricket.</div>
+      <div class="hero-btn-container">
+        <a href="#contact" class="btn btn-primary hero-btn-primary scroll-link">JOIN THE ACADEMY</a>
+        <a href="#contact" class="btn btn-secondary hero-btn-secondary scroll-link">BOOK A FREE TRIAL</a>
+        <a href="#shop" class="btn btn-outline-orange hero-btn-shop scroll-link">EXPLORE THE SHOP</a>
+      </div>
+    </div>
+
+    <!-- Scroll Indicator mouse -->
+    <a href="#why-choose-us" class="scroll-indicator scroll-link" aria-label="Scroll down to details">
+      <span>Scroll Down</span>
+      <div class="mouse">
+        <div class="wheel"></div>
+      </div>
+    </a>
+  </section>
+
+  <!-- ==========================================================================
+       WHY RENEGADES SECTION
+       ========================================================================== -->
+  <section class="section" id="why-choose-us">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">THE RENEGADES EDGE</span>
+        <h2 class="section-title" id="whySectionTitle">Why Players Choose Renegades</h2>
+        <p class="section-desc">We deliver the ultimate environment for competitive training, skill polishing, and real
+          career development.</p>
+      </div>
+
+      <div class="why-grid" id="whyGrid">
+        <!-- Rendered Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FUTURE STARS ARENA SHOWCASE (NEW TURF GROUND BACKDROP)
+       ========================================================================== -->
+  <section class="section" id="future-arena">
+    <div class="container">
+      <div class="future-arena-hero-card reveal-element">
+        <span class="arena-badge" id="arenaBadge">Loading...</span>
+        <h2 class="arena-title" id="arenaTitle">Loading...</h2>
+        <span class="arena-subtitle" id="arenaSubtitle">Loading...</span>
+        <p class="arena-desc" id="arenaDesc">Loading...</p>
+
+        <div class="arena-features-box">
+          <ul class="arena-features-horizontal" id="arenaFeaturesList">
+            <!-- Injected dynamically -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       OUR ASSOCIATED CLUB NETWORK
+       ========================================================================== -->
+  <section class="section" id="associated-network" style="padding-bottom: 5rem;">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">KSCA PATHWAY ASSOCIATIONS</span>
+        <h2 class="section-title" id="clubsHeader">ASSOCIATED CLUB NETWORK</h2>
+        <p class="section-desc" id="clubsSub">Renegades Sports Arena works closely with multiple KSCA-registered cricket
+          clubs, creating opportunities for deserving players to gain valuable match exposure and competitive cricket
+          experience.</p>
+      </div>
+    </div>
+
+    <!-- Infinite horizontal scrolling logo wall -->
+    <div class="ticker-wrap reveal-element">
+      <div class="ticker" id="clubsTicker">
+        <!-- Injected Dynamically via JS -->
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="disclaimer-box reveal-element" id="clubsDesc">
+        Selection opportunities are based on player performance, commitment, and available club requirements.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==========================================================================
+       VISION & MISSION SECTION
+       ========================================================================== -->
+  <section class="section" id="vision-mission">
+    <div class="container">
+      <div class="vision-mission-grid reveal-element">
+        <!-- Vision Card -->
+        <div class="vision-card glass-card">
+          <div class="card-watermark">VISION</div>
+          <div class="vision-icon">👁️</div>
+          <h3>OUR VISION</h3>
+          <p id="visionText">To become one of Karnataka’s most respected high-performance sports institutions that
+            develops disciplined athletes and creates meaningful sporting opportunities.</p>
+        </div>
+        <!-- Mission Card -->
+        <div class="mission-card glass-card">
+          <div class="card-watermark">MISSION</div>
+          <div class="mission-icon">🎯</div>
+          <h3>OUR MISSION</h3>
+          <p id="missionText">To nurture young athletes through professional coaching, structured development, and
+            competitive exposure while building character, leadership, and sporting excellence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       THE RENEGADES PATHWAY SECTION (TIMELINE)
+       ========================================================================== -->
+  <section class="section" id="pathway">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">ATHLETIC PATHWAY</span>
+        <h2 class="section-title">From Beginner to Competitive Cricket</h2>
+        <p class="section-desc">Our progressive developmental timeline guiding athletes from raw talent to competitive
+          cricket.</p>
+
+        <!-- Tagline styling -->
+        <div class="timeline-tagline">
+          <span>TRAIN.</span>
+          <span>DEVELOP.</span>
+          <span>PERFORM.</span>
+          <span>PROGRESS.</span>
+        </div>
+      </div>
+
+      <div class="timeline-container" id="pathwayContainer">
+        <!-- Injected Dynamically via JS -->
+      </div>
+
+      <div class="pathway-disclaimer reveal-element"
+        style="margin-top: 4rem; text-align: center; color: var(--text-secondary); max-width: 800px; margin-left: auto; margin-right: auto; padding: 1.5rem; border-top: 1px dashed var(--glass-border);">
+        <p style="font-size: 0.9rem; font-style: italic; line-height: 1.6;">
+          Renegades Sports Arena provides structured development pathways and exposure opportunities through our
+          established network within the KSCA cricket ecosystem. We do not guarantee selections or placements.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PLAYER DEVELOPMENT PROGRAMS
+       ========================================================================== -->
+  <section class="section section-alt" id="programs">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">ACADEMY CURRICULUM</span>
+        <h2 class="section-title">PLAYER DEVELOPMENT PROGRAMS</h2>
+        <p class="section-desc">Tailored curriculums focusing on high-performance metrics for all ages, skill tiers, and
+          specialized fields.</p>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="filter-controls reveal-element" id="programsFilterControls">
+        <!-- Rendered Dynamically via JS -->
+      </div>
+
+      <div class="programs-grid" id="programsGrid">
+        <!-- Rendered Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       ⚾ MAJOR LEAGUE BASEBALL (MLB) DEVELOPMENT PROGRAM
+       ========================================================================== -->
+  <section class="section stadium-lights-section" id="mlb-baseball">
+    <!-- Floating particles background -->
+    <div class="particle-container" id="mlb-particles"></div>
+
+    <div class="container" style="position: relative; z-index: 2;">
+      <div class="section-header reveal-element" style="text-align: center;">
+        <div class="mlb-badge-wrapper">
+          <span>🌍 INTERNATIONAL SPORTS DEVELOPMENT</span>
+        </div>
+        <h2 class="section-title">Developing India's Next Generation of Baseball Talent</h2>
+        <p class="section-desc">Renegades Sports Arena proudly offers baseball coaching and development opportunities through our Major League Baseball (MLB) connections, introducing young athletes to international coaching methodologies and global sporting opportunities.</p>
+      </div>
+
+      <div class="mlb-program-grid" id="mlbProgramsGrid">
+        <!-- Rendered Dynamically via Supabase, with static fallback -->
+        <div class="mlb-card reveal-element delay-1">
+          <div class="mlb-card-icon">⚾</div>
+          <h3 class="mlb-card-title">MLB U-11 Development Program</h3>
+          <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Introducing basic baseball fundamentals in a highly engaging environment.</p>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Baseball fundamentals</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Throwing mechanics</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Catching and fielding</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Hand-eye coordination</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Speed and agility training</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Fun and engaging skill development modules</span>
+          </div>
+        </div>
+
+        <div class="mlb-card reveal-element delay-2">
+          <div class="mlb-card-icon">⚾</div>
+          <h3 class="mlb-card-title">MLB U-13 Advanced Development Program</h3>
+          <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Advanced skill refinement and tactical training for competitive league paths.</p>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Advanced batting mechanics</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Pitching development</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Position-specific coaching</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Match strategy and game intelligence</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Tournament preparation</span>
+          </div>
+          <div class="mlb-card-bullet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Leadership and teamwork development</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animated Premium cards for benefits -->
+      <h3 style="text-align: center; margin-top: 5rem; font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff; text-transform: uppercase;">
+        Development Pillars
+      </h3>
+      <div class="mlb-program-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 2rem;">
+        <div class="why-card glass-card reveal-element delay-1" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+          <div class="why-icon" style="font-size: 2.5rem;">🌎</div>
+          <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">International Exposure</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Pathways to global development tournaments and coaching clinics.</p>
+        </div>
+        <div class="why-card glass-card reveal-element delay-2" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+          <div class="why-icon" style="font-size: 2.5rem;">⚾</div>
+          <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">MLB Methodologies</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Advanced drills, analytical video feedback, and pitcher-specific logs.</p>
+        </div>
+        <div class="why-card glass-card reveal-element delay-3" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+          <div class="why-icon" style="font-size: 2.5rem;">🏆</div>
+          <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Talent Identification</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Direct access to scouts and national baseball trials network.</p>
+        </div>
+        <div class="why-card glass-card reveal-element delay-4" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+          <div class="why-icon" style="font-size: 2.5rem;">📈</div>
+          <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Athlete Development</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Physiological and athletic profiling tailored for modern players.</p>
+        </div>
+        <div class="why-card glass-card reveal-element delay-5" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+          <div class="why-icon" style="font-size: 2.5rem;">🤝</div>
+          <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Professional Mentorship</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">One-on-one reviews and strategy talks with active professional baseballers.</p>
+        </div>
+        <div class="why-card glass-card reveal-element delay-6" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+          <div class="why-icon" style="font-size: 2.5rem;">🌟</div>
+          <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Character & Leadership</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Building off-field discipline, respect, academic drive, and team values.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cinematic full-width section with stadium quotes -->
+  <section class="cinematic-quote-wrap">
+    <div class="container">
+      <h2 class="cinematic-quote-title">"From the cricket grounds of Bengaluru to international baseball opportunities, Renegades Sports Arena empowers young athletes to compete beyond boundaries."</h2>
+      <p class="cinematic-quote-author">"Champions are not born in comfort zones. They are built through discipline, opportunity, and the courage to dream globally."</p>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       WHY PARENTS CHOOSE RENEGADES
+       ========================================================================== -->
+  <section class="section section-alt" id="parents-choose">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">TRUST & INTEGRITY</span>
+        <h2 class="section-title">WHY PARENTS CHOOSE RENEGADES</h2>
+        <p class="section-desc">We build character, discipline, and high-performance athletic skills in a premium,
+          supportive environment.</p>
+      </div>
+      <div class="trust-grid" id="parentsChooseGrid">
+        <!-- Injected dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       RENEGADES PRO SHOP
+       ========================================================================== -->
+  <section class="section" id="shop">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">EQUIPMENT & MERCHANDISE</span>
+        <h2 class="section-title">RENEGADES PRO SHOP</h2>
+        <p class="section-desc">Premium cricket equipment, protective gear, and official academy merchandise. Order
+          online and pick up at the arena.</p>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="filter-controls reveal-element" id="shopFilterControls">
+        <!-- Injected Dynamically via JS -->
+      </div>
+
+      <!-- Products Grid -->
+      <div class="shop-grid reveal-element" id="shopGrid">
+        <!-- Injected Dynamically via JS -->
+      </div>
+
+      <!-- Exclusive Player Benefits -->
+      <div class="exclusive-benefits-banner reveal-element" style="margin-top: 6rem;">
+        <div class="benefits-banner-header">
+          <span class="benefits-badge">ACADEMY EXCLUSIVE</span>
+          <h2>EXCLUSIVE BENEFITS FOR RENEGADES PLAYERS</h2>
+          <p>All registered academy students receive up to 25% OFF on selected premium cricket gear packages.</p>
+        </div>
+
+        <div class="benefits-split">
+          <!-- Discounted Prices Grid -->
+          <div class="benefits-discounts-list">
+            <div class="discount-item">
+              <span class="item-name">🏏 Premium Willow Bat</span>
+              <div class="price-flow">
+                <span class="original-val">₹5,500</span> → <span class="discount-val">₹4,125</span>
+                <span class="save-badge">Save ₹1,375</span>
+              </div>
+            </div>
+            <div class="discount-item">
+              <span class="item-name">🥊 Elite Protective Pads</span>
+              <div class="price-flow">
+                <span class="original-val">₹3,200</span> → <span class="discount-val">₹2,400</span>
+                <span class="save-badge">Save ₹800</span>
+              </div>
+            </div>
+            <div class="discount-item">
+              <span class="item-name">🧤 Professional Batting Gloves</span>
+              <div class="price-flow">
+                <span class="original-val">₹2,800</span> → <span class="discount-val">₹2,100</span>
+                <span class="save-badge">Save ₹700</span>
+              </div>
+            </div>
+            <div class="discount-item">
+              <span class="item-name">🦵 Moonwalkr Thigh Pads</span>
+              <div class="price-flow">
+                <span class="original-val">₹1,200</span> → <span class="discount-val">₹900</span>
+                <span class="save-badge">Save ₹300</span>
+              </div>
+            </div>
+            <div class="discount-item">
+              <span class="item-name">🎒 SG Premium Backpack/Bag</span>
+              <div class="price-flow">
+                <span class="original-val">₹4,350</span> → <span class="discount-val">₹3,260</span>
+                <span class="save-badge">Save ₹1,090</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Full Kit Offer -->
+          <div class="full-kit-promo-card">
+            <div class="promo-badge">🔥 BEST VALUE PACKAGE</div>
+            <h3>RENEGADES PLAYER FULL KIT</h3>
+            <p>Get fully equipped for the season with our coach-recommended complete kit set (Bat + Pads + Gloves +
+              Thigh Guard + Bag).</p>
+
+            <div class="full-kit-pricing">
+              <div class="original-price-row">
+                Original Price: <span class="strike-price">₹17,050</span>
+              </div>
+              <div class="final-price-row">
+                Player Price: <span class="glowing-price">₹12,790</span>
+              </div>
+              <div class="savings-row">
+                Total Savings: <span class="savings-highlight">₹4,260</span>
+              </div>
+            </div>
+
+            <a href="https://wa.me/919731134665?text=Hello%20Renegades%20Sports%20Arena%2C%20I%20would%20like%20to%20order%20the%20Full%20Kit%20Package%20for%20%E2%82%B912790."
+              class="btn btn-primary btn-order-full-kit" target="_blank" rel="noopener">
+              ORDER FULL KIT NOW
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build Your Kit Customizer -->
+      <div class="kit-builder-card reveal-element" style="margin-top: 5rem;" id="kit-builder">
+        <div class="kit-builder-header">
+          <span class="kit-badge">✨ CUSTOM INTERACTIVE BUILDER</span>
+          <h3>BUILD YOUR CUSTOM CRICKET KIT</h3>
+          <p>Select your preferred products from each category below. We'll automatically calculate your discount,
+            savings, and final price.</p>
+        </div>
+
+        <div class="kit-builder-split">
+          <!-- Dropdowns -->
+          <div class="kit-builder-form">
+            <div class="kit-builder-group">
+              <label for="select-bat" class="kit-label">Select Willow Bat</label>
+              <select id="select-bat" class="kit-select">
+                <option value="bat-willow" data-orig="5500" data-disc="4125">Premium English Willow Bat (₹4,125)
+                </option>
+                <option value="none" data-orig="0" data-disc="0">No Bat (-)</option>
+              </select>
+            </div>
+            <div class="kit-builder-group">
+              <label for="select-pads" class="kit-label">Select Batting Pads</label>
+              <select id="select-pads" class="kit-select">
+                <option value="pads-mrf" data-orig="3200" data-disc="2400">MRF Pro Pads (₹2,400)</option>
+                <option value="pads-bas" data-orig="3200" data-disc="2400">BAS Vampire Pads (₹2,400)</option>
+                <option value="pads-sg" data-orig="3200" data-disc="2400">SG Test Pads (₹2,400)</option>
+                <option value="pads-ss-opener" data-orig="3200" data-disc="2400">SS Test Opener Pads (₹2,400)</option>
+                <option value="pads-ss-sunridges" data-orig="3200" data-disc="2400">SS Sunridges Pads (₹2,400)</option>
+                <option value="none" data-orig="0" data-disc="0">No Pads (-)</option>
+              </select>
+            </div>
+            <div class="kit-builder-group">
+              <label for="select-gloves" class="kit-label">Select Batting Gloves</label>
+              <select id="select-gloves" class="kit-select">
+                <option value="gloves-sg-klr" data-orig="2800" data-disc="2100">SG KLR-1 Gloves (₹2,100)</option>
+                <option value="gloves-mrf" data-orig="2800" data-disc="2100">MRF Pro Gloves (₹2,100)</option>
+                <option value="gloves-bas" data-orig="2800" data-disc="2100">BAS Bow Gloves (₹2,100)</option>
+                <option value="gloves-ss-dragon" data-orig="2800" data-disc="2100">SS Dragon Gloves (₹2,100)</option>
+                <option value="gloves-sg-white" data-orig="2800" data-disc="2100">SG Test White Gloves (₹2,100)</option>
+                <option value="gloves-gray-nicolls" data-orig="2800" data-disc="2100">Gray-Nicolls Gloves (₹2,100)
+                </option>
+                <option value="none" data-orig="0" data-disc="0">No Gloves (-)</option>
+              </select>
+            </div>
+            <div class="kit-builder-group">
+              <label for="select-protection" class="kit-label">Select Thigh Guard</label>
+              <select id="select-protection" class="kit-select">
+                <option value="thigh-moonwalkr" data-orig="1200" data-disc="900">Moonwalkr Thigh Guards (₹900)</option>
+                <option value="none" data-orig="0" data-disc="0">No Thigh Guard (-)</option>
+              </select>
+            </div>
+            <div class="kit-builder-group">
+              <label for="select-bag" class="kit-label">Select Kit Bag</label>
+              <select id="select-bag" class="kit-select">
+                <option value="bag-sg" data-orig="4350" data-disc="3260">SG Premium Backpack (₹3,260)</option>
+                <option value="bag-nb" data-orig="4350" data-disc="3260">New Balance Wheelie Bag (₹3,260)</option>
+                <option value="none" data-orig="0" data-disc="0">No Kit Bag (-)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Summary Box -->
+          <div class="kit-builder-summary">
+            <h4>KIT ESTIMATE SUMMARY</h4>
+            <div class="summary-price-box">
+              <div class="summary-row">
+                <span>Original Subtotal:</span>
+                <span id="kit-original-total">₹17,050</span>
+              </div>
+              <div class="summary-row text-orange">
+                <span>Renegades Discount (25%):</span>
+                <span id="kit-discount">₹4,260</span>
+              </div>
+              <div class="summary-row divider"></div>
+              <div class="summary-row final-total-row">
+                <span>Final Price:</span>
+                <span id="kit-final-total">₹12,790</span>
+              </div>
+            </div>
+
+            <div class="summary-actions">
+              <a href="#" class="btn btn-primary" id="btn-buy-custom-kit" target="_blank" rel="noopener">
+                ENQUIRE CUSTOM KIT
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       MEET THE COACHES SECTION
+       ========================================================================== -->
+  <section class="section section-alt" id="coaches">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">ELITE INSTRUCTORS</span>
+        <h2 class="section-title">Meet The Coaches</h2>
+        <p class="section-desc">Learn from experienced division cricketers and professional net bowlers dedicated to
+          accelerating your game development.</p>
+      </div>
+
+      <div class="coaches-grid" id="coachesGrid">
+        <!-- Injected Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       WORLD-CLASS FACILITIES SECTION
+       ========================================================================== -->
+  <section class="section" id="facilities">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">HIGH PERFORMANCE ARENA</span>
+        <h2 class="section-title">World-Class Training Facilities</h2>
+        <p class="section-desc">Access premier turf box nets, physical strength zones, side-arm practice, and one-on-one
+          specialized sessions. (Note: A new two-turf wicket pitch ground is currently being developed).</p>
+      </div>
+
+      <div class="facilities-grid" id="facilitiesGrid">
+        <!-- Injected Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       GALLERY SECTION
+       ========================================================================== -->
+  <section class="section section-alt" id="gallery">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">INSIDE RENEGADES</span>
+        <h2 class="section-title">GALLERY</h2>
+        <p class="section-desc">A snapshot of tournament play, daily practice routines, fitness diagnostics, and
+          championship awards.</p>
+      </div>
+
+      <div class="filter-controls reveal-element" id="galleryFilterControls">
+        <!-- Rendered Dynamically via JS -->
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- Injected Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       CUSTOM LIGHTBOX
+       ========================================================================== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog">
+    <div class="lightbox-content-wrapper">
+      <div class="lightbox-close" id="lightboxClose" aria-label="Close Lightbox">&times;</div>
+      <div class="lightbox-prev" id="lightboxPrev" aria-label="Previous Media">&#10094;</div>
+      <div class="lightbox-media-container" id="lightboxMediaContainer"
+        style="width: 100%; max-height: 75vh; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; margin-bottom: 1rem; position: relative;">
+        <!-- Injected Dynamically via JS -->
+      </div>
+      <div class="lightbox-next" id="lightboxNext" aria-label="Next Media">&#10095;</div>
+      <div class="lightbox-title" id="lightboxTitle"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       🏆 TOURNAMENT MANAGEMENT MODULE
+       ========================================================================== -->
+  <section class="section section-alt stadium-lights-section" id="tournaments" style="border-top: 1px solid var(--glass-border);">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">ELITE COMPETITIONS</span>
+        <h2 class="section-title">🏆 Renegades Championship Series</h2>
+        <p class="section-desc">Hosting elite cricket and baseball competitions that inspire young athletes to perform at their highest level.</p>
+      </div>
+
+      <!-- Video / Cinematic Background Visual Placeholder block -->
+      <div class="future-arena-hero-card reveal-element" style="margin-bottom: 3rem; background-image: linear-gradient(180deg, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.7) 100%), url('https://images.unsplash.com/photo-1540747737956-37872404471d?auto=format&fit=crop&w=1200&q=80');">
+        <span class="arena-badge">LIVE CHAMPIONSHIPS</span>
+        <h3 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">REN-CHAMP SERIES 2026</h3>
+        <p style="color: var(--text-secondary); max-width: 600px; margin-bottom: 1.5rem;">Experience stadium lights, professional turf grounds, digital score tracking, and KSCA & MLB development scouts live on-ground.</p>
+        <div class="arena-features-box">
+          <ul class="arena-features-horizontal">
+            <li>🏏 Cricket Tournaments</li>
+            <li>⚾ Baseball Tournaments</li>
+            <li>👦 U-11 Championship</li>
+            <li>👦 U-13 Championship</li>
+            <li>👦 U-15 Championship</li>
+            <li>👦 U-17 Championship</li>
+            <li>🏆 Open Invitational Cup</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Real-time Tournament Dashboard -->
+      <div class="tournament-dashboard reveal-element">
+        <!-- Sub-tabs inside Dashboard -->
+        <div class="dashboard-tabs" id="tournamentDashboardTabs">
+          <button class="dash-tab-btn active" data-tab="list">🏆 Tournaments</button>
+          <button class="dash-tab-btn" data-tab="live">⚡ Live Scores</button>
+          <button class="dash-tab-btn" data-tab="brackets">📅 Fixtures & Brackets</button>
+          <button class="dash-tab-btn" data-tab="standings">📊 Points Standings</button>
+        </div>
+
+        <!-- 1. Active Tournaments List Tab -->
+        <div class="tournament-tab-content active" id="tabContent-list">
+          <div class="tournaments-list-grid" id="homepageTournamentsGrid">
+            <!-- Skeleton cards loading by default, replaced by JS -->
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+
+        <!-- 2. Live Scores Ticker/Scoreboards Tab -->
+        <div class="tournament-tab-content" id="tabContent-live" style="display: none;">
+          <div class="live-scores-wrap" id="homepageLiveScoresGrid">
+            <!-- Populated dynamically via real-time Supabase integration -->
+            <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 3rem;">
+              No matches are currently live. Check fixtures for match schedules.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Fixtures & Knockout Brackets Tab -->
+        <div class="tournament-tab-content" id="tabContent-brackets" style="display: none;">
+          <div class="fixtures-panel-container">
+            <div class="form-group" style="max-width: 300px; margin-bottom: 2rem;">
+              <label for="bracketTournamentSelect" class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">Select Tournament:</label>
+              <select id="bracketTournamentSelect" class="form-control" style="background: var(--bg-input); border: 1px solid var(--glass-border); color: #fff;">
+                <!-- Filled by JS -->
+              </select>
+            </div>
+            
+            <div class="bracket-wrapper" id="tournamentBracketContainer">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Points Standings Tables Tab -->
+        <div class="tournament-tab-content" id="tabContent-standings" style="display: none;">
+          <div class="fixtures-panel-container">
+            <div class="form-group" style="max-width: 300px; margin-bottom: 2rem;">
+              <label for="standingsTournamentSelect" class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">Select Tournament:</label>
+              <select id="standingsTournamentSelect" class="form-control" style="background: var(--bg-input); border: 1px solid var(--glass-border); color: #fff;">
+                <!-- Filled by JS -->
+              </select>
+            </div>
+
+            <div class="table-responsive" style="margin-top: 1.5rem;">
+              <table class="bookings-table" style="background: rgba(0,0,0,0.2); width:100%;">
+                <thead>
+                  <tr>
+                    <th>Pos</th>
+                    <th>Team</th>
+                    <th>P</th>
+                    <th>W</th>
+                    <th>L</th>
+                    <th>Pts</th>
+                    <th>Form</th>
+                  </tr>
+                </thead>
+                <tbody id="tournamentStandingsTableBody">
+                  <!-- Filled by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Dynamic Tournament Registration Step Modal -->
+  <div class="modal-overlay" id="registrationModal">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" id="closeRegistrationModal">&times;</button>
+      
+      <!-- Step indicators -->
+      <div class="steps-indicator-bar">
+        <div class="step-dot active" id="dot-step1"></div>
+        <div class="step-dot" id="dot-step2"></div>
+        <div class="step-dot" id="dot-step3"></div>
+      </div>
+
+      <!-- Step 1: Form Inputs -->
+      <div class="registration-step active" id="regStep-1">
+        <h3 class="registration-step-title">Tournament Registration</h3>
+        <form id="tournamentRegistrationForm" novalidate>
+          <input type="hidden" id="regTournamentId">
+          <div class="form-group">
+            <label for="regType" class="form-label">Registration Type *</label>
+            <select id="regType" class="form-control" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+              <option value="team">Register as a Team</option>
+              <option value="individual">Register as an Individual</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="regName" class="form-label" id="regNameLabel">Team Name *</label>
+            <input type="text" id="regName" class="form-control" placeholder="Enter name" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+          </div>
+          <div class="form-group-row">
+            <div class="form-group">
+              <label for="regEmail" class="form-label">Contact Email *</label>
+              <input type="email" id="regEmail" class="form-control" placeholder="name@domain.com" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+            </div>
+            <div class="form-group">
+              <label for="regPhone" class="form-label">Contact Phone (WhatsApp) *</label>
+              <input type="tel" id="regPhone" class="form-control" placeholder="10-digit number" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regAgeGroup" class="form-label">Age Group Category *</label>
+            <select id="regAgeGroup" class="form-control" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+              <option value="U-11">Under-11 Championship</option>
+              <option value="U-13">Under-13 Championship</option>
+              <option value="U-15">Under-15 Championship</option>
+              <option value="U-17">Under-17 Championship</option>
+              <option value="Open">Open Invitational Cup</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1.5rem;">PROCEED TO PAYMENT</button>
+        </form>
+      </div>
+
+      <!-- Step 2: Simulated UPI Payment Scan -->
+      <div class="registration-step" id="regStep-2">
+        <h3 class="registration-step-title" style="text-align: center;">Scan UPI QR Code</h3>
+        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem;">Scan the QR code below from any UPI app (GPay, PhonePe, Paytm) to complete registration fees of <strong class="text-orange">₹1,500</strong>.</p>
+        
+        <div class="upi-sim-panel">
+          <div class="upi-qrcode-image" id="paymentQrCodeContainer">
+            <!-- Injected by API -->
+          </div>
+          <p style="font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: #fff;">BHIM UPI PAYMENTS</p>
+          <p style="font-size: 0.75rem; color: var(--text-grey); margin-top: 0.25rem;">Merchant: Renegades Sports Arena</p>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <button type="button" class="btn btn-outline-orange" id="btnBackToForm" style="flex: 1;">BACK</button>
+          <button type="button" class="btn btn-primary" id="btnSimulatePayment" style="flex: 2;">CONFIRM MOCK PAYMENT</button>
+        </div>
+      </div>
+
+      <!-- Step 3: QR Pass Generation -->
+      <div class="registration-step" id="regStep-3">
+        <h3 class="registration-step-title" style="text-align: center; color: var(--color-grass);">✓ REGISTRATION CONFIRMED!</h3>
+        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Your registration passcode has been generated. Show this pass on-ground for verification.</p>
+        
+        <!-- Ticket Box -->
+        <div class="ticket-pass" id="ticketPassBox">
+          <div class="ticket-header">
+            <img src="assets/images/logo.png" alt="Emblem" style="height: 35px;">
+            <div style="line-height: 1.2;">
+              <span style="font-family: var(--font-display); font-weight: 900; color: #fff; font-size: 0.95rem; text-transform: uppercase;">RENEGADES CHAMPIONSHIP</span>
+              <span style="display: block; font-size: 0.65rem; color: var(--text-grey); letter-spacing: 1px;">ENTRY VERIFICATION PASS</span>
+            </div>
+          </div>
+          <div class="ticket-body-grid">
+            <div class="ticket-details">
+              <div class="ticket-info-group">
+                Tournament
+                <strong id="ticketTournamentName">Renegades Cricket Cup</strong>
+              </div>
+              <div class="ticket-info-group">
+                Registrant (Team/Indiv)
+                <strong id="ticketRegistrantName">Renegades Stars</strong>
+              </div>
+              <div class="ticket-info-group">
+                Category
+                <strong id="ticketCategory">U-11 Championship</strong>
+              </div>
+            </div>
+            <div class="ticket-qr-container">
+              <div id="ticketQrImageContainer"></div>
+              <span class="ticket-pass-id" id="ticketPassCodeText">RSA-XXXXX</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
+          <button type="button" class="btn btn-primary" id="btnPrintTicketPass" style="width: 100%;">PRINT / DOWNLOAD PASS</button>
+          <button type="button" class="btn btn-outline-orange" id="btnFinishRegistration" style="width: 100%;">DONE</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       GOOGLE REVIEWS SECTION
+       ========================================================================== -->
+  <section class="section" id="reviews">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">PLAYER & PARENT FEEDBACK</span>
+        <h2 class="section-title">What Our Players & Parents Say</h2>
+        <p class="section-desc">Hear what parents and players say about our coaching quality, path networks, and premium
+          arena layout.</p>
+      </div>
+
+      <div class="reviews-carousel-container reveal-element">
+        <div class="reviews-track" id="reviewsTrack">
+          <!-- Injected Dynamically via JS -->
+        </div>
+
+        <!-- Indicator dots -->
+        <div class="carousel-indicators" id="reviewsIndicators">
+          <!-- Injected Dynamically via JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       ACHIEVEMENTS / STATS COUNTERS SECTION
+       ========================================================================== -->
+  <section class="section section-alt" id="stats">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">THE RECORD BOOKS</span>
+        <h2 class="section-title">Numbers That Matter</h2>
+        <p class="section-desc">Our statistics show the continuous impact, hours logged, and scale of players training
+          inside our arena network.</p>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <!-- Injected Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       CONTACT FORM & GOOGLE MAPS SPLIT SECTION
+       ========================================================================== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="section-subtitle">LAUNCH YOUR JOURNEY</span>
+        <h2 class="section-title">Connect & Join Now</h2>
+        <p class="section-desc">Book a trial practice run, discuss registration slots, or visit the Bengaluru facility.
+          Fill out details below and select your booking goal.</p>
+      </div>
+
+      <div class="contact-split reveal-element">
+        <!-- Left Side Map -->
+        <div class="map-container" id="mapContainer">
+          <!-- Map Iframe Injected Dynamically via JS -->
+        </div>
+
+        <!-- Right Side Form -->
+        <div class="contact-form-container">
+          <div class="booking-type-toggle">
+            <button type="button" class="toggle-btn active" id="toggleBookNewBtn">Book Trial</button>
+            <button type="button" class="toggle-btn" id="toggleManageBtn">Manage Booking</button>
+          </div>
+
+          <!-- New Booking Form -->
+          <form id="academyContactForm" novalidate>
+            <div class="form-group">
+              <label for="formName" class="form-label">Full Name *</label>
+              <input type="text" id="formName" class="form-control" placeholder="Enter student/parent name" required>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="formAge" class="form-label">Age of Student *</label>
+                <input type="number" id="formAge" class="form-control" placeholder="Age" min="5" max="45" required>
+              </div>
+              <div class="form-group">
+                <label for="formPhone" class="form-label">WhatsApp/Phone *</label>
+                <input type="tel" id="formPhone" class="form-control" placeholder="10-digit number" required>
+              </div>
+            </div>
+
+            <div class="form-group" id="parentNameGroup" style="display: none;">
+              <label for="formParentName" class="form-label">Parent Name *</label>
+              <input type="text" id="formParentName" class="form-control" placeholder="Enter parent/guardian name">
+            </div>
+
+            <div class="form-group">
+              <label for="formEmail" class="form-label">Email Address *</label>
+              <input type="email" id="formEmail" class="form-control" placeholder="name@domain.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="formSkillLevel" class="form-label">Skill Level *</label>
+              <select id="formSkillLevel" class="form-control" required>
+                <option value="" disabled selected>Select experience level</option>
+                <option value="Beginner">Beginner (Grassroots / New to Cricket)</option>
+                <option value="Intermediate">Intermediate (School / Academy Level)</option>
+                <option value="Advanced">Advanced (Division / Professional level)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="formDate" class="form-label">Select Date *</label>
+              <input type="date" id="formDate" class="form-control" required>
+            </div>
+
+            <div class="form-group" id="slotsSelectionGroup" style="display: none;">
+              <label class="form-label">Select Time Slot *</label>
+
+              <div class="slots-group-container">
+                <div class="slots-group-header">Morning Slots</div>
+                <div class="slots-grid" id="morningSlotsGrid">
+                  <button type="button" class="slot-btn" data-slot="6 AM">6:00 AM <span class="slot-count"
+                      id="count-6-AM">5 left</span></button>
+                  <button type="button" class="slot-btn" data-slot="7 AM">7:00 AM <span class="slot-count"
+                      id="count-7-AM">5 left</span></button>
+                  <button type="button" class="slot-btn" data-slot="8 AM">8:00 AM <span class="slot-count"
+                      id="count-8-AM">5 left</span></button>
+                </div>
+              </div>
+
+              <div class="slots-group-container" style="margin-top: 1.5rem;">
+                <div class="slots-group-header">Evening Slots</div>
+                <div class="slots-grid" id="eveningSlotsGrid">
+                  <button type="button" class="slot-btn" data-slot="4 PM">4:00 PM <span class="slot-count"
+                      id="count-4-PM">5 left</span></button>
+                  <button type="button" class="slot-btn" data-slot="5 PM">5:00 PM <span class="slot-count"
+                      id="count-5-PM">5 left</span></button>
+                  <button type="button" class="slot-btn" data-slot="6 PM">6:00 PM <span class="slot-count"
+                      id="count-6-PM">5 left</span></button>
+                  <button type="button" class="slot-btn" data-slot="7 PM">7:00 PM <span class="slot-count"
+                      id="count-7-PM">5 left</span></button>
+                </div>
+              </div>
+
+              <input type="hidden" id="selectedSlot" required>
+            </div>
+
+            <div class="form-group">
+              <label for="formMessage" class="form-label">Message / Details</label>
+              <textarea id="formMessage" class="form-control"
+                placeholder="Share current skill experience level or coaching targets..."></textarea>
+            </div>
+
+            <div class="form-success-message" id="formSuccessMessage" role="alert"></div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-secondary form-submit-btn" id="formTrialBtn"
+                style="width: 100%; grid-column: 1 / -1;">BOOK TRIAL SESSION</button>
+              <button type="submit" class="btn btn-primary form-submit-btn" id="formJoinBtn" style="display: none;">JOIN
+                THE ACADEMY</button>
+            </div>
+          </form>
+
+          <!-- Manage Bookings Section -->
+          <div id="manageBookingPanel" style="display: none;">
+            <div class="form-group">
+              <label for="manageEmailPhone" class="form-label">Email or Phone Number *</label>
+              <input type="text" id="manageEmailPhone" class="form-control" placeholder="Enter booking email or phone"
+                required>
+            </div>
+            <button type="button" class="btn btn-primary form-submit-btn" id="btnFindBooking" style="width: 100%;">FIND
+              MY BOOKING</button>
+
+            <div class="form-success-message" id="manageSuccessMessage" role="alert"></div>
+
+            <div id="manageBookingsResult" class="manage-results-list" style="margin-top: 2rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FLOATING SOCIAL MEDIA DOCK
+       ========================================================================== -->
+  <div class="sticky-social-bar" id="stickySocialBar">
+    <a href="https://www.instagram.com/p/DYlwjXOxmg2/?igsh=MThxNWJkbWRqNDRodA==" class="sticky-social-item"
+      target="_blank" rel="noopener" aria-label="Academy Instagram" title="Academy Instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+    </a>
+    <a href="https://www.instagram.com/p/C7_hUfoSK6Z/?igsh=bGpzeDkweHNxaGti" class="sticky-social-item" target="_blank"
+      rel="noopener" aria-label="Coach Instagram" title="Coach Instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+    </a>
+    <a href="mailto:renegadessportsarena@gmail.com" class="sticky-social-item" aria-label="Email Renegades"
+      title="Email Renegades">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+    </a>
+  </div>
+
+  <!-- ==========================================================================
+       WHATSAPP STICKY WIDGET
+       ========================================================================== -->
+  <div class="whatsapp-sticky" id="whatsappWidget">
+    <div class="whatsapp-tooltip">Talk To Our Team</div>
+    <a href="#" class="whatsapp-btn" id="whatsappLink" target="_blank" rel="noopener"
+      aria-label="Chat with Renegades on WhatsApp">
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.993L2 22l5.233-1.371a9.936 9.936 0 0 0 4.777 1.217h.005c5.505 0 9.989-4.478 9.99-9.984A9.972 9.972 0 0 0 12.012 2zm5.842 14.186c-.255.72-1.48 1.408-2.033 1.464-.5.052-1.154.077-1.85-.152a12.879 12.879 0 0 1-5.112-3.176 11.233 11.233 0 0 1-2.584-4.526c-.378-1.264.44-2.228 1.156-2.228.256 0 .428.005.57.01.18.007.316.012.457.348.163.39.56 1.36.608 1.46.049.096.082.21.016.342-.065.13-.1.218-.196.33-.098.114-.207.256-.294.343-.098.098-.201.205-.087.4.114.195.505.83 1.08 1.346.744.665 1.37.87 1.564.968.196.1.31.086.425-.043.114-.13.5-.58.636-.78.136-.2.272-.163.457-.096.184.065 1.173.553 1.375.656.202.103.337.152.386.234.05.08.05.474-.204 1.196z" />
+      </svg>
+    </a>
+  </div>
+
+  <!-- ==========================================================================
+       FINAL BRAND SECTION
+       ========================================================================== -->
+  <section class="final-brand-section reveal-element">
+    <div class="container" style="position: relative; z-index: 2;">
+      <h2 class="brand-showcase-title">RENEGADES <span>SPORTS ARENA</span></h2>
+      <p style="color: var(--text-secondary); max-width: 750px; margin: 0 auto; font-size: 1.15rem; line-height: 1.6;">
+        Developing Champions in Cricket and Baseball Through International Standards, Character, Discipline, and Global Opportunities.
+      </p>
+
+      <!-- Animated Taglines -->
+      <div class="brand-tagline-row">
+        <div class="brand-tagline-item" style="color: var(--accent-primary);">
+          <span>🏏</span> Train Locally.
+        </div>
+        <div class="brand-tagline-item" style="color: #58A6FF;">
+          <span>⚾</span> Compete Globally.
+        </div>
+        <div class="brand-tagline-item" style="color: var(--color-gold);">
+          <span>🏆</span> Lead Fearlessly.
+        </div>
+      </div>
+
+      <!-- Animated Icons Row -->
+      <div class="brand-icon-feature-row">
+        <div class="brand-icon-feature-item reveal-element delay-1">
+          <div class="brand-icon-feature-circle">🏏</div>
+          <span class="brand-icon-feature-text">Cricket Excellence</span>
+        </div>
+        <div class="brand-icon-feature-item reveal-element delay-2">
+          <div class="brand-icon-feature-circle">⚾</div>
+          <span class="brand-icon-feature-text">Baseball Development</span>
+        </div>
+        <div class="brand-icon-feature-item reveal-element delay-3">
+          <div class="brand-icon-feature-circle">🏆</div>
+          <span class="brand-icon-feature-text">Elite Tournament Experiences</span>
+        </div>
+        <div class="brand-icon-feature-item reveal-element delay-4">
+          <div class="brand-icon-feature-circle">🌍</div>
+          <span class="brand-icon-feature-text">International Opportunities</span>
+        </div>
+        <div class="brand-icon-feature-item reveal-element delay-5">
+          <div class="brand-icon-feature-circle">📈</div>
+          <span class="brand-icon-feature-text">Holistic Athlete Development</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       LUXURY FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container footer-top">
+      <!-- Col 1: Brand Info -->
+      <div class="footer-col footer-brand">
+        <a href="#home" class="logo-wrapper scroll-link" style="margin-bottom: 1.5rem;">
+          <img src="assets/images/logo.png" alt="Renegades Emblem" class="logo-img" style="height: 45px;">
+          <span class="logo-text" style="font-size: 1.1rem;">RENEGADES <span
+              style="font-size:0.9rem; display:block; letter-spacing:0.1em; color:var(--text-muted);">SPORTS
+              ARENA</span></span>
+        </a>
+        <p>A premium cricket training academy and sports facility in Bengaluru offering KSCA division alignments,
+          digital analytics, and elite level match exposures.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-link social-instagram" aria-label="Instagram" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+          <a href="#" class="footer-social-link social-facebook" aria-label="Facebook" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
+          </a>
+          <a href="#" class="footer-social-link social-youtube" aria-label="YouTube" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+              </path>
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Col 2: Navigation Links -->
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links-list">
+          <li><a href="#home" class="scroll-link">Home</a></li>
+          <li><a href="#why-choose-us" class="scroll-link">Why Choose Us</a></li>
+          <li><a href="#gallery" class="scroll-link">Academy Gallery</a></li>
+          <li><a href="#reviews" class="scroll-link">Reviews</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Programs Links -->
+      <div class="footer-col">
+        <h4>Our Programs</h4>
+        <ul class="footer-links-list">
+          <li><a href="#programs" class="scroll-link">Junior Academy</a></li>
+          <li><a href="#programs" class="scroll-link">Elite Performance</a></li>
+          <li><a href="#programs" class="scroll-link">Weekend Coaching</a></li>
+          <li><a href="#programs" class="scroll-link">Batting Specialization</a></li>
+          <li><a href="#programs" class="scroll-link">Fast Bowling Academy</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Reach Out Details -->
+      <div class="footer-col">
+        <h4>Contact Arena</h4>
+        <div class="footer-contact-item">
+          <!-- Pin Icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="contact-address">Loading Address...</span>
+        </div>
+        <div class="footer-contact-item">
+          <!-- Phone Icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+            </path>
+          </svg>
+          <a href="#" class="contact-phone">Loading Phone...</a>
+        </div>
+        <div class="footer-contact-item">
+          <!-- Mail Icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <a href="#" class="contact-email">Loading Email...</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p class="copyright">&copy; 2026 Renegades Sports Arena. All Rights Reserved. Designed for champions.</p>
+      <a href="admin.html" class="admin-portal-link" target="_blank" rel="noopener">Admin Control Dashboard</a>
+    </div>
+  </footer>
+
+  <!-- Dynamic Javascript Config and Core script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/notifications_services.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="assets/js/mlb_tournaments.js"></script>
+
+</body>
+
+</html>

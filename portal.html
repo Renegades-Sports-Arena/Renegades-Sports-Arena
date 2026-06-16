@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Renegades Sports Arena multi-role user portal. Access your player profiles, parent dashboards, and coaching panels.">
+  <title>RSA Portal | Renegades Sports Arena</title>
+
+  <!-- Style Sheets -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/portal.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+</head>
+
+<body class="has-loader">
+
+  <!-- Cinematic Loader -->
+  <div id="loader" aria-hidden="true">
+    <img src="assets/images/logo.png" alt="Renegades Sports Arena Logo" class="loader-logo">
+    <div class="loader-bar">
+      <div class="loader-progress"></div>
+    </div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="header portal-header">
+    <div class="container header-container">
+      <a href="index.html" class="logo-wrapper">
+        <img src="assets/images/logo.png" alt="Renegades Emblem" class="logo-img">
+        <span class="logo-text">RENEGADES <span>PORTAL</span></span>
+      </a>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-outline-orange">← Back to Site</a>
+        <button id="logoutBtn" class="btn btn-primary" style="display: none;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification System -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Main Container -->
+  <main class="portal-main">
+    <div class="container">
+
+      <!-- ==========================================================================
+           AUTH SECTION
+           ========================================================================== -->
+      <section id="authSection" class="auth-section">
+        <div class="auth-card glass-card">
+          <div class="auth-tabs">
+            <button class="auth-tab-btn active" onclick="switchAuthTab('signin')">Sign In</button>
+            <button class="auth-tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+          </div>
+
+          <!-- Sign In Form -->
+          <div id="signInFormContainer" class="auth-form-container active">
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle">Enter your credentials to access your portal dashboard.</p>
+            <form id="signInForm">
+              <div class="form-group">
+                <label for="loginEmail" class="form-label">Email Address *</label>
+                <input type="email" id="loginEmail" class="form-control" required placeholder="name@domain.com">
+              </div>
+              <div class="form-group">
+                <label for="loginPassword" class="form-label">Password *</label>
+                <input type="password" id="loginPassword" class="form-control" required placeholder="••••••••">
+              </div>
+              <div class="form-actions-row">
+                <a href="#" onclick="switchAuthTab('forgot')" class="forgot-link">Forgot Password?</a>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Sign In</button>
+            </form>
+            <div class="demo-logins-box">
+              <p>Demo accounts (Self-Healing Mode):</p>
+              <div class="demo-buttons">
+                <button type="button" class="btn-demo-acc" onclick="fillDemo('player@rsa.com')">Player Demo</button>
+                <button type="button" class="btn-demo-acc" onclick="fillDemo('parent@rsa.com')">Parent Demo</button>
+                <button type="button" class="btn-demo-acc" onclick="fillDemo('coach@rsa.com')">Coach Demo</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sign Up Form -->
+          <div id="signUpFormContainer" class="auth-form-container">
+            <h2 class="auth-title">Join the Arena</h2>
+            <p class="auth-subtitle">Create a portal account to start tracking performance.</p>
+            <form id="signUpForm">
+              <div class="form-group">
+                <label for="registerName" class="form-label">Full Name *</label>
+                <input type="text" id="registerName" class="form-control" required placeholder="Virat Kohli">
+              </div>
+              <div class="form-group">
+                <label for="registerEmail" class="form-label">Email Address *</label>
+                <input type="email" id="registerEmail" class="form-control" required placeholder="name@domain.com">
+              </div>
+              <div class="form-group">
+                <label for="registerPassword" class="form-label">Password *</label>
+                <input type="password" id="registerPassword" class="form-control" required placeholder="Min 6 characters">
+              </div>
+              <div class="form-group">
+                <label for="registerRole" class="form-label">Choose Role *</label>
+                <select id="registerRole" class="form-control" required>
+                  <option value="player">Player</option>
+                  <option value="parent">Parent</option>
+                  <option value="coach">Coach</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Create Account</button>
+            </form>
+          </div>
+
+          <!-- Forgot Password Form -->
+          <div id="forgotFormContainer" class="auth-form-container">
+            <h2 class="auth-title">Reset Password</h2>
+            <p class="auth-subtitle">We will send you instructions to change your password.</p>
+            <form id="forgotForm">
+              <div class="form-group">
+                <label for="forgotEmail" class="form-label">Email Address *</label>
+                <input type="email" id="forgotEmail" class="form-control" required placeholder="name@domain.com">
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Send Recovery Link</button>
+              <button type="button" onclick="switchAuthTab('signin')" class="btn btn-secondary w-100 mt-2">Back to Sign In</button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           PLAYER PORTAL
+           ========================================================================== -->
+      <section id="playerPortal" class="portal-section" style="display: none;">
+        <div class="portal-layout">
+          <!-- Sidebar -->
+          <aside class="portal-sidebar">
+            <div class="user-card-mini">
+              <img id="playerAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="user-avatar">
+              <div class="user-info">
+                <h4 id="playerName">Player Profile</h4>
+                <span class="user-role badge-player">Player</span>
+              </div>
+            </div>
+            <nav class="portal-menu">
+              <button class="portal-menu-item active" onclick="switchTab('player', 'overview')">📊 Overview</button>
+              <button class="portal-menu-item" onclick="switchTab('player', 'performance')">📈 Performance Reports</button>
+              <button class="portal-menu-item" onclick="switchTab('player', 'attendance')">📅 Attendance</button>
+              <button class="portal-menu-item" onclick="switchTab('player', 'certificates')">🏆 Certificates</button>
+              <button class="portal-menu-item" onclick="switchTab('player', 'payments')">💳 Invoices & Fees</button>
+              <button class="portal-menu-item" style="display: flex; align-items: center; width: 100%; text-align: left;" onclick="switchTab('player', 'notifications')"><span>🔔 Alerts & Notifications</span> <span class="badge-unread-count" id="playerUnreadCount" style="display:none; background:var(--accent-primary); color:white; border-radius:10px; padding: 2px 6px; font-size:0.7rem; margin-left: auto; line-height: 1;">0</span></button>
+              <button class="portal-menu-item" onclick="switchTab('player', 'profile')">👤 My Profile</button>
+            </nav>
+          </aside>
+
+          <!-- Main View Area -->
+          <div class="portal-content">
+            <!-- Player Overview Tab -->
+            <div id="player-tab-overview" class="tab-pane active">
+              <div class="dashboard-banner">
+                <h2>Welcome Back, <span class="player-name-placeholder">Renegade</span>!</h2>
+                <p>Keep training hard. Indian baseball and cricket stars are built here.</p>
+              </div>
+
+              <!-- Stats Cards -->
+              <div class="stats-grid">
+                <div class="stat-card glass-card">
+                  <div class="stat-icon">📅</div>
+                  <div class="stat-details">
+                    <h3>Attendance</h3>
+                    <div class="stat-value" id="playerAttendanceRate">0%</div>
+                    <p class="stat-sub">Overall Presence Rate</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card">
+                  <div class="stat-icon">📈</div>
+                  <div class="stat-details">
+                    <h3>Skill Index</h3>
+                    <div class="stat-value" id="playerSkillIndex">0.0 / 10</div>
+                    <p class="stat-sub">Bat, Bowl, Field, Fit average</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card">
+                  <div class="stat-icon">💳</div>
+                  <div class="stat-details">
+                    <h3>Fees Status</h3>
+                    <div class="stat-value" id="playerFeesStatus">N/A</div>
+                    <p class="stat-sub" id="playerFeesSubtext">No pending invoices</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Announcement Row -->
+              <div class="glass-card mt-4 p-4">
+                <h3 class="section-title-mini">📢 Latest Announcement</h3>
+                <div class="announcement-card-content mt-2" id="playerAnnouncement">
+                  <p class="text-muted">No new announcements at this time.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Player Performance Tab -->
+            <div id="player-tab-performance" class="tab-pane">
+              <h2 class="tab-title">Performance Analytics Dashboard</h2>
+              <p class="tab-desc">Monitor Cricket and Baseball technical scores, growth metrics, and goal progressions.</p>
+
+              <!-- Sport Analytics Toggle -->
+              <div class="sport-toggle-box mb-4">
+                <button class="btn btn-outline-cyan active" id="playerCricketBtn" onclick="togglePlayerSport('cricket')">🏏 Cricket Analytics</button>
+                <button class="btn btn-outline-cyan" id="playerBaseballBtn" onclick="togglePlayerSport('baseball')">⚾ Baseball Analytics</button>
+              </div>
+
+              <!-- Sport Specific Stats Grid -->
+              <div class="stats-grid mb-4" id="sportStatsGrid">
+                <!-- Cricket Stats (Default) -->
+                <div class="stat-card glass-card cricket-stat-item">
+                  <div class="stat-icon">🏏</div>
+                  <div class="stat-details">
+                    <h3>Batting Average</h3>
+                    <div class="stat-value" id="statBatAvg">0.0</div>
+                    <p class="stat-sub" id="statBatRuns">Runs: 0 | Strike Rate: 0</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card cricket-stat-item">
+                  <div class="stat-icon">🔴</div>
+                  <div class="stat-details">
+                    <h3>Wickets Taken</h3>
+                    <div class="stat-value" id="statBowlWkts">0</div>
+                    <p class="stat-sub" id="statBowlEcon">Econ: 0.0 | Avg: 0.0</p>
+                  </div>
+                </div>
+                
+                <!-- Baseball Stats (Initially Hidden) -->
+                <div class="stat-card glass-card baseball-stat-item" style="display:none;">
+                  <div class="stat-icon">⚾</div>
+                  <div class="stat-details">
+                    <h3>Batting Average</h3>
+                    <div class="stat-value" id="statBaseBatAvg">.000</div>
+                    <p class="stat-sub" id="statBaseHits">Hits: 0 | Runs: 0</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card baseball-stat-item" style="display:none;">
+                  <div class="stat-icon">🔥</div>
+                  <div class="stat-details">
+                    <h3>Pitching ERA</h3>
+                    <div class="stat-value" id="statBaseEra">0.00</div>
+                    <p class="stat-sub" id="statBaseKs">Innings: 0 | SO: 0</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Charts Segment Grid -->
+              <div class="performance-split mb-4">
+                <div class="performance-chart-card glass-card">
+                  <h3>Technical Progress (Skills Radar)</h3>
+                  <div class="chart-container-canvas">
+                    <canvas id="playerSkillsChart" width="300" height="300"></canvas>
+                  </div>
+                </div>
+                <div class="performance-chart-card glass-card">
+                  <h3>Fitness Progress Timeline</h3>
+                  <div class="chart-container-canvas">
+                    <canvas id="playerFitnessChart" width="300" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="performance-split mb-4">
+                <div class="performance-chart-card glass-card">
+                  <h3>Attendance Trends (Monthly)</h3>
+                  <div class="chart-container-canvas">
+                    <canvas id="playerAttendanceChart" width="300" height="300"></canvas>
+                  </div>
+                </div>
+                <div class="performance-details-card glass-card">
+                  <h3>Skill Tracker & Breakdown</h3>
+                  <div class="skills-breakdown" id="playerSkillsBreakdown">
+                    <!-- Loaded dynamically -->
+                  </div>
+                  <div class="coach-critique-box mt-4">
+                    <h4>Critique & Feedback Notes</h4>
+                    <p id="playerCoachCritique" class="critique-text">No reports logged yet.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goal Tracking & Comparison Widgets Split -->
+              <div class="performance-split">
+                <!-- Goal Tracker -->
+                <div class="glass-card p-4">
+                  <h3 class="section-title-mini">🎯 Athletic Goals & Skill Milestones</h3>
+                  <p class="text-secondary" style="font-size:0.85rem; margin-bottom:1rem;">Work on these challenges set by your coach.</p>
+                  <div class="goals-container" id="playerGoalsList">
+                    <!-- Load goals list -->
+                  </div>
+                </div>
+
+                <!-- Individual Player Comparison -->
+                <div class="glass-card p-4">
+                  <h3 class="section-title-mini">⚖️ Performance Benchmark Comparison</h3>
+                  <p class="text-secondary" style="font-size:0.85rem; margin-bottom:1rem;">Compare your technical rating index against academy benchmarks.</p>
+                  <div class="comparison-tool-box">
+                    <div class="form-group">
+                      <label for="compareTargetSelector" class="form-label" style="font-size:0.75rem;">Compare Against:</label>
+                      <select id="compareTargetSelector" class="form-control" onchange="updatePlayerComparison()">
+                        <option value="elite">Elite Academy Standard (9.0 Index)</option>
+                        <option value="average">Academy Average Standard (6.5 Index)</option>
+                      </select>
+                    </div>
+                    <div class="comparison-results mt-3" id="playerComparisonResults">
+                      <!-- Progress bars for comparison -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Monthly Performance & Developmental Reports -->
+              <div class="glass-card mt-4 p-4">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h3 class="section-title-mini">📋 Monthly Developmental Report</h3>
+                  <button class="btn btn-outline-cyan btn-sm" onclick="downloadDevelopmentReport('player')">📥 Download Report PDF Summary</button>
+                </div>
+                <div class="development-report-content mt-3 p-3 bg-dark rounded" id="playerDevelopmentReportBox">
+                  <!-- Load development report text -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Player Attendance Tab -->
+            <div id="player-tab-attendance" class="tab-pane">
+              <h2 class="tab-title">Session Attendance Log</h2>
+              <p class="tab-desc">Review your scheduled classes and present/absent logs.</p>
+              <div class="attendance-table-container glass-card mt-4">
+                <table class="portal-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Class/Topic</th>
+                      <th>Status</th>
+                      <th>Marked By</th>
+                    </tr>
+                  </thead>
+                  <tbody id="playerAttendanceLog">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Player Certificates Tab -->
+            <div id="player-tab-certificates" class="tab-pane">
+              <h2 class="tab-title">Achievements & Badges</h2>
+              <p class="tab-desc">Your milestones, ranks, and printable achievement certificates.</p>
+              <div class="badges-grid mt-4" id="playerCertificatesGrid">
+                <!-- Badges loaded dynamically -->
+              </div>
+            </div>
+
+            <!-- Player Payments Tab -->
+            <div id="player-tab-payments" class="tab-pane">
+              <h2 class="tab-title">Billing & Fee Payments</h2>
+              <p class="tab-desc">Pay fees, view receipt logs, and download current invoices.</p>
+              <div class="payment-table-container glass-card mt-4">
+                <table class="portal-table">
+                  <thead>
+                    <tr>
+                      <th>Invoice ID</th>
+                      <th>Description</th>
+                      <th>Amount</th>
+                      <th>Due Date</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="playerPaymentsLog">
+                    <!-- Dynamic payment rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Player Profile Tab -->
+            <div id="player-tab-profile" class="tab-pane">
+              <h2 class="tab-title">Profile Management</h2>
+              <p class="tab-desc">Update your contact profile, school info, and profile avatar.</p>
+              <div class="profile-card-form glass-card mt-4">
+                <form id="playerProfileForm">
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Full Name</label>
+                      <input type="text" id="playerProfName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Phone Number</label>
+                      <input type="text" id="playerProfPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Age</label>
+                      <input type="number" id="playerProfAge" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">School / Institute</label>
+                      <input type="text" id="playerProfSchool" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Profile Picture URL</label>
+                    <input type="url" id="playerProfAvatar" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Biography</label>
+                    <textarea id="playerProfBio" class="form-control" rows="4"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Save Profile Details</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Player Notifications Tab -->
+            <div id="player-tab-notifications" class="tab-pane">
+              <h2 class="tab-title">Notifications Inbox</h2>
+              <p class="tab-desc">Direct alerts, match updates, fee reminders, and certifications messages.</p>
+              <div class="notifications-list mt-4" id="playerNotificationsList">
+                <!-- Loaded dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           PARENT PORTAL
+           ========================================================================== -->
+      <section id="parentPortal" class="portal-section" style="display: none;">
+        <div class="portal-layout">
+          <!-- Sidebar -->
+          <aside class="portal-sidebar">
+            <div class="user-card-mini">
+              <img id="parentAvatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="user-avatar">
+              <div class="user-info">
+                <h4 id="parentName">Parent Profile</h4>
+                <span class="user-role badge-parent">Parent</span>
+              </div>
+            </div>
+
+            <!-- Student Selector Dropdown for parent context -->
+            <div class="student-select-box mt-3 p-2 bg-dark rounded">
+              <label for="parentStudentSelector" class="form-label" style="font-size:0.75rem; display:block; margin-bottom:4px; color:var(--text-secondary);">Select Child:</label>
+              <select id="parentStudentSelector" class="form-control form-control-sm" onchange="parentSelectStudent()">
+                <!-- Loaded dynamically -->
+              </select>
+            </div>
+
+             <nav class="portal-menu mt-3">
+               <button class="portal-menu-item active" onclick="switchTab('parent', 'dashboard')">📊 Child Overview</button>
+               <button class="portal-menu-item" onclick="switchTab('parent', 'analytics')">📈 Performance Analytics</button>
+               <button class="portal-menu-item" onclick="switchTab('parent', 'attendance')">📅 Attendance Log</button>
+               <button class="portal-menu-item" onclick="switchTab('parent', 'payments')">💳 Fees & Dues</button>
+                <button class="portal-menu-item" style="display: flex; align-items: center; width: 100%; text-align: left;" onclick="switchTab('parent', 'notifications')"><span>🔔 Notification Center</span> <span class="badge-unread-count" id="parentUnreadCount" style="display:none; background:var(--accent-primary); color:white; border-radius:10px; padding: 2px 6px; font-size:0.7rem; margin-left: auto; line-height: 1;">0</span></button>
+                <button class="portal-menu-item" onclick="switchTab('parent', 'feedback')">💬 Coach Feedback</button>
+             </nav>
+          </aside>
+
+          <!-- Main View Area -->
+          <div class="portal-content">
+            <!-- Parent Dashboard Tab -->
+            <div id="parent-tab-dashboard" class="tab-pane active">
+              <div class="dashboard-banner">
+                <h2>Welcome, <span id="parent-name-title">Parent</span>!</h2>
+                <p>Track your child's schedule, performance indices, and payments details below.</p>
+              </div>
+
+              <!-- Stats Cards -->
+              <div class="stats-grid">
+                <div class="stat-card glass-card">
+                  <div class="stat-icon">📅</div>
+                  <div class="stat-details">
+                    <h3>Child Attendance</h3>
+                    <div class="stat-value" id="parentAttendanceRate">0%</div>
+                    <p class="stat-sub">Present Sessions</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card">
+                  <div class="stat-icon">📈</div>
+                  <div class="stat-details">
+                    <h3>Overall Skill Rating</h3>
+                    <div class="stat-value" id="parentChildRating">0.0 / 10</div>
+                    <p class="stat-sub">Coaching assessment average</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card">
+                  <div class="stat-icon">💳</div>
+                  <div class="stat-details">
+                    <h3>Outstanding Fees</h3>
+                    <div class="stat-value" id="parentFeesValue">₹0</div>
+                    <p class="stat-sub" id="parentFeesLabel">Pending payments</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notices Broadcasts -->
+              <div class="glass-card mt-4 p-4">
+                <h3 class="section-title-mini">📢 Notices & Academy Holiday Notifications</h3>
+                <div class="announcement-card-content mt-2" id="parentAnnouncementsList">
+                  <!-- Dynamic notice items -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Parent Performance Analytics Tab -->
+            <div id="parent-tab-analytics" class="tab-pane">
+              <h2 class="tab-title">Child Growth Progress Analytics</h2>
+              <p class="tab-desc">Monitor technical skill indicators, attendance trends, and goal milestones for your child.</p>
+
+              <!-- Parent Child Sport Toggle -->
+              <div class="sport-toggle-box mb-4">
+                <button class="btn btn-outline-cyan active" id="parentCricketBtn" onclick="toggleParentSport('cricket')">🏏 Cricket Analytics</button>
+                <button class="btn btn-outline-cyan" id="parentBaseballBtn" onclick="toggleParentSport('baseball')">⚾ Baseball Analytics</button>
+              </div>
+
+              <!-- Metrics Summary Cards -->
+              <div class="stats-grid mb-4">
+                <div class="stat-card glass-card parent-cricket-item">
+                  <div class="stat-icon">🏏</div>
+                  <div class="stat-details">
+                    <h3>Batting Performance</h3>
+                    <div class="stat-value" id="parentStatBatAvg">0.0</div>
+                    <p class="stat-sub" id="parentStatBatRuns">Runs: 0 | SR: 0</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card parent-cricket-item">
+                  <div class="stat-icon">🔴</div>
+                  <div class="stat-details">
+                    <h3>Bowling Performance</h3>
+                    <div class="stat-value" id="parentStatBowlWkts">0</div>
+                    <p class="stat-sub" id="parentStatBowlEcon">Econ: 0.0 | Avg: 0.0</p>
+                  </div>
+                </div>
+
+                <div class="stat-card glass-card parent-baseball-item" style="display:none;">
+                  <div class="stat-icon">⚾</div>
+                  <div class="stat-details">
+                    <h3>Hitting Average</h3>
+                    <div class="stat-value" id="parentStatBaseBatAvg">.000</div>
+                    <p class="stat-sub" id="parentStatBaseHits">Hits: 0 | Runs: 0</p>
+                  </div>
+                </div>
+                <div class="stat-card glass-card parent-baseball-item" style="display:none;">
+                  <div class="stat-icon">🔥</div>
+                  <div class="stat-details">
+                    <h3>Pitching ERA</h3>
+                    <div class="stat-value" id="parentStatBaseEra">0.00</div>
+                    <p class="stat-sub" id="parentStatBaseKs">Innings: 0 | SO: 0</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Graphs Grid -->
+              <div class="performance-split mb-4">
+                <div class="performance-chart-card glass-card">
+                  <h3>Skills Radar Graph</h3>
+                  <div class="chart-container-canvas">
+                    <canvas id="parentSkillsChart" width="300" height="300"></canvas>
+                  </div>
+                </div>
+                <div class="performance-chart-card glass-card">
+                  <h3>Fitness Progress Timeline</h3>
+                  <div class="chart-container-canvas">
+                    <canvas id="parentFitnessChart" width="300" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="performance-split mb-4">
+                <div class="performance-chart-card glass-card">
+                  <h3>Attendance Summary (Monthly)</h3>
+                  <div class="chart-container-canvas">
+                    <canvas id="parentAttendanceChart" width="300" height="300"></canvas>
+                  </div>
+                </div>
+                <div class="performance-details-card glass-card">
+                  <h3>Technical Progress Breakdown</h3>
+                  <div class="skills-breakdown" id="parentSkillsBreakdown">
+                    <!-- Dynamic Progress bars -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goals & Comparison Grid -->
+              <div class="performance-split mb-4">
+                <div class="glass-card p-4">
+                  <h3 class="section-title-mini">🎯 Child Goals & Milestones</h3>
+                  <div class="goals-container mt-2" id="parentGoalsList">
+                    <!-- Loaded dynamically -->
+                  </div>
+                </div>
+                <div class="glass-card p-4">
+                  <h3 class="section-title-mini">⚖️ Benchmark Comparison</h3>
+                  <div class="form-group">
+                    <label for="parentCompareTargetSelector" class="form-label" style="font-size:0.75rem;">Compare Against:</label>
+                    <select id="parentCompareTargetSelector" class="form-control" onchange="updateParentComparison()">
+                      <option value="elite">Elite Academy Standard (9.0 Index)</option>
+                      <option value="average">Academy Average Standard (6.5 Index)</option>
+                    </select>
+                  </div>
+                  <div class="comparison-results mt-3" id="parentComparisonResults">
+                    <!-- Dynamic progress comparisons -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Downloadable Certificates List -->
+              <div class="glass-card p-4 mb-4">
+                <h3 class="section-title-mini">🏆 Earned Badges & Downloadable Certificates</h3>
+                <p class="text-secondary" style="font-size:0.85rem; margin-bottom:1rem;">Print or download your child's award frames.</p>
+                <div class="table-responsive">
+                  <table class="portal-table">
+                    <thead>
+                      <tr>
+                        <th>Certificate Title</th>
+                        <th>Rank Badge</th>
+                        <th>Date Awarded</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="parentCertificatesLog">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Monthly Performance & Developmental Reports -->
+              <div class="glass-card p-4">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h3 class="section-title-mini">📋 Monthly Developmental Report</h3>
+                  <button class="btn btn-outline-cyan btn-sm" onclick="downloadDevelopmentReport('parent')">📥 Download Report PDF Summary</button>
+                </div>
+                <div class="development-report-content mt-3 p-3 bg-dark rounded" id="parentDevelopmentReportBox">
+                  <!-- Load development report text -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Parent Attendance Tab -->
+            <div id="parent-tab-attendance" class="tab-pane">
+              <h2 class="tab-title">Child Session Log</h2>
+              <p class="tab-desc">Full archive of classes attended or missed by your child.</p>
+              <div class="attendance-table-container glass-card mt-4">
+                <table class="portal-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Session Subject</th>
+                      <th>Status</th>
+                      <th>Marked By</th>
+                    </tr>
+                  </thead>
+                  <tbody id="parentAttendanceLog">
+                    <!-- Dynamic rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Parent Fees & Dues Tab -->
+            <div id="parent-tab-payments" class="tab-pane">
+              <h2 class="tab-title">Fee Invoice Overview</h2>
+              <p class="tab-desc">Verify billing status, outstanding amounts, and process fee payments securely.</p>
+              <div class="payment-table-container glass-card mt-4">
+                <table class="portal-table">
+                  <thead>
+                    <tr>
+                      <th>Invoice ID</th>
+                      <th>Invoice Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="parentPaymentsLog">
+                    <!-- Dynamic invoices -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Parent Feedback Tab -->
+            <div id="parent-tab-feedback" class="tab-pane">
+              <h2 class="tab-title">Coach Notes & Critical Feedback</h2>
+              <p class="tab-desc">Direct critique and growth instructions from the coaching roster.</p>
+              <div class="coach-critique-box glass-card mt-4" style="padding: 2rem;">
+                <h4 class="mb-3" style="color:var(--accent-primary);">Critique Note</h4>
+                <p id="parentCoachFeedback" class="critique-text">No critical feedback logged at this time.</p>
+              </div>
+            </div>
+
+            <!-- Parent Notifications Tab -->
+            <div id="parent-tab-notifications" class="tab-pane">
+              <h2 class="tab-title">Notifications & Security Alerts</h2>
+              <p class="tab-desc">Archive log of all email updates, WhatsApp notifications, and SMS messages dispatched to parents.</p>
+              <div class="notifications-list mt-4" id="parentNotificationsList">
+                <!-- Loaded dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           COACH DASHBOARD
+           ========================================================================== -->
+      <section id="coachPortal" class="portal-section" style="display: none;">
+        <div class="portal-layout">
+          <!-- Sidebar -->
+          <aside class="portal-sidebar">
+            <div class="user-card-mini">
+              <img id="coachAvatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="user-avatar">
+              <div class="user-info">
+                <h4 id="coachName">Coach Panel</h4>
+                <span class="user-role badge-coach">Coach</span>
+              </div>
+            </div>
+            <nav class="portal-menu">
+              <button class="portal-menu-item active" onclick="switchTab('coach', 'students')">👥 Student Roster</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'attendance')">📅 Mark Attendance</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'evaluator')">📊 Skill Evaluator</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'session-planning')">📝 Session Planning</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'announcements')">📢 Broadcast Alert</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'certificates')">🏆 Issue Certificates</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'dispatcher')">📲 Alert Dispatcher</button>
+              <button class="portal-menu-item" onclick="switchTab('coach', 'teamstats')">📈 Team & Tournament Stats</button>
+            </nav>
+          </aside>
+
+          <!-- Main View Area -->
+          <div class="portal-content">
+
+            <!-- Coach Students Roster Tab -->
+            <div id="coach-tab-students" class="tab-pane active">
+              <h2 class="tab-title">Student Roster Directory</h2>
+              <p class="tab-desc">Manage all enrolled players and quick review their general details.</p>
+              <div class="roster-container mt-4">
+                <div class="roster-search-bar mb-3">
+                  <input type="text" id="rosterSearchInput" class="form-control" placeholder="Search students by name..." onkeyup="filterRoster()">
+                </div>
+                <div class="glass-card table-responsive">
+                  <table class="portal-table">
+                    <thead>
+                      <tr>
+                        <th>Player Name</th>
+                        <th>Email</th>
+                        <th>Age</th>
+                        <th>Phone</th>
+                        <th>School</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="coachStudentRosterTable">
+                      <!-- Loaded dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coach Mark Attendance Tab -->
+            <div id="coach-tab-attendance" class="tab-pane">
+              <h2 class="tab-title">Daily Attendance Marker</h2>
+              <p class="tab-desc">Mark attendance logs for your coaching session classes.</p>
+              
+              <div class="attendance-controls-box glass-card p-4 mt-4 mb-4">
+                <div class="form-grid-3">
+                  <div class="form-group mb-0">
+                    <label class="form-label">Session Date</label>
+                    <input type="date" id="attendanceDatePicker" class="form-control">
+                  </div>
+                  <div class="form-group mb-0">
+                    <label class="form-label">Session Topic / Title</label>
+                    <input type="text" id="attendanceTopicInput" class="form-control" placeholder="e.g. Batting Stance Drill">
+                  </div>
+                  <div class="form-group mb-0" style="display:flex; align-items:flex-end;">
+                    <button class="btn btn-primary w-100" onclick="submitBulkAttendance()">Save Attendance Batch</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-card">
+                <table class="portal-table">
+                  <thead>
+                    <tr>
+                      <th width="50px">No.</th>
+                      <th>Student Name</th>
+                      <th>Status Check</th>
+                    </tr>
+                  </thead>
+                  <tbody id="coachAttendanceMarkerList">
+                    <!-- Checkbox list loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Coach Skill Evaluator Tab -->
+            <div id="coach-tab-evaluator" class="tab-pane">
+              <h2 class="tab-title">Technical Skills & Seasonal Stats Evaluator</h2>
+              <p class="tab-desc">Log ratings, update Cricket/Baseball statistics, and assign goal milestones for athletes.</p>
+
+              <div class="evaluator-grid mt-4">
+                <div class="glass-card p-4">
+                  <h3>Athlete Assessment & Stats Entry Form</h3>
+                  <form id="coachEvaluationForm" class="mt-3">
+                    <div class="form-group">
+                      <label class="form-label">Select Student *</label>
+                      <select id="evalStudentSelect" class="form-control" required onchange="loadStudentStatsForCoach()">
+                        <!-- Loaded dynamically -->
+                      </select>
+                    </div>
+
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Batting / Hitting Rating (0 - 10)</label>
+                        <input type="number" id="evalBatting" class="form-control" min="0" max="10" value="5" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Bowling / Pitching Rating (0 - 10)</label>
+                        <input type="number" id="evalBowling" class="form-control" min="0" max="10" value="5" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Fielding Rating (0 - 10)</label>
+                        <input type="number" id="evalFielding" class="form-control" min="0" max="10" value="5" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Physical Fitness Rating (0 - 10)</label>
+                        <input type="number" id="evalFitness" class="form-control" min="0" max="10" value="5" required>
+                      </div>
+                    </div>
+
+                    <!-- Sport Type Selector -->
+                    <div class="form-group">
+                      <label class="form-label">Athlete Active Sport Stats Profile *</label>
+                      <select id="evalSportType" class="form-control" required onchange="toggleCoachEvalSport()">
+                        <option value="cricket">Cricket Stats Profile</option>
+                        <option value="baseball">Baseball Stats Profile</option>
+                      </select>
+                    </div>
+
+                    <!-- Cricket Statistics Fields -->
+                    <div id="coachCricketStatsFields" class="form-grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Cricket Matches Played</label>
+                        <input type="number" id="evalCricketMatches" class="form-control" value="0">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Runs Scored</label>
+                        <input type="number" id="evalCricketRuns" class="form-control" value="0">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Wickets Taken</label>
+                        <input type="number" id="evalCricketWickets" class="form-control" value="0">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Economy Rate</label>
+                        <input type="number" id="evalCricketEcon" class="form-control" step="0.01" value="0.00">
+                      </div>
+                    </div>
+
+                    <!-- Baseball Statistics Fields -->
+                    <div id="coachBaseballStatsFields" class="form-grid-2" style="display:none;">
+                      <div class="form-group">
+                        <label class="form-label">Baseball Matches Played</label>
+                        <input type="number" id="evalBaseballMatches" class="form-control" value="0">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Hits Secured</label>
+                        <input type="number" id="evalBaseballHits" class="form-control" value="0">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Innings Pitched</label>
+                        <input type="number" id="evalBaseballInnings" class="form-control" step="0.1" value="0.0">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Earned Run Average (ERA)</label>
+                        <input type="number" id="evalBaseballEra" class="form-control" step="0.01" value="0.00">
+                      </div>
+                    </div>
+
+                    <!-- Goal Setting Fields -->
+                    <div class="form-group">
+                      <label class="form-label">Assign New Target Goal / Milestone</label>
+                      <input type="text" id="evalNewGoal" class="form-control" placeholder="e.g. Increase bowling speed to 125 km/h">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Critique Feedback Comments & Monthly Developmental Notes</label>
+                      <textarea id="evalFeedback" class="form-control" rows="3" placeholder="Write development notes here..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Post Evaluation & Update Statistics</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coach Session Planning Tab -->
+            <div id="coach-tab-session-planning" class="tab-pane">
+              <h2 class="tab-title">Session Planner</h2>
+              <p class="tab-desc">Outline scheduled coaching methodologies, drills, and target dates.</p>
+
+              <div class="session-planner-grid mt-4">
+                <div class="glass-card p-4">
+                  <h3>Add Session Plan</h3>
+                  <form id="coachSessionForm" class="mt-3">
+                    <div class="form-group">
+                      <label class="form-label">Plan Title *</label>
+                      <input type="text" id="sessionTitle" class="form-control" required placeholder="e.g. Advanced Pitcher Curveballs">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Scheduled Date *</label>
+                      <input type="date" id="sessionDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Main Topic / Area</label>
+                      <input type="text" id="sessionTopic" class="form-control" placeholder="e.g. Pitching Mechanics">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Drills checklist (comma separated)</label>
+                      <input type="text" id="sessionDrills" class="form-control" placeholder="Warm up laps, Grip drills, Target practice">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create Plan</button>
+                  </form>
+                </div>
+
+                <div class="glass-card p-4">
+                  <h3>Active Session Plans</h3>
+                  <div class="session-plans-list mt-3" id="coachSessionPlansList">
+                    <!-- Dynamic plans list -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coach Announcements Tab -->
+            <div id="coach-tab-announcements" class="tab-pane">
+              <h2 class="tab-title">Academy Notices & Broadcast Editor</h2>
+              <p class="tab-desc">Broadcast notifications to the dashboards of players and parents.</p>
+              
+              <div class="announcement-editor-layout mt-4">
+                <div class="glass-card p-4">
+                  <h3>New Announcement Notice</h3>
+                  <form id="coachAnnouncementForm" class="mt-3">
+                    <div class="form-group">
+                      <label class="form-label">Notice Title *</label>
+                      <input type="text" id="announceTitle" class="form-control" required placeholder="e.g. Summer Camp Timings Change">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Target Audience *</label>
+                      <select id="announceTarget" class="form-control" required>
+                        <option value="all">All Roles</option>
+                        <option value="player">Players Only</option>
+                        <option value="parent">Parents Only</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Message Content *</label>
+                      <textarea id="announceContent" class="form-control" rows="5" required placeholder="Write announcement text here..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Broadcast Notice</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coach Issue Certificates Tab -->
+            <div id="coach-tab-certificates" class="tab-pane">
+              <h2 class="tab-title">Issue Achievement Certificates</h2>
+              <p class="tab-desc">Award training certificates and performance badges to players.</p>
+
+              <div class="certificates-grid-layout mt-4">
+                <div class="glass-card p-4">
+                  <h3>Issue Certificate Form</h3>
+                  <form id="coachCertificateForm" class="mt-3">
+                    <div class="form-group">
+                      <label class="form-label">Select Student *</label>
+                      <select id="certStudentSelect" class="form-control" required>
+                        <!-- Loaded dynamically -->
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Certificate Title *</label>
+                      <input type="text" id="certTitle" class="form-control" required placeholder="e.g. Fast Pitching Champion">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Badge Rank *</label>
+                      <select id="certBadge" class="form-control" required>
+                        <option value="Gold">Gold Badge</option>
+                        <option value="Silver">Silver Badge</option>
+                        <option value="Bronze">Bronze Badge</option>
+                        <option value="Elite">Elite Performer Badge</option>
+                        <option value="Rookie">Rookie Star Badge</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Description / Achievements Citation</label>
+                      <textarea id="certDescription" class="form-control" rows="3" placeholder="Citation detailing why the student is awarded this badge..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Issue Award</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coach Alert Dispatcher Tab -->
+            <div id="coach-tab-dispatcher" class="tab-pane">
+              <h2 class="tab-title">Simulated Alert & Notification Dispatcher</h2>
+              <p class="tab-desc">Simulate WhatsApp messages, Email digests, and Mobile Push updates using live templates.</p>
+
+              <div class="evaluator-grid mt-4">
+                <div class="glass-card p-4">
+                  <h3>Compose Simulated Notification Alert</h3>
+                  <form id="coachAlertForm" class="mt-3" onsubmit="dispatchSimulatedNotification(event)">
+                    <div class="form-group">
+                      <label class="form-label">Notification Type Template *</label>
+                      <select id="alertTemplateSelector" class="form-control" onchange="applyAlertTemplate()">
+                        <option value="tournament_alert">🏆 Tournament Announcement</option>
+                        <option value="match_reminder">🏏 Upcoming Match Reminder</option>
+                        <option value="fee_reminder">💳 Monthly Fee Outstanding Alert</option>
+                        <option value="attendance_alert">⚠️ Session Low Attendance Warning</option>
+                        <option value="session_update">📅 Session Class Rescheduled Update</option>
+                        <option value="trial_confirmation">⚾ Trial Session Confirmation</option>
+                        <option value="birthday_wish">🎂 Student Birthday Wish</option>
+                        <option value="achievement_certificate">🥇 Badge Certificate Achievement Alert</option>
+                        <option value="performance_report">📈 Performance Progress Report Published</option>
+                        <option value="emergency_announcement">🚨 Emergency Academy Notice</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Target Recipient Athlete *</label>
+                      <select id="alertStudentSelect" class="form-control" required onchange="applyAlertTemplate()">
+                        <!-- Loaded dynamically -->
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Select Delivery Channels *</label>
+                      <div style="display:flex; gap:1.5rem; margin-top:0.25rem;">
+                        <label style="cursor:pointer;"><input type="checkbox" id="alertChannelWhatsApp" checked> WhatsApp Notification</label>
+                        <label style="cursor:pointer;"><input type="checkbox" id="alertChannelEmail" checked> Email Digest</label>
+                        <label style="cursor:pointer;"><input type="checkbox" id="alertChannelPush" checked> Push Alert</label>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Message Subject / Title *</label>
+                      <input type="text" id="alertTitleInput" class="form-control" required placeholder="Alert Title">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Message Body *</label>
+                      <textarea id="alertBodyInput" class="form-control" rows="4" required placeholder="Write alert body text here..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Send Simulated Notification Alerts</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coach Team Stats Tab -->
+            <div id="coach-tab-teamstats" class="tab-pane">
+              <h2 class="tab-title">Team Statistics & Tournament Analytics</h2>
+              <p class="tab-desc">Monitor overall academy metrics, class progress ratings, and tournament performance logs.</p>
+
+              <div class="performance-split mt-4">
+                <!-- Team Metrics Summary -->
+                <div class="glass-card p-4">
+                  <h3>Academy Team Metrics</h3>
+                  <div class="stats-grid mt-3">
+                    <div class="stat-card" style="padding:1rem; background:rgba(0,0,0,0.15);">
+                      <div class="stat-details">
+                        <h3>Team Size</h3>
+                        <div class="stat-value" id="coachTeamSize">0</div>
+                        <p class="stat-sub">Active athletes</p>
+                      </div>
+                    </div>
+                    <div class="stat-card" style="padding:1rem; background:rgba(0,0,0,0.15);">
+                      <div class="stat-details">
+                        <h3>Team Presence</h3>
+                        <div class="stat-value" id="coachTeamPresence">0%</div>
+                        <p class="stat-sub">Avg Attendance</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="chart-container-canvas mt-4">
+                    <canvas id="coachTeamStatsChart" width="300" height="280"></canvas>
+                  </div>
+                </div>
+
+                <!-- Tournament Performance Overview -->
+                <div class="glass-card p-4">
+                  <h3>Academy Tournament Standings</h3>
+                  <div class="form-group mt-3">
+                    <label for="coachTournamentSelector" class="form-label" style="font-size:0.75rem;">Active Tournament Details:</label>
+                    <select id="coachTournamentSelector" class="form-control" onchange="syncCoachTournamentStats()">
+                      <!-- Populated dynamically -->
+                    </select>
+                  </div>
+
+                  <div class="table-responsive mt-3">
+                    <table class="portal-table">
+                      <thead>
+                        <tr>
+                          <th>Team Name</th>
+                          <th>Played</th>
+                          <th>Won</th>
+                          <th>Lost</th>
+                          <th>Win Ratio</th>
+                        </tr>
+                      </thead>
+                      <tbody id="coachTournamentStandingsBody">
+                        <!-- Loaded dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Dynamic Certificate Modal Container -->
+  <div id="certModal" class="modal-overlay" style="display:none;" onclick="closeCertModal()">
+    <div class="modal-card certificate-frame" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="closeCertModal()">×</button>
+      <div id="printableCertificateContent" class="cert-print-area">
+        <!-- Rendered dynamically on request -->
+      </div>
+      <div class="cert-modal-actions mt-4">
+        <button class="btn btn-primary" onclick="printCertificate()">🖨️ Print Certificate</button>
+        <button class="btn btn-secondary" onclick="closeCertModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic UPI Payment Modal -->
+  <div id="paymentModal" class="modal-overlay" style="display:none;" onclick="closePaymentModal()">
+    <div class="modal-card payment-gateway-card" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+      <h3 style="color:#fff; font-family:var(--font-display); font-weight:800; font-size:1.4rem;">UPI PAYMENT INDUCTION</h3>
+      <p class="text-secondary mt-2">Scan the UPI QR code below using any bank or UPI application (GPay, PhonePe, Paytm) to complete your fee transaction.</p>
+      
+      <div class="qr-box mt-4 mb-4" style="text-align:center;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=renegades@upi&pn=Renegades%20Sports%20Arena&am=1500&cu=INR" alt="UPI QR Code" style="border: 4px solid #fff; border-radius:8px; display:inline-block;">
+        <p class="mt-2 text-orange" style="font-weight:bold; font-family:var(--font-display); font-size:1.1rem;">Amount: ₹1,500</p>
+      </div>
+
+      <form id="upiSubmitForm" onsubmit="confirmPayment(event)">
+        <input type="hidden" id="payingInvoiceId">
+        <div class="form-group">
+          <label class="form-label">Transaction Ref ID / UPI TXN ID *</label>
+          <input type="text" id="upiTxnId" class="form-control" required placeholder="Enter 12 digit UPI transaction ID">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Submit Verification Reference</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/notifications_services.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/portal.js"></script>
+</body>
+
+</html>

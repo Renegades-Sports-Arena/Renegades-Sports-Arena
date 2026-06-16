@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renegades Sports Arena | Control Dashboard</title>
+
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/admin_extensions.css">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       1. LOGIN ACCESS CONTROL
+       ========================================================================== -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <img src="assets/images/logo.png" alt="Renegades Logo" class="login-logo">
+      <h1>Renegades Arena</h1>
+      <p>Control Dashboard Access</p>
+
+      <form id="loginForm" novalidate>
+        <input type="password" id="loginPassword" class="login-input" placeholder="••••••••"
+          autocomplete="current-password" required>
+        <button type="submit" class="login-btn">Log In</button>
+        <div class="login-error" id="loginError" role="alert">Incorrect password. Please try again.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. MAIN DASHBOARD CONTAINER
+       ========================================================================== -->
+  <div class="dashboard-container" id="dashboardPanel">
+
+    <!-- Sidebar navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/images/logo.png" alt="Logo" class="sidebar-logo">
+        <h1 class="sidebar-title">Renegades <span>Control Panel</span></h1>
+      </div>
+
+      <nav class="sidebar-menu" id="sidebarMenu" aria-label="Dashboard Panels">
+        <button class="menu-item active" data-target-tab="bookings-tab">Bookings Manager</button>
+        <button class="menu-item" data-target-tab="general-tab">General Info</button>
+        <button class="menu-item" data-target-tab="hero-tab">Hero Section</button>
+        <button class="menu-item" data-target-tab="why-tab">Why Renegades</button>
+        <button class="menu-item" data-target-tab="future-arena-tab">Future Stars Arena</button>
+        <button class="menu-item" data-target-tab="clubs-tab">Club Network</button>
+        <button class="menu-item" data-target-tab="programs-tab">Programs</button>
+        <button class="menu-item" data-target-tab="shop-tab">Pro Shop Manager</button>
+        <button class="menu-item" data-target-tab="coaches-tab">Coaching Team</button>
+        <button class="menu-item" data-target-tab="facilities-tab">Facilities</button>
+        <button class="menu-item" data-target-tab="gallery-tab">Gallery Manager</button>
+        <button class="menu-item" data-target-tab="reviews-tab">Google Reviews</button>
+        
+        <!-- Extended CMS Panels -->
+        <button class="menu-item" data-target-tab="mlb-programs-tab" style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: #58A6FF;">⚾ MLB Programs</button>
+        <button class="menu-item" data-target-tab="tournament-cms-tab" style="color: var(--accent);">🏆 Tournament CMS</button>
+        <button class="menu-item" data-target-tab="fixtures-scoring-tab" style="color: var(--accent);">📅 Match Scoring</button>
+        <button class="menu-item" data-target-tab="registrations-cms-tab" style="color: var(--accent);">👥 Registrations</button>
+        
+        <button class="menu-item" data-target-tab="export-tab"
+          style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: var(--accent);">Export
+          Configuration</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logoutBtn">Log Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Top header bar -->
+      <header class="topbar">
+        <h2 id="currentTabTitle">General Info Settings</h2>
+        <div class="topbar-actions">
+          <a href="index.html" class="btn-view-site" target="_blank" rel="noopener">Preview Site</a>
+          <button class="btn-save-master" id="saveAllBtn">Save Changes</button>
+        </div>
+      </header>
+
+      <!-- Editing space -->
+      <div class="main-content">
+
+        <!-- Tab 0: Bookings Manager -->
+        <section class="tab-panel active" id="bookings-tab">
+          <!-- Top stats or quick info cards -->
+          <div class="booking-stats-row">
+            <div class="booking-stat-card">
+              <div class="stat-num" id="totalBookingsCount">0</div>
+              <div class="stat-lbl">Total Bookings</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-orange" id="pendingBookingsCount">0</div>
+              <div class="stat-lbl">Pending Review</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-green" id="approvedBookingsCount">0</div>
+              <div class="stat-lbl">Approved</div>
+            </div>
+          </div>
+
+          <!-- Main layout card -->
+          <div class="form-section-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
+              <h3 style="border-bottom:none; margin-bottom:0; padding-bottom:0; color:var(--accent);">Trial Session Bookings</h3>
+              
+              <!-- Tab switches inside bookings (Table View vs Calendar View) -->
+              <div class="admin-view-toggle">
+                <button type="button" class="view-toggle-btn active" id="viewBookingsListBtn">List View</button>
+                <button type="button" class="view-toggle-btn" id="viewBookingsCalendarBtn">Calendar View</button>
+              </div>
+            </div>
+
+            <!-- Filters block -->
+            <div class="bookings-filters-bar" id="bookingsFiltersBar">
+              <input type="text" id="bookingsSearchInput" class="form-input" placeholder="Search by name, email, phone..." style="flex: 2;">
+              <select id="bookingsStatusFilter" class="form-input" style="flex: 1;">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rescheduled">Rescheduled</option>
+                <option value="rejected">Rejected</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <input type="date" id="bookingsDateFilter" class="form-input" style="flex: 1;">
+              <button type="button" class="btn-save-master" id="bookingsClearFiltersBtn" style="background:var(--border-grey); box-shadow:none; padding: 0.8rem 1rem;">Clear</button>
+              <button type="button" class="btn-save-master" id="bookingsExportCsvBtn" style="padding: 0.8rem 1rem;">Export CSV</button>
+            </div>
+
+            <!-- 1. List View Section -->
+            <div id="bookingsListContainer" class="table-responsive">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Age/Parent</th>
+                    <th>Contact</th>
+                    <th>Skill Level</th>
+                    <th>Date & Slot</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingsTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+              <div id="bookingsTableEmpty" style="display:none; text-align:center; padding: 3rem 0; color: var(--text-grey);">
+                No bookings match the selected filters.
+              </div>
+            </div>
+
+            <!-- 2. Calendar View Section -->
+            <div id="bookingsCalendarContainer" style="display: none;">
+              <div class="calendar-header-controls">
+                <button type="button" class="cal-nav-btn" id="calPrevMonthBtn">&lt; Prev</button>
+                <h4 id="calCurrentMonthTitle" style="color:var(--text-white); text-transform:none; margin:0;">June 2026</h4>
+                <button type="button" class="cal-nav-btn" id="calNextMonthBtn">Next &gt;</button>
+              </div>
+              <div class="calendar-weeks-grid">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+              <div class="calendar-days-grid" id="calendarDaysGrid">
+                <!-- Populated dynamically -->
+              </div>
+              
+              <!-- Inline Day Details Panel inside Calendar tab -->
+              <div class="calendar-day-details-panel" id="calendarDayDetailsPanel" style="display:none; margin-top:2rem; padding: 1.5rem; border: 1px solid var(--border-grey); border-radius: 6px; background: var(--bg-input);">
+                <h4 id="calendarDayDetailsTitle" style="color:var(--accent); text-transform:none; margin-bottom:1rem;">Bookings on June 15, 2026</h4>
+                <div id="calendarDayDetailsList"></div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Tab 1: General Info -->
+        <section class="tab-panel" id="general-tab" aria-labelledby="currentTabTitle">
+          <div class="form-section-card">
+            <h3>Academy Identity</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-general-name" class="form-label">Academy Name</label>
+                <input type="text" id="input-general-name" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-general-tagline" class="form-label">Tagline / Motto</label>
+                <input type="text" id="input-general-tagline" class="form-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Contact Details</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-general-phone" class="form-label">Contact Phone</label>
+                <input type="text" id="input-general-phone" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-general-email" class="form-label">Contact Email</label>
+                <input type="email" id="input-general-email" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-general-whatsapp" class="form-label">WhatsApp Number (e.g. 919876543210)</label>
+                <input type="text" id="input-general-whatsapp" class="form-input">
+                <span class="tip-text">Must include country code, no symbols or spaces.</span>
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-general-address" class="form-label">Academy Location Address</label>
+                <textarea id="input-general-address" class="form-input"></textarea>
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-general-map" class="form-label">Google Maps Embed Link (iframe src url)</label>
+                <input type="text" id="input-general-map" class="form-input">
+                <span class="tip-text">Paste only the URL from the src attribute of the Google Maps iframe embed
+                  code.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Social Profiles</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-general-instagram" class="form-label">Instagram Link</label>
+                <input type="url" id="input-general-instagram" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-general-facebook" class="form-label">Facebook Link</label>
+                <input type="url" id="input-general-facebook" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-general-youtube" class="form-label">YouTube Link</label>
+                <input type="url" id="input-general-youtube" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-general-google" class="form-label">Google Business Profile Review Link</label>
+                <input type="url" id="input-general-google" class="form-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Announcement Banner</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-general-announcement-enabled" class="form-label">Enable Announcement Banner</label>
+                <select id="input-general-announcement-enabled" class="form-input">
+                  <option value="true">Enabled</option>
+                  <option value="false">Disabled</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-general-announcement-bg" class="form-label">Banner Background Color</label>
+                <input type="color" id="input-general-announcement-bg" class="form-input"
+                  style="height: 40px; padding: 2px;">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-general-announcement-text" class="form-label">Banner Announcement Text</label>
+                <input type="text" id="input-general-announcement-text" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-general-announcement-link" class="form-label">Banner Link URL (Optional)</label>
+                <input type="text" id="input-general-announcement-link" class="form-input">
+                <span class="tip-text">Redirect link when clicking the banner (e.g. #contact or external URL).</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Hero Section -->
+        <section class="tab-panel" id="hero-tab">
+          <div class="form-section-card">
+            <h3>Hero Media Content</h3>
+            <div class="form-grid">
+              <div class="form-group form-group-full">
+                <label for="input-hero-title" class="form-label">Headline Title</label>
+                <input type="text" id="input-hero-title" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-hero-subheading" class="form-label">Subheading Description</label>
+                <textarea id="input-hero-subheading" class="form-input"></textarea>
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-hero-tagline" class="form-label">Hero Banner Subheading Tagline</label>
+                <input type="text" id="input-hero-tagline" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-hero-video" class="form-label">Background Loop Video Link (.mp4)</label>
+                <input type="text" id="input-hero-video" class="form-input">
+                <span class="tip-text">Specify an absolute URL to a premium sports stock video (e.g. from Pexels,
+                  Pixabay, Mixkit).</span>
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-hero-fallback" class="form-label">Background Poster/Fallback Image Link</label>
+                <input type="text" id="input-hero-fallback" class="form-input">
+                <span class="tip-text">High-res picture displayed while video is loading or on older mobile
+                  devices.</span>
+              </div>
+              <div class="form-group">
+                <label for="input-hero-primary" class="form-label">Primary Button Text</label>
+                <input type="text" id="input-hero-primary" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-hero-secondary" class="form-label">Secondary Button Text</label>
+                <input type="text" id="input-hero-secondary" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-hero-shop-text" class="form-label">Shop Button Text</label>
+                <input type="text" id="input-hero-shop-text" class="form-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Homepage Statistics (Counters)</h3>
+            <div id="statsList" class="list-items-wrapper">
+              <!-- Dynamic stats counters entries -->
+            </div>
+            <button class="btn-add-item" id="addStatBtn" style="margin-top: 1.5rem;">+ Add Statistics Counter</button>
+          </div>
+        </section>
+
+        <!-- Tab 3: Why Choose Us -->
+        <section class="tab-panel" id="why-tab">
+          <div class="form-section-card">
+            <h3>Why Us Title Settings</h3>
+            <div class="form-group">
+              <label for="input-why-title" class="form-label">Section Header Text</label>
+              <input type="text" id="input-why-title" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Card Grid Modules (Max 6 Recommended)</h3>
+            <div id="whyCardsList" class="list-items-wrapper">
+              <!-- Dynamically populated card forms -->
+            </div>
+          </div>
+        </section>
+
+
+
+        <!-- Tab 4b: Future Stars Arena Showcase -->
+        <section class="tab-panel" id="future-arena-tab">
+          <div class="form-section-card">
+            <h3>Showcase Ground Information</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-arena-badge" class="form-label">Project Status Badge</label>
+                <input type="text" id="input-arena-badge" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="input-arena-title" class="form-label">Main Title</label>
+                <input type="text" id="input-arena-title" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-arena-subtitle" class="form-label">Subtitle Header</label>
+                <input type="text" id="input-arena-subtitle" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-arena-desc" class="form-label">Description Copy</label>
+                <textarea id="input-arena-desc" class="form-input" style="height: 120px;"></textarea>
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-arena-image" class="form-label">Showcase Image Link</label>
+                <input type="text" id="input-arena-image" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-arena-features" class="form-label">Facility Specifications (Comma separated
+                  list)</label>
+                <input type="text" id="input-arena-features" class="form-input">
+                <span class="tip-text">Separate specifications using commas. Example: Double-Turf Wicket, Boundary
+                  zones, Night lights</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 5: Club Network -->
+        <section class="tab-panel" id="clubs-tab">
+          <div class="form-section-card">
+            <h3>Section Header</h3>
+            <div class="form-grid">
+              <div class="form-group form-group-full">
+                <label for="input-clubs-title" class="form-label">Headline Title</label>
+                <input type="text" id="input-clubs-title" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-clubs-sub" class="form-label">Section Description Text</label>
+                <textarea id="input-clubs-sub" class="form-input"></textarea>
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-clubs-disclaimer" class="form-label">Disclaimer Warning Text</label>
+                <input type="text" id="input-clubs-disclaimer" class="form-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Associated Clubs List</h3>
+            <div id="clubsList" class="list-items-wrapper">
+              <!-- Dynamic club entries -->
+            </div>
+            <button class="btn-add-item" id="addClubBtn" style="margin-top: 1.5rem;">+ Add Club Partner</button>
+          </div>
+        </section>
+
+        <!-- Tab 6: Programs -->
+        <section class="tab-panel" id="programs-tab">
+          <div class="form-section-card">
+            <h3>Academy Development Curriculums</h3>
+            <div id="programsList" class="list-items-wrapper">
+              <!-- Dynamic programs entries -->
+            </div>
+            <button class="btn-add-item" id="addProgramBtn" style="margin-top: 1.5rem;">+ Create New Program
+              Card</button>
+          </div>
+        </section>
+
+        <!-- Tab 7: Shop Manager -->
+        <section class="tab-panel" id="shop-tab">
+          <div class="form-section-card">
+            <h3>Shop Header Settings</h3>
+            <div class="form-grid">
+              <div class="form-group form-group-full">
+                <label for="input-shop-title" class="form-label">Shop Headline Title</label>
+                <input type="text" id="input-shop-title" class="form-input">
+              </div>
+              <div class="form-group form-group-full">
+                <label for="input-shop-subheading" class="form-label">Shop Subheading Description</label>
+                <textarea id="input-shop-subheading" class="form-input"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Shop Categories Settings</h3>
+            <div class="form-group form-group-full">
+              <label for="input-shop-categories-raw" class="form-label">Categories (Format: id:name, separate with
+                commas)</label>
+              <input type="text" id="input-shop-categories-raw" class="form-input">
+              <span class="tip-text">Example: all:All Products, bats:🏏 Bats, pads:🥊 Pads, gloves:🧤 Gloves,
+                protection:🦵 Thigh Guards, bags:🎒 Kit Bags, merchandise:👕 Merchandise</span>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Shop Products List</h3>
+            <div id="shopProductsList" class="list-items-wrapper">
+              <!-- Dynamic product entries -->
+            </div>
+            <button class="btn-add-item" id="addShopProductBtn" style="margin-top: 1.5rem;">+ Add New Product</button>
+          </div>
+        </section>
+
+        <!-- Tab 8: Coaching Team -->
+        <section class="tab-panel" id="coaches-tab">
+          <div class="form-section-card">
+            <h3>Coaching Roster</h3>
+            <div id="coachesList" class="list-items-wrapper">
+              <!-- Dynamic coaches list -->
+            </div>
+            <button class="btn-add-item" id="addCoachBtn" style="margin-top: 1.5rem;">+ Add Coaching Staff
+              Profile</button>
+          </div>
+        </section>
+
+        <!-- Tab 9: Facilities -->
+        <section class="tab-panel" id="facilities-tab">
+          <div class="form-section-card">
+            <h3>Academy Facilities & Ground Zones</h3>
+            <div id="facilitiesList" class="list-items-wrapper">
+              <!-- Dynamic facilities list -->
+            </div>
+            <button class="btn-add-item" id="addFacilityBtn" style="margin-top: 1.5rem;">+ Add Facility Arena</button>
+          </div>
+        </section>
+
+        <!-- Tab 10: Gallery -->
+        <section class="tab-panel" id="gallery-tab">
+          <div class="form-section-card">
+            <h3>Gallery Album Settings</h3>
+            <div class="form-group form-group-full">
+              <label for="input-gallery-albums-raw" class="form-label">Gallery Albums/Categories (Separate with
+                commas)</label>
+              <input type="text" id="input-gallery-albums-raw" class="form-input">
+              <span class="tip-text">Example: training, matches, events, players, achievements</span>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Bulk Photo Upload</h3>
+            <input type="file" id="bulkGalleryImageUpload" class="form-input" accept="image/*" multiple
+              style="border: 2px dashed var(--accent); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; width: 100%; display: block; background: var(--bg-input);">
+            <span class="tip-text" style="text-align: center; margin-top: 0.5rem;">Upload multiple photos at once. They
+              will be auto-compressed and appended to your media list instantly.</span>
+          </div>
+
+          <div class="form-section-card">
+            <h3>Gallery Media Library</h3>
+            <div id="galleryList" class="list-items-wrapper">
+              <!-- Dynamic gallery items -->
+            </div>
+            <button class="btn-add-item" id="addGalleryBtn" style="margin-top: 1.5rem;">+ Add New Media Item</button>
+          </div>
+        </section>
+
+        <!-- Tab 11: Google Reviews -->
+        <section class="tab-panel" id="reviews-tab">
+          <div class="form-section-card">
+            <h3>Testimonials List</h3>
+            <div id="reviewsList" class="list-items-wrapper">
+              <!-- Dynamic reviews list -->
+            </div>
+            <button class="btn-add-item" id="addReviewBtn" style="margin-top: 1.5rem;">+ Create Review Entry</button>
+          </div>
+        </section>
+
+        <!-- Extended Tab: MLB Programs CMS -->
+        <section class="tab-panel" id="mlb-programs-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Major League Baseball Development Programs</h3>
+            <div id="adminMlbProgramsList" class="list-items-wrapper">
+              <!-- Populated dynamically via JS -->
+            </div>
+            <button class="btn-add-item" id="adminAddMlbProgramBtn" style="margin-top: 1.5rem;">+ Create New Baseball Program</button>
+          </div>
+        </section>
+
+        <!-- Extended Tab: Tournament CMS -->
+        <section class="tab-panel" id="tournament-cms-tab">
+          <!-- Create/Edit Tournament Form -->
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Create / Edit Tournament</h3>
+            <form id="adminTournamentForm" novalidate>
+              <input type="hidden" id="adminTournamentId">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Tournament Name *</label>
+                  <input type="text" id="adminTournamentName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sport Type *</label>
+                  <select id="adminTournamentSport" class="form-input" required>
+                    <option value="Cricket">Cricket</option>
+                    <option value="Baseball">Baseball</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Age Group Category *</label>
+                  <select id="adminTournamentAgeGroup" class="form-input" required>
+                    <option value="U-11">U-11 Championship</option>
+                    <option value="U-13">U-13 Championship</option>
+                    <option value="U-15">U-15 Championship</option>
+                    <option value="U-17">U-17 Championship</option>
+                    <option value="Open">Open Invitational Cup</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Venue Ground Location *</label>
+                  <input type="text" id="adminTournamentVenue" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Start Date *</label>
+                  <input type="date" id="adminTournamentStartDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">End Date *</label>
+                  <input type="date" id="adminTournamentEndDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Registration Status *</label>
+                  <select id="adminTournamentRegStatus" class="form-input" required>
+                    <option value="open">Open (Accepting Registrations)</option>
+                    <option value="closed">Closed (Rosters Locked)</option>
+                    <option value="upcoming">Upcoming (Opening Soon)</option>
+                  </select>
+                </div>
+                <div class="form-group form-group-full">
+                  <label class="form-label">Poster Image Banner Link / File Upload</label>
+                  <input type="text" id="adminTournamentPoster" class="form-input">
+                  <input type="file" class="form-input" accept="image/*" id="adminTournamentPosterFile" style="margin-top:0.5rem;">
+                </div>
+              </div>
+              <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn-save-master" style="flex:2;">Save Tournament</button>
+                <button type="button" class="btn-save-master" id="adminCancelTournamentBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Active Tournaments List -->
+          <div class="form-section-card">
+            <h3>Active Tournaments List</h3>
+            <div class="table-responsive">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Poster</th>
+                    <th>Name</th>
+                    <th>Sport</th>
+                    <th>Category</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTournamentsTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Roster Team/Player Management -->
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Roster Team & Players Management</h3>
+            <div class="form-grid">
+              <div class="form-group" style="max-width: 300px;">
+                <label class="form-label">Select Tournament</label>
+                <select id="adminRosterTournamentSelect" class="form-input">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Team Forms List -->
+            <div id="adminTeamsList" class="list-items-wrapper" style="margin-top: 1.5rem;">
+              <!-- Dynamic teams list in selected tournament -->
+            </div>
+            <button class="btn-add-item" id="adminAddTeamBtn" style="margin-top: 1.5rem;">+ Add Team to Tournament</button>
+          </div>
+        </section>
+
+        <!-- Extended Tab: Fixtures & Scoring CMS -->
+        <section class="tab-panel" id="fixtures-scoring-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Generate & Edit Match Fixtures</h3>
+            
+            <div class="form-grid">
+              <div class="form-group" style="max-width: 300px;">
+                <label class="form-label">Select Tournament</label>
+                <select id="adminScoringTournamentSelect" class="form-input">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+            </div>
+
+            <div class="fixture-generator-card" id="adminFixtureGeneratorBox">
+              <h4>Tournament Bracket Auto-Scheduler</h4>
+              <p style="color:var(--text-grey); font-size:0.85rem;">Automatically generate a fixture roster based on all registered teams in the selected tournament.</p>
+              <div class="generator-action-row">
+                <button type="button" class="btn-save-master" onclick="generateFixtures('knockout')">Generate Knockout Tree</button>
+                <button type="button" class="btn-save-master" onclick="generateFixtures('league')" style="background:#0066CC;">Generate Round-Robin League</button>
+                <button type="button" class="btn-save-master" onclick="clearFixtures()" style="background:#EF4444; box-shadow:none;">Clear Roster</button>
+              </div>
+            </div>
+
+            <div style="margin-top:2rem;">
+              <h3>Scheduled Match Fixtures List</h3>
+              <div class="table-responsive">
+                <table class="bookings-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Match Details</th>
+                      <th>Venue</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminFixturesTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scoring Panel (Visible when scoring a match) -->
+          <div class="form-section-card" id="adminMatchScorerConsole" style="display:none; border: 1px solid var(--accent);">
+            <h3 style="color:var(--accent);">Scoring Dashboard: <span id="scoringMatchHeader">Team A vs Team B</span></h3>
+            
+            <form id="adminMatchScoringForm" novalidate>
+              <input type="hidden" id="scoringMatchId">
+              <input type="hidden" id="scoringSportType">
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Match Status</label>
+                  <select id="scoringMatchStatus" class="form-input">
+                    <option value="scheduled">Scheduled</option>
+                    <option value="live">Live</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Current Innings / Game Status Details</label>
+                  <input type="text" id="scoringInningsStatus" class="form-input" placeholder="e.g. Overs 14.2 or Top of 4th">
+                </div>
+              </div>
+
+              <!-- Cricket Scoring Inputs -->
+              <div class="score-board-console" id="cricketScoringInputs" style="display:none;">
+                <h4 style="color:#fff;">Cricket Scores Configuration</h4>
+                
+                <div class="score-grid-admin">
+                  <div class="score-input-item">
+                    <label id="lblCricketRunsA">Team A Runs</label>
+                    <input type="number" id="cricketRunsA" class="form-input" min="0">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblCricketWicketsA">Team A Wickets</label>
+                    <input type="number" id="cricketWicketsA" class="form-input" min="0" max="10">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblCricketOversA">Team A Overs Bowled</label>
+                    <input type="number" id="cricketOversA" class="form-input" step="0.1" min="0">
+                  </div>
+                </div>
+
+                <div class="score-grid-admin" style="margin-top: 1.5rem;">
+                  <div class="score-input-item">
+                    <label id="lblCricketRunsB">Team B Runs</label>
+                    <input type="number" id="cricketRunsB" class="form-input" min="0">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblCricketWicketsB">Team B Wickets</label>
+                    <input type="number" id="cricketWicketsB" class="form-input" min="0" max="10">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblCricketOversB">Team B Overs Bowled</label>
+                    <input type="number" id="cricketOversB" class="form-input" step="0.1" min="0">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Baseball Scoring Inputs -->
+              <div class="score-board-console" id="baseballScoringInputs" style="display:none;">
+                <h4 style="color:#fff;">Baseball Inning Scores</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Current Inning Number</label>
+                    <input type="number" id="baseballInningNum" class="form-input" min="1" max="9">
+                  </div>
+                </div>
+
+                <div class="score-grid-admin">
+                  <div class="score-input-item">
+                    <label id="lblBaseballRunsA">Team A Runs</label>
+                    <input type="number" id="baseballRunsA" class="form-input" min="0">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblBaseballHitsA">Team A Hits</label>
+                    <input type="number" id="baseballHitsA" class="form-input" min="0">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblBaseballErrorsA">Team A Errors</label>
+                    <input type="number" id="baseballErrorsA" class="form-input" min="0">
+                  </div>
+                </div>
+
+                <div class="score-grid-admin" style="margin-top: 1.5rem;">
+                  <div class="score-input-item">
+                    <label id="lblBaseballRunsB">Team B Runs</label>
+                    <input type="number" id="baseballRunsB" class="form-input" min="0">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblBaseballHitsB">Team B Hits</label>
+                    <input type="number" id="baseballHitsB" class="form-input" min="0">
+                  </div>
+                  <div class="score-input-item">
+                    <label id="lblBaseballErrorsB">Team B Errors</label>
+                    <input type="number" id="baseballErrorsB" class="form-input" min="0">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Completed Match Results inputs -->
+              <div class="score-board-console" id="completedMatchInputs" style="display:none; border-color:var(--color-grass);">
+                <h4 style="color:#fff; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem; margin-bottom:1rem;">Winner & Awards (Required on Completion)</h4>
+                
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Winner Team</label>
+                    <select id="scoringWinnerId" class="form-input">
+                      <!-- Filled by JS -->
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Match Summary Details</label>
+                    <input type="text" id="scoringResultDetails" class="form-input" placeholder="e.g. Renegades U-11 won by 6 runs">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Match MVP Player</label>
+                    <input type="text" id="scoringMvp" class="form-input" placeholder="Enter player name">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Special Awards / Highlights</label>
+                    <input type="text" id="scoringAwards" class="form-input" placeholder="e.g. Best Batsman / Gold Medalist">
+                  </div>
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Match Highlights Photo URL</label>
+                    <input type="text" id="scoringPhoto" class="form-input">
+                    <input type="file" class="form-input" accept="image/*" id="scoringPhotoFile" style="margin-top:0.5rem;">
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:1.5rem; margin-top:2rem;">
+                <button type="submit" class="btn-save-master" style="flex:2;">Confirm Scores</button>
+                <button type="button" class="btn-save-master" id="adminCloseScorerBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Extended Tab: Registrations Manager CMS -->
+        <section class="tab-panel" id="registrations-cms-tab">
+          <div class="booking-stats-row">
+            <div class="booking-stat-card">
+              <div class="stat-num" id="totalRegsCount">0</div>
+              <div class="stat-lbl">Total Registrations</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-orange" id="pendingRegsCount">0</div>
+              <div class="stat-lbl">Pending Payments</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-green" id="paidRegsCount">0</div>
+              <div class="stat-lbl">Confirmed Entries</div>
+            </div>
+          </div>
+
+          <div class="form-section-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
+              <h3 style="border-bottom:none; margin-bottom:0; padding-bottom:0; color:var(--accent);">Tournament Registrations List</h3>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="bookings-filters-bar">
+              <select id="adminRegsTournamentSelect" class="form-input" style="flex:2;">
+                <!-- Populated by JS -->
+              </select>
+              <select id="adminRegsPaymentFilter" class="form-input" style="flex:1;">
+                <option value="all">All Payments</option>
+                <option value="paid">Confirmed Paid</option>
+                <option value="pending">Pending Review</option>
+              </select>
+              <button type="button" class="btn-save-master" id="adminExportRegsCsvBtn" style="padding: 0.8rem 1rem;">Export CSV</button>
+            </div>
+
+            <!-- Table List -->
+            <div class="table-responsive">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Contact Info</th>
+                    <th>Category</th>
+                    <th>QR Passcode</th>
+                    <th>Payment</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRegistrationsTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+              <div id="adminRegsTableEmpty" style="display:none; text-align:center; padding:3rem 0; color:var(--text-grey);">
+                No tournament registrations found for this filter combination.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 12: Export Configuration -->
+        <section class="tab-panel" id="export-tab">
+          <div class="export-container">
+            <div class="export-card">
+              <span class="export-icon">💾</span>
+              <h3>Export Content Database</h3>
+              <p>To make the changes permanent for all website visitors, you need to download the generated file and
+                place it in the workspace folder. This overrides code updates dynamically without database backends.</p>
+
+              <div class="instruction-box">
+                <ol>
+                  <li>Click the <strong>Download config.js</strong> button below.</li>
+                  <li>Copy the downloaded file (named <code>config.js</code>).</li>
+                  <li>Navigate to the folder: <code>assets/js/</code> inside the workspace.</li>
+                  <li>Paste the file there, overwriting the existing <code>config.js</code> file.</li>
+                  <li>Redeploy or commit changes to make them public!</li>
+                </ol>
+              </div>
+
+              <div class="export-actions">
+                <button class="btn-action btn-action-primary" id="btnDownloadConfig">Download config.js</button>
+                <button class="btn-action btn-action-outline" id="btnResetConfig">Reset to Default Settings</button>
+                <button class="btn-action btn-action-danger" id="btnClearStorage">Clear Local Cache</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Reschedule Overlay Modal Dialog -->
+  <div class="login-overlay hidden" id="adminRescheduleModal" style="z-index: 10002;">
+    <div class="login-card" style="max-width: 480px; text-align:left;">
+      <h3 style="font-family:var(--font-display); color:var(--accent); font-size:1.3rem; margin-bottom:1rem; text-transform:uppercase;">Reschedule Trial Slot</h3>
+      <div class="form-group">
+        <label class="form-label">Selected Date</label>
+        <input type="date" id="adminRescheduleDate" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Slot</label>
+        <div class="slots-grid" id="adminRescheduleSlotsGrid" style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="6 AM">6 AM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="7 AM">7 AM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="8 AM">8 AM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="4 PM">4 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="5 PM">5 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="6 PM">6 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="7 PM">7 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+        </div>
+        <input type="hidden" id="adminRescheduleSlotInput">
+      </div>
+      <div style="display:flex; gap:1.5rem; margin-top: 2rem;">
+        <button type="button" class="login-btn" style="background:var(--border-grey);" id="adminRescheduleCancelBtn">Cancel</button>
+        <button type="button" class="login-btn" id="adminRescheduleSaveBtn">Save Slot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success indicator banner -->
+  <div class="save-success-notification" id="successBanner" role="alert">Changes Saved to Browser Storage!</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/notifications_services.js"></script>
+  <script src="assets/js/admin.js"></script>
+  <script src="assets/js/admin_extensions.js"></script>
+
+</body>
+
+</html>

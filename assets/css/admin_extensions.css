@@ -1,0 +1,159 @@
+/* ==========================================================================
+   RENEGADES SPORTS ARENA - ADMIN PORTAL CMS EXTENSIONS
+   ========================================================================== */
+
+/* Scoring Input Elements */
+.score-board-console {
+  background: var(--bg-card);
+  border: 1px solid var(--border-grey);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.score-grid-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.score-input-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.score-input-item label {
+  font-size: 0.8rem;
+  color: var(--text-grey);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Fixtures Generator Box */
+.fixture-generator-card {
+  background: rgba(255,255,255,0.01);
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.fixture-generator-card h4 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 0.8rem;
+}
+
+.generator-action-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Registration Grid view */
+.registrations-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.reg-summary-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border-grey);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.reg-summary-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.reg-summary-lbl {
+  font-size: 0.75rem;
+  color: var(--text-grey);
+  text-transform: uppercase;
+}
+
+/* Toggle Status switch in forms */
+.toggle-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.switch-label-status {
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Custom badges in tables */
+.badge-status {
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.badge-status.paid {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid #10B981;
+}
+
+.badge-status.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  border: 1px solid #F59E0B;
+}
+
+.badge-status.live {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid #EF4444;
+}
+
+.badge-status.completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid #10B981;
+}
+
+/* Tab menu indicator extensions */
+.menu-item[data-target-tab^="mlb-"], .menu-item[data-target-tab^="tournament-"] {
+  border-left: 2px solid var(--accent);
+  padding-left: calc(1.5rem - 2px);
+}
+
+/* Scoring dashboard matches list */
+.scoring-match-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-grey);
+}
+
+.scoring-match-row:last-child {
+  border-bottom: none;
+}
+
+.scoring-match-teams {
+  font-weight: 700;
+  color: #fff;
+}
+
+.scoring-match-info {
+  font-size: 0.8rem;
+  color: var(--text-grey);
+}
