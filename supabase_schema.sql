@@ -562,4 +562,64 @@ GRANT ALL ON public.booking_locks TO anon, authenticated, service_role;
 GRANT ALL ON public.audit_logs TO anon, authenticated, service_role;
 
 
+-- ==========================================================================
+-- STORAGE SYSTEM SETUP FOR PORTAL AVATARS
+-- ==========================================================================
+
+-- Insert avatars storage bucket configuration with 2MB limits and type constraints
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('avatars', 'avatars', true, 2097152, ARRAY['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+ON CONFLICT (id) DO UPDATE 
+SET public = true, 
+    file_size_limit = 2097152, 
+    allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+-- Enable Row Level Security on storage objects
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- Set up access policies on avatars bucket
+CREATE POLICY "Allow public read access on avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+CREATE POLICY "Allow public insert access on avatars" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'avatars');
+CREATE POLICY "Allow public update access on avatars" ON storage.objects FOR UPDATE USING (bucket_id = 'avatars');
+CREATE POLICY "Allow public delete access on avatars" ON storage.objects FOR DELETE USING (bucket_id = 'avatars');
+
+
+-- ==========================================================================
+-- REAL-TIME NOTIFICATIONS COLUMN ALTERS & ACCESS POLICIES
+-- ==========================================================================
+
+-- Alter table to support new fields
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT false;
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS action_url TEXT;
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
+
+-- Re-enable Row Level Security
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Clean up any existing policies
+DROP POLICY IF EXISTS "Enable SELECT for anonymous users" ON public.notifications;
+DROP POLICY IF EXISTS "Enable INSERT for anonymous users" ON public.notifications;
+DROP POLICY IF EXISTS "Enable UPDATE for anonymous users" ON public.notifications;
+DROP POLICY IF EXISTS "Enable DELETE for anonymous users" ON public.notifications;
+DROP POLICY IF EXISTS "Users can read only their own notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Admin can insert notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Users can update their own notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Admin can delete notifications" ON public.notifications;
+
+-- Create policies
+CREATE POLICY "Users can read only their own notifications" ON public.notifications
+    FOR SELECT USING (auth.uid() = user_id OR user_id IS NULL);
+
+CREATE POLICY "Admin can insert notifications" ON public.notifications
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can update their own notifications" ON public.notifications
+    FOR UPDATE USING (auth.uid() = user_id OR user_id IS NULL) WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
+
+CREATE POLICY "Admin can delete notifications" ON public.notifications
+    FOR DELETE USING (true);
+
+
+
+
 

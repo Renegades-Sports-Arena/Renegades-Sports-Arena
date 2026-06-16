@@ -62,6 +62,7 @@
         <button class="menu-item" data-target-tab="tournament-cms-tab" style="color: var(--accent);">🏆 Tournament CMS</button>
         <button class="menu-item" data-target-tab="fixtures-scoring-tab" style="color: var(--accent);">📅 Match Scoring</button>
         <button class="menu-item" data-target-tab="registrations-cms-tab" style="color: var(--accent);">👥 Registrations</button>
+        <button class="menu-item" data-target-tab="notifications-tab" style="color: #ffc107;">🔔 Notification Center</button>
         
         <button class="menu-item" data-target-tab="export-tab"
           style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: var(--accent);">Export
@@ -908,6 +909,87 @@
                 <button class="btn-action btn-action-outline" id="btnResetConfig">Reset to Default Settings</button>
                 <button class="btn-action btn-action-danger" id="btnClearStorage">Clear Local Cache</button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Extended Tab: Notification Center -->
+        <section class="tab-panel" id="notifications-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Compose & Dispatch Notification</h3>
+            <form id="adminNotificationForm" novalidate>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Notification Title *</label>
+                  <input type="text" id="adminNotTitle" class="form-input" required placeholder="e.g. Schedule Update">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Notification Type *</label>
+                  <select id="adminNotType" class="form-input" required>
+                    <option value="tournament_alert">Tournament Alert</option>
+                    <option value="match_reminder">Match Reminder</option>
+                    <option value="fee_reminder">Fee Reminder</option>
+                    <option value="attendance_alert">Attendance Alert</option>
+                    <option value="session_update" selected>Session Update</option>
+                    <option value="trial_confirmation">Trial Confirmation</option>
+                    <option value="birthday_wish">Birthday Wish</option>
+                    <option value="achievement_certificate">Achievement Certificate</option>
+                    <option value="performance_report">Performance Report</option>
+                    <option value="emergency_announcement">Emergency Announcement</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Target Audience Scope *</label>
+                  <select id="adminNotScope" class="form-input" required onchange="toggleAdminNotScope()">
+                    <option value="broadcast">Broadcast (All Users)</option>
+                    <option value="individual">Individual User</option>
+                    <option value="role">User Role</option>
+                  </select>
+                </div>
+                <div class="form-group" id="adminNotUserGroup" style="display: none;">
+                  <label class="form-label">Select Recipient User *</label>
+                  <select id="adminNotUser" class="form-input">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group" id="adminNotRoleGroup" style="display: none;">
+                  <label class="form-label">Select Target Role *</label>
+                  <select id="adminNotRole" class="form-input">
+                    <option value="player">Players</option>
+                    <option value="parent">Parents</option>
+                    <option value="coach">Coaches</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Action URL (Optional)</label>
+                  <input type="text" id="adminNotUrl" class="form-input" placeholder="e.g. portal.html#payments">
+                </div>
+              </div>
+              <div class="form-group" style="margin-top: 1rem;">
+                <label class="form-label">Notification Message *</label>
+                <textarea id="adminNotMessage" class="form-input" rows="4" required placeholder="Enter notification message here..."></textarea>
+              </div>
+              <button type="submit" class="btn-action btn-action-primary" style="margin-top: 1rem;" id="btnSendNotification">Send Notification</button>
+            </form>
+          </div>
+
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3 style="color:var(--accent);">Notification Dispatch History</h3>
+            <div style="overflow-x: auto; margin-top: 1rem;">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Title & Message</th>
+                    <th>Type</th>
+                    <th>Target Audience</th>
+                    <th>Date Sent</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminNotificationHistoryLog">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
             </div>
           </div>
         </section>

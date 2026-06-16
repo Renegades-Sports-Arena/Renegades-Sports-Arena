@@ -32,7 +32,25 @@
         <img src="assets/images/logo.png" alt="Renegades Emblem" class="logo-img">
         <span class="logo-text">RENEGADES <span>PORTAL</span></span>
       </a>
-      <div class="header-actions">
+      <div class="header-actions" style="display: flex; align-items: center; gap: 1rem;">
+        <div id="headerNotificationContainer" style="position: relative; display: none;">
+          <button id="headerNotificationBell" class="btn btn-outline-orange" aria-label="Toggle notifications" style="padding: 0.5rem 0.8rem; font-size: 1.1rem; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; position: relative;">
+            🔔
+            <span id="headerNotificationBadge" style="position: absolute; top: -5px; right: -5px; background: #EF4444; color: white; border-radius: 50%; font-size: 0.65rem; padding: 0.15rem 0.35rem; font-weight: bold; min-width: 18px; text-align: center; line-height: 1;">0</span>
+          </button>
+          
+          <!-- Dropdown Panel -->
+          <div id="headerNotificationPanel" class="glass-card" style="display: none; position: absolute; top: 50px; right: 0; width: 320px; max-height: 400px; overflow-y: auto; z-index: 1005; padding: 1rem; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); text-align: left; background: var(--bg-secondary); border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem;">
+              <h4 style="margin: 0; font-family: var(--font-display); font-size: 0.95rem; color: #fff;">Notifications</h4>
+              <button class="btn btn-outline-orange btn-sm" style="font-size: 0.65rem; padding: 0.2rem 0.5rem;" onclick="markAllNotificationsAsRead()">Mark All Read</button>
+            </div>
+            <div id="headerNotificationList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 280px; overflow-y: auto;">
+              <!-- Loaded dynamically -->
+            </div>
+          </div>
+        </div>
+
         <a href="index.html" class="btn btn-outline-orange">← Back to Site</a>
         <button id="logoutBtn" class="btn btn-primary" style="display: none;">Logout</button>
       </div>
@@ -74,14 +92,7 @@
               </div>
               <button type="submit" class="btn btn-primary w-100">Sign In</button>
             </form>
-            <div class="demo-logins-box">
-              <p>Demo accounts (Self-Healing Mode):</p>
-              <div class="demo-buttons">
-                <button type="button" class="btn-demo-acc" onclick="fillDemo('player@rsa.com')">Player Demo</button>
-                <button type="button" class="btn-demo-acc" onclick="fillDemo('parent@rsa.com')">Parent Demo</button>
-                <button type="button" class="btn-demo-acc" onclick="fillDemo('coach@rsa.com')">Coach Demo</button>
-              </div>
-            </div>
+
           </div>
 
           <!-- Sign Up Form -->
@@ -407,8 +418,19 @@
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Profile Picture URL</label>
-                    <input type="url" id="playerProfAvatar" class="form-control">
+                    <label class="form-label">Profile Picture</label>
+                    <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                      <img id="playerProfAvatarPreview" src="" alt="Avatar Preview" class="user-avatar" style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-primary);">
+                      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <input type="file" id="playerProfAvatarFile" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
+                        <div style="display: flex; gap: 0.5rem;">
+                          <button type="button" class="btn btn-outline-orange btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="document.getElementById('playerProfAvatarFile').click()">Choose Image</button>
+                          <button type="button" class="btn btn-secondary btn-sm" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.4rem 0.8rem; font-size: 0.75rem; color: #fff;" id="btnDeleteAvatar" onclick="handleDeleteAvatar()">Delete Image</button>
+                        </div>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">Max size: 2MB. Format: JPEG, PNG, GIF, WebP</span>
+                      </div>
+                    </div>
+                    <input type="hidden" id="playerProfAvatar">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Biography</label>

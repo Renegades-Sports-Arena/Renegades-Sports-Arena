@@ -5,6 +5,7 @@
    ========================================================================== */
 
 // --- STATE MANAGEMENT ---
+const DEFAULT_BLANK_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FhYSI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ii8+PHBhdGggZD0iTTEyIDE0Yy02LjEgMC04IDQtOCA0djJoMTZ2LTJzLTEuOS00LTgtNHoiLz48L3N2Zz4=";
 let currentUser = null; // Profile object: { id, email, name, role, ... }
 let isMockSession = false;
 let liveCache = {
@@ -345,6 +346,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // Player Forms
   document.getElementById("playerProfileForm").addEventListener("submit", handlePlayerProfileSave);
   
+  const avatarFileEl = document.getElementById("playerProfAvatarFile");
+  if (avatarFileEl) {
+    avatarFileEl.addEventListener("change", handleAvatarFileChange);
+  }
+
+  // Header notifications panel toggle
+  const bellBtn = document.getElementById("headerNotificationBell");
+  const panelEl = document.getElementById("headerNotificationPanel");
+  if (bellBtn && panelEl) {
+    bellBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      panelEl.style.display = panelEl.style.display === "none" ? "block" : "none";
+    });
+    document.addEventListener("click", (e) => {
+      if (!panelEl.contains(e.target) && !bellBtn.contains(e.target)) {
+        panelEl.style.display = "none";
+      }
+    });
+  }
+  
   // Coach Forms
   document.getElementById("coachEvaluationForm").addEventListener("submit", handleCoachEvalSubmit);
   document.getElementById("coachSessionForm").addEventListener("submit", handleCoachSessionSubmit);
@@ -415,23 +436,11 @@ async function handleSignInSubmit(e) {
   const email = document.getElementById("loginEmail").value.trim();
   const pass = document.getElementById("loginPassword").value;
 
-  // 1. Self Healing / Fallback Mode check
-  const isDemoUser = ["player@rsa.com", "parent@rsa.com", "coach@rsa.com", "rohit@rsa.com"].includes(email.toLowerCase());
-  
-  if (isDemoUser && pass === "password") {
-    isMockSession = true;
-    const db = getLocalDB();
-    const profile = db.profiles.find(p => p.email.toLowerCase() === email.toLowerCase());
-    
-    if (profile) {
-      currentUser = profile;
-      showToast(`Logged in successfully to Demo ${profile.role} account!`, "success");
-      loadDashboard(profile);
-      return;
-    }
-  }
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Signing In...";
 
-  // 2. Real Supabase Login Attempt
   try {
     const client = window.supabaseClient;
     if (!client) throw new Error("Supabase client is not loaded.");
@@ -460,6 +469,7 @@ async function handleSignInSubmit(e) {
         email: email,
         role: role,
         name: defaultName,
+        avatar_url: DEFAULT_BLANK_AVATAR
       };
 
       const { data: insertedProf, error: insertError } = await client
@@ -480,7 +490,10 @@ async function handleSignInSubmit(e) {
 
   } catch (err) {
     console.error("Live DB auth login error: ", err.message);
-    showToast(`Auth Failed: ${err.message}. (Use demo logins if live keys are restricted)`, "error");
+    showToast(`Auth Failed: ${err.message}`, "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 }
 
@@ -490,6 +503,11 @@ async function handleSignUpSubmit(e) {
   const email = document.getElementById("registerEmail").value.trim();
   const password = document.getElementById("registerPassword").value;
   const role = document.getElementById("registerRole").value;
+
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Creating Account...";
 
   try {
     const client = window.supabaseClient;
@@ -509,7 +527,8 @@ async function handleSignUpSubmit(e) {
         user_id: authData.user.id,
         email: email,
         name: name,
-        role: role
+        role: role,
+        avatar_url: DEFAULT_BLANK_AVATAR
       };
 
       const { error: profErr } = await client
@@ -518,47 +537,54 @@ async function handleSignUpSubmit(e) {
 
       if (profErr) throw profErr;
 
-      showToast("Registration successful! Check verification email or login directly.", "success");
+      showToast("Registration successful! Check your email for verification.", "success");
       switchAuthTab("signin");
     }
 
   } catch (err) {
     console.error("Sign up failed: ", err.message);
-    
-    // Save locally to emulate signup if offline/restricted
-    const db = getLocalDB();
-    if (db.profiles.some(p => p.email.toLowerCase() === email.toLowerCase())) {
-      showToast("Email already exists in local DB. Try signing in.", "error");
-      return;
-    }
-
-    const localId = `local-${Date.now()}`;
-    const newLocalProf = {
-      id: localId,
-      email: email,
-      name: name,
-      role: role,
-      phone: "",
-      age: 18,
-      school: "",
-      bio: "Newly signed up local athlete."
-    };
-
-    db.profiles.push(newLocalProf);
-    saveLocalDB(db);
-    showToast("Local profile emulated (offline mode). Login using details now!", "success");
-    switchAuthTab("signin");
+    showToast(`Sign up failed: ${err.message}`, "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 }
 
-function handleForgotSubmit(e) {
+async function handleForgotSubmit(e) {
   e.preventDefault();
   const email = document.getElementById("forgotEmail").value.trim();
-  showToast(`Password reset link dispatched to ${email}!`, "success");
-  switchAuthTab("signin");
+  const client = window.supabaseClient;
+  if (!client) return;
+
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Sending...";
+
+  try {
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (error) throw error;
+    showToast(`Password reset link dispatched to ${email}!`, "success");
+    switchAuthTab("signin");
+  } catch (err) {
+    showToast(`Failed to send reset link: ${err.message}`, "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
 }
 
-function handleLogout() {
+async function handleLogout() {
+  const client = window.supabaseClient;
+  if (client) {
+    try {
+      await client.auth.signOut();
+    } catch (err) {
+      console.error("Supabase signOut error:", err);
+    }
+  }
   currentUser = null;
   isMockSession = false;
   
@@ -568,16 +594,62 @@ function handleLogout() {
   document.getElementById("parentPortal").style.display = "none";
   document.getElementById("coachPortal").style.display = "none";
   document.getElementById("logoutBtn").style.display = "none";
+
+  // Hide header notification bell & clean up realtime subs
+  const headerNotifContainer = document.getElementById("headerNotificationContainer");
+  if (headerNotifContainer) {
+    headerNotifContainer.style.display = "none";
+  }
+  const headerNotifPanel = document.getElementById("headerNotificationPanel");
+  if (headerNotifPanel) {
+    headerNotifPanel.style.display = "none";
+  }
+  if (window.cleanupSupabaseRealtimeSub) {
+    window.cleanupSupabaseRealtimeSub();
+  }
   
   showToast("Logged out successfully.", "info");
 }
 
-function initAuthListener() {
+async function initAuthListener() {
   const client = window.supabaseClient;
   if (!client) return;
 
+  // Restore session on page load
+  try {
+    const { data: { session } } = await client.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await client
+        .from("profiles")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .single();
+      if (profile) {
+        currentUser = profile;
+        loadDashboard(currentUser);
+      }
+    }
+  } catch (err) {
+    console.error("Session restore failed:", err);
+  }
+
   client.auth.onAuthStateChange(async (event, session) => {
-    if (event === "SIGNED_IN" && session?.user && !isMockSession) {
+    if (event === "PASSWORD_RECOVERY") {
+      const newPassword = prompt("Please enter your new password (minimum 6 characters):");
+      if (newPassword) {
+        if (newPassword.length < 6) {
+          alert("Password must be at least 6 characters.");
+          return;
+        }
+        try {
+          const { error } = await client.auth.updateUser({ password: newPassword });
+          if (error) throw error;
+          showToast("Password updated successfully!", "success");
+        } catch (err) {
+          showToast("Failed to update password: " + err.message, "error");
+        }
+      }
+    } else if (event === "SIGNED_IN" && session?.user && !isMockSession) {
       try {
         const { data: profile } = await client
           .from("profiles")
@@ -592,6 +664,13 @@ function initAuthListener() {
       } catch (e) {
         console.warn("Auth Listener Profile Bind Failed: ", e);
       }
+    } else if (event === "SIGNED_OUT") {
+      currentUser = null;
+      document.getElementById("authSection").style.display = "block";
+      document.getElementById("playerPortal").style.display = "none";
+      document.getElementById("parentPortal").style.display = "none";
+      document.getElementById("coachPortal").style.display = "none";
+      document.getElementById("logoutBtn").style.display = "none";
     }
   });
 }
@@ -662,10 +741,18 @@ async function loadDashboard(profile) {
     window.initSupabaseRealtimeSub();
   }
 
+  // Show header notification bell
+  const headerNotifContainer = document.getElementById("headerNotificationContainer");
+  if (headerNotifContainer) {
+    headerNotifContainer.style.display = "block";
+    syncHeaderNotifications(profile.id, profile.role);
+  }
+
   if (profile.role === "player") {
     document.getElementById("playerPortal").style.display = "block";
     // Bind Mini Card info
-    document.getElementById("playerAvatar").src = profile.avatar_url || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+    const avatarUrl = profile.avatar_url || DEFAULT_BLANK_AVATAR;
+    document.getElementById("playerAvatar").src = avatarUrl;
     document.getElementById("playerName").textContent = profile.name;
     
     // Fill Profiles Form
@@ -673,7 +760,11 @@ async function loadDashboard(profile) {
     document.getElementById("playerProfPhone").value = profile.phone || "";
     document.getElementById("playerProfAge").value = profile.age || "";
     document.getElementById("playerProfSchool").value = profile.school || "";
-    document.getElementById("playerProfAvatar").value = profile.avatar_url || "";
+    document.getElementById("playerProfAvatar").value = avatarUrl;
+    const preview = document.getElementById("playerProfAvatarPreview");
+    if (preview) {
+      preview.src = avatarUrl;
+    }
     document.getElementById("playerProfBio").value = profile.bio || "";
 
     // Sync other tabs
@@ -682,7 +773,7 @@ async function loadDashboard(profile) {
 
   } else if (profile.role === "parent") {
     document.getElementById("parentPortal").style.display = "block";
-    document.getElementById("parentAvatar").src = profile.avatar_url || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80";
+    document.getElementById("parentAvatar").src = profile.avatar_url || DEFAULT_BLANK_AVATAR;
     document.getElementById("parentName").textContent = profile.name;
 
     await syncParentDashboardData(profile.id);
@@ -690,7 +781,7 @@ async function loadDashboard(profile) {
 
   } else if (profile.role === "coach") {
     document.getElementById("coachPortal").style.display = "block";
-    document.getElementById("coachAvatar").src = profile.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80";
+    document.getElementById("coachAvatar").src = profile.avatar_url || DEFAULT_BLANK_AVATAR;
     document.getElementById("coachName").textContent = profile.name;
 
     await syncCoachDashboardData();
@@ -1069,15 +1160,22 @@ async function handlePlayerProfileSave(e) {
   const avatar = document.getElementById("playerProfAvatar").value.trim();
   const bio = document.getElementById("playerProfBio").value.trim();
 
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Saving...";
+
   if (!isMockSession) {
     try {
       const client = window.supabaseClient;
+      if (!client) throw new Error("Supabase client is not loaded.");
+
       const { data, error } = await client
         .from("profiles")
         .update({
           name: name,
           phone: phone,
-          age: Number(age),
+          age: age ? Number(age) : null,
           school: school,
           avatar_url: avatar,
           bio: bio
@@ -1088,31 +1186,184 @@ async function handlePlayerProfileSave(e) {
 
       if (error) throw error;
       currentUser = data;
-      showToast("Profile details updated successfully in Supabase!", "success");
+      showToast("Profile details updated successfully!", "success");
       loadDashboard(currentUser);
     } catch (err) {
-      console.error("Error saving profile to Supabase:", err);
-      showToast("Error updating profile in live database: " + err.message, "error");
+      console.error("Error saving profile:", err);
+      showToast("Error updating profile: " + err.message, "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     }
+  } else {
+    try {
+      let db = getLocalDB();
+      const index = db.profiles.findIndex(p => p.id === currentUser.id);
+      if (index !== -1) {
+        db.profiles[index].name = name;
+        db.profiles[index].phone = phone;
+        db.profiles[index].age = age ? Number(age) : null;
+        db.profiles[index].school = school;
+        db.profiles[index].avatar_url = avatar;
+        db.profiles[index].bio = bio;
+        
+        saveLocalDB(db);
+        currentUser = db.profiles[index];
+        showToast("Profile details updated successfully!", "success");
+        loadDashboard(currentUser);
+      }
+    } catch (err) {
+      console.error("Error saving mock profile:", err);
+      showToast("Error updating mock profile.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  }
+}
+
+// --- PROFILE AVATAR UPLOAD ROUTINES ---
+function updateAvatarUI(url) {
+  const preview = document.getElementById("playerProfAvatarPreview");
+  if (preview) preview.src = url;
+
+  const hiddenInput = document.getElementById("playerProfAvatar");
+  if (hiddenInput) hiddenInput.value = url;
+
+  const playerAvatar = document.getElementById("playerAvatar");
+  if (playerAvatar) playerAvatar.src = url;
+}
+
+async function deleteAvatarFromStorage(url) {
+  if (!url || url.startsWith("data:image")) return;
+  const client = window.supabaseClient;
+  if (!client) return;
+
+  try {
+    const bucketMarker = "/storage/v1/object/public/avatars/";
+    const markerIndex = url.indexOf(bucketMarker);
+    if (markerIndex !== -1) {
+      const filePath = decodeURIComponent(url.substring(markerIndex + bucketMarker.length));
+      await client.storage.from('avatars').remove([filePath]);
+    }
+  } catch (err) {
+    console.error("Failed to delete avatar from storage:", err);
+  }
+}
+
+async function handleAvatarUpload(file) {
+  const client = window.supabaseClient;
+  if (!client) throw new Error("Supabase client is not loaded.");
+
+  // Client-side validations
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.");
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    throw new Error("File size exceeds 2MB limit.");
+  }
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `avatar-${Date.now()}.${fileExt}`;
+  const filePath = `${currentUser.id}/${fileName}`;
+
+  const { data, error } = await client.storage
+    .from('avatars')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = client.storage
+    .from('avatars')
+    .getPublicUrl(filePath);
+
+  return { publicUrl };
+}
+
+async function handleAvatarFileChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const btnChoose = document.querySelector("button[onclick*='playerProfAvatarFile']");
+  const originalText = btnChoose.textContent;
+  btnChoose.disabled = true;
+  btnChoose.textContent = "Uploading...";
+
+  try {
+    // Clean up old avatar from storage if not default
+    if (currentUser.avatar_url && currentUser.avatar_url !== DEFAULT_BLANK_AVATAR) {
+      await deleteAvatarFromStorage(currentUser.avatar_url);
+    }
+
+    const { publicUrl } = await handleAvatarUpload(file);
+
+    // Save directly to profiles
+    const client = window.supabaseClient;
+    const { data, error } = await client
+      .from("profiles")
+      .update({ avatar_url: publicUrl })
+      .eq("id", currentUser.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    currentUser = data;
+
+    updateAvatarUI(publicUrl);
+    showToast("Profile picture updated successfully!", "success");
+  } catch (err) {
+    console.error("Avatar change error:", err);
+    showToast("Upload failed: " + err.message, "error");
+  } finally {
+    btnChoose.disabled = false;
+    btnChoose.textContent = originalText;
+    e.target.value = "";
+  }
+}
+
+async function handleDeleteAvatar() {
+  if (!currentUser) return;
+  if (currentUser.avatar_url === DEFAULT_BLANK_AVATAR) {
+    showToast("Profile is already using the default avatar.", "info");
     return;
   }
 
-  let db = getLocalDB();
-  const index = db.profiles.findIndex(p => p.id === currentUser.id);
-  if (index !== -1) {
-    db.profiles[index].name = name;
-    db.profiles[index].phone = phone;
-    db.profiles[index].age = Number(age);
-    db.profiles[index].school = school;
-    db.profiles[index].avatar_url = avatar;
-    db.profiles[index].bio = bio;
-    
-    saveLocalDB(db);
-    currentUser = db.profiles[index];
-    showToast("Profile details updated successfully!", "success");
-    loadDashboard(currentUser);
+  if (!confirm("Are you sure you want to delete your profile picture?")) return;
+
+  const btnDelete = document.getElementById("btnDeleteAvatar");
+  const originalText = btnDelete.textContent;
+  btnDelete.disabled = true;
+  btnDelete.textContent = "Deleting...";
+
+  try {
+    await deleteAvatarFromStorage(currentUser.avatar_url);
+
+    const client = window.supabaseClient;
+    const { data, error } = await client
+      .from("profiles")
+      .update({ avatar_url: DEFAULT_BLANK_AVATAR })
+      .eq("id", currentUser.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    currentUser = data;
+
+    updateAvatarUI(DEFAULT_BLANK_AVATAR);
+    showToast("Profile picture deleted successfully.", "success");
+  } catch (err) {
+    console.error("Error deleting avatar:", err);
+    showToast("Delete failed: " + err.message, "error");
+  } finally {
+    btnDelete.disabled = false;
+    btnDelete.textContent = originalText;
   }
 }
+
 
 // ==========================================================================
 // B. PARENT DASHBOARD DATA HANDLERS
@@ -2529,15 +2780,17 @@ async function markNotificationRead(role, notId) {
       const client = window.supabaseClient;
       const { error } = await client
         .from("notifications")
-        .update({ status: "read" })
+        .update({ status: "read", is_read: true })
         .eq("id", notId);
       if (error) throw error;
       const idx = liveCache.notifications.findIndex(n => n.id === notId);
       if (idx !== -1) {
         liveCache.notifications[idx].status = "read";
+        liveCache.notifications[idx].is_read = true;
       }
       showToast("Notification marked as read.", "success");
       await syncNotificationsList(role, currentUser.id);
+      await syncHeaderNotifications(currentUser.id, role);
     } catch (err) {
       console.error("Error marking notification read:", err);
       showToast("Error updating notification status.", "error");
@@ -2549,9 +2802,11 @@ async function markNotificationRead(role, notId) {
   const idx = db.notifications.findIndex(n => n.id === notId);
   if (idx !== -1) {
     db.notifications[idx].status = "read";
+    db.notifications[idx].is_read = true;
     saveLocalDB(db);
     showToast("Notification marked as read.", "success");
     await syncNotificationsList(role, currentUser.id);
+    await syncHeaderNotifications(currentUser.id, role);
   }
 }
 
@@ -2588,7 +2843,7 @@ async function updateUnreadNotificationsBadge(role, userId) {
     notifications = db.notifications.filter(n => targetUserIds.includes(n.user_id));
   }
 
-  const unreadCount = notifications.filter(n => n.status === "unread").length;
+  const unreadCount = notifications.filter(n => n.status === "unread" || n.is_read === false).length;
   const badge = document.getElementById(role === "player" ? "playerUnreadCount" : "parentUnreadCount");
   if (badge) {
     if (unreadCount > 0) {
@@ -2599,6 +2854,147 @@ async function updateUnreadNotificationsBadge(role, userId) {
     }
   }
 }
+
+async function markAllNotificationsAsRead() {
+  if (!currentUser) return;
+  const role = currentUser.role;
+  const userId = currentUser.id;
+
+  if (!isMockSession) {
+    try {
+      const client = window.supabaseClient;
+      
+      let query;
+      if (role === "player") {
+        query = client.from("notifications").update({ status: "read", is_read: true }).eq("user_id", userId);
+      } else {
+        const { data: rels } = await client.from("parent_student_relations").select("student_id").eq("parent_id", userId);
+        const childIds = (rels || []).map(r => r.student_id);
+        const userIds = [userId, ...childIds];
+        query = client.from("notifications").update({ status: "read", is_read: true }).in("user_id", userIds);
+      }
+      
+      const { error } = await query;
+      if (error) throw error;
+      
+      liveCache.notifications.forEach(n => {
+        n.status = "read";
+        n.is_read = true;
+      });
+      
+      showToast("All notifications marked as read.", "success");
+      await syncNotificationsList(role, userId);
+      await syncHeaderNotifications(userId, role);
+    } catch (err) {
+      console.error("Error marking all notifications read:", err);
+      showToast("Error updating notifications.", "error");
+    }
+  } else {
+    const db = getLocalDB();
+    db.notifications.forEach(n => {
+      if (role === "player") {
+        if (n.user_id === userId) {
+          n.status = "read";
+          n.is_read = true;
+        }
+      } else {
+        const relations = db.parent_student_relations.filter(r => r.parent_id === userId);
+        const childIds = relations.map(r => r.student_id);
+        const targetUserIds = [userId, ...childIds];
+        if (targetUserIds.includes(n.user_id)) {
+          n.status = "read";
+          n.is_read = true;
+        }
+      }
+    });
+    saveLocalDB(db);
+    showToast("All notifications marked as read.", "success");
+    await syncNotificationsList(role, userId);
+    await syncHeaderNotifications(userId, role);
+  }
+}
+
+async function syncHeaderNotifications(userId, role) {
+  if (!isMockSession) {
+    try {
+      const client = window.supabaseClient;
+      let data = [];
+      if (role === "player") {
+        const { data: nData } = await client.from("notifications").select("*").eq("user_id", userId);
+        data = nData || [];
+      } else {
+        const { data: rels } = await client.from("parent_student_relations").select("student_id").eq("parent_id", userId);
+        const childIds = (rels || []).map(r => r.student_id);
+        const userIds = [userId, ...childIds];
+        const { data: nData } = await client.from("notifications").select("*").in("user_id", userIds);
+        data = nData || [];
+      }
+      liveCache.notifications = data;
+    } catch (err) {
+      console.error("Error fetching live notifications for header:", err);
+    }
+  }
+
+  const db = isMockSession ? getLocalDB() : liveCache;
+  let notifications = [];
+
+  if (role === "player") {
+    notifications = db.notifications.filter(n => n.user_id === userId);
+  } else {
+    const relations = db.parent_student_relations.filter(r => r.parent_id === userId);
+    const childIds = relations.map(r => r.student_id);
+    const targetUserIds = [userId, ...childIds];
+    notifications = db.notifications.filter(n => targetUserIds.includes(n.user_id));
+  }
+
+  // Sort descending
+  notifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  // Update badge count
+  const unreadNotifications = notifications.filter(n => n.is_read === false || n.status === "unread");
+  const unreadCount = unreadNotifications.length;
+  
+  const badge = document.getElementById("headerNotificationBadge");
+  if (badge) {
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount;
+      badge.style.display = "block";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+
+  // Populate list
+  const listElement = document.getElementById("headerNotificationList");
+  if (!listElement) return;
+
+  listElement.innerHTML = "";
+
+  // Render recent 5 notifications
+  const recentNotifs = notifications.slice(0, 5);
+
+  if (recentNotifs.length > 0) {
+    recentNotifs.forEach(n => {
+      const isUnreadStatus = (n.is_read === false || n.status === "unread") ? "background: rgba(255, 107, 0, 0.05); font-weight: bold;" : "";
+      listElement.innerHTML += `
+        <div style="padding: 0.75rem; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s; ${isUnreadStatus}">
+          <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+            <span>🔔 ${n.type.toUpperCase().replace('_', ' ')}</span>
+            <span>${new Date(n.created_at).toLocaleDateString()}</span>
+          </div>
+          <h5 style="margin: 0; font-size: 0.85rem; color: #fff;">${n.title}</h5>
+          <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">${n.message}</p>
+        </div>
+      `;
+    });
+  } else {
+    listElement.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 1rem; margin: 0;">No notifications.</p>`;
+  }
+}
+
+// Bind to window to allow notifications dispatcher to access
+window.syncHeaderNotifications = syncHeaderNotifications;
+window.markAllNotificationsAsRead = markAllNotificationsAsRead;
 
 // ==========================================================================
 // H. STATEFUL ATHLETIC GOALS SETTINGS

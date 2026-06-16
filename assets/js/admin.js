@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initBookingsManager();
   initAdminNavigation();
   initActions();
+  initNotificationsTab();
 });
 
 // ==========================================================================
@@ -1969,5 +1970,231 @@ function exportBookingsToCSV(bookings) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+
+// ==========================================================================
+// 12. NOTIFICATION CENTER OPERATIONS
+// ==========================================================================
+let allProfilesCached = [];
+
+async function initNotificationsTab() {
+  const form = document.getElementById("adminNotificationForm");
+  if (form) {
+    form.addEventListener("submit", handleAdminSendNotification);
+  }
+  
+  // Fetch and cache profiles and notifications history
+  await syncAdminNotificationUsers();
+  await syncAdminNotificationHistory();
+}
+
+async function syncAdminNotificationUsers() {
+  const client = window.supabaseClient;
+  const userSelect = document.getElementById("adminNotUser");
+  if (!client || !userSelect) return;
+
+  try {
+    const { data: profiles, error } = await client
+      .from("profiles")
+      .select("id, name, email, role")
+      .order("name", { ascending: true });
+
+    if (error) throw error;
+    allProfilesCached = profiles || [];
+
+    userSelect.innerHTML = '<option value="">-- Choose User --</option>';
+    allProfilesCached.forEach(p => {
+      userSelect.innerHTML += `<option value="${p.id}">${p.name} (${p.email} - ${p.role.toUpperCase()})</option>`;
+    });
+  } catch (err) {
+    console.error("Failed to load profiles for notifications:", err);
+  }
+}
+
+function toggleAdminNotScope() {
+  const scope = document.getElementById("adminNotScope").value;
+  const userGroup = document.getElementById("adminNotUserGroup");
+  const roleGroup = document.getElementById("adminNotRoleGroup");
+
+  if (scope === "individual") {
+    userGroup.style.display = "block";
+    roleGroup.style.display = "none";
+    document.getElementById("adminNotUser").required = true;
+    document.getElementById("adminNotRole").required = false;
+  } else if (scope === "role") {
+    userGroup.style.display = "none";
+    roleGroup.style.display = "block";
+    document.getElementById("adminNotUser").required = false;
+    document.getElementById("adminNotRole").required = true;
+  } else {
+    userGroup.style.display = "none";
+    roleGroup.style.display = "none";
+    document.getElementById("adminNotUser").required = false;
+    document.getElementById("adminNotRole").required = false;
+  }
+}
+
+// Bind to window to allow HTML onchange access
+window.toggleAdminNotScope = toggleAdminNotScope;
+
+async function syncAdminNotificationHistory() {
+  const client = window.supabaseClient;
+  const historyLog = document.getElementById("adminNotificationHistoryLog");
+  if (!client || !historyLog) return;
+
+  try {
+    // Select all notifications
+    const { data: notifications, error } = await client
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    historyLog.innerHTML = "";
+    if (notifications && notifications.length > 0) {
+      notifications.forEach(n => {
+        let recipientStr = "Broadcast";
+        if (n.user_id) {
+          const userProf = allProfilesCached.find(p => p.id === n.user_id);
+          recipientStr = userProf ? `${userProf.name} (${userProf.role.toUpperCase()})` : `User ID: ${n.user_id.substring(0, 8)}...`;
+        } else if (n.metadata && n.metadata.target_role) {
+          recipientStr = `Role: ${n.metadata.target_role.toUpperCase()}s`;
+        }
+
+        historyLog.innerHTML += `
+          <tr>
+            <td>
+              <strong>${n.title}</strong>
+              <div style="font-size:0.75rem; color:var(--text-grey); margin-top:2px;">${n.message}</div>
+            </td>
+            <td><span class="badge-status pending" style="background:rgba(255,193,7,0.15); color:#ffc107; border:1px solid rgba(255,193,7,0.3); padding:0.1rem 0.4rem; font-size:0.6rem;">${n.type.toUpperCase().replace('_', ' ')}</span></td>
+            <td>${recipientStr}</td>
+            <td>${new Date(n.created_at).toLocaleString()}</td>
+            <td>
+              <button class="btn-sm btn-cancel" style="padding:0.2rem 0.5rem; font-size:0.7rem;" onclick="deleteAdminNotification('${n.id}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    } else {
+      historyLog.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-grey); padding:2rem;">No notification logs found.</td></tr>`;
+    }
+  } catch (err) {
+    console.error("Failed to load notifications history:", err);
+  }
+}
+
+async function handleAdminSendNotification(e) {
+  e.preventDefault();
+  const client = window.supabaseClient;
+  if (!client) return;
+
+  const title = document.getElementById("adminNotTitle").value.trim();
+  const type = document.getElementById("adminNotType").value;
+  const scope = document.getElementById("adminNotScope").value;
+  const message = document.getElementById("adminNotMessage").value.trim();
+  const actionUrl = document.getElementById("adminNotUrl").value.trim();
+
+  if (!title || !message) {
+    alert("Please fill in all mandatory fields.");
+    return;
+  }
+
+  const sendBtn = document.getElementById("btnSendNotification");
+  const originalText = sendBtn.textContent;
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Sending...";
+
+  try {
+    let targets = [];
+    let metadata = {};
+
+    if (scope === "individual") {
+      const targetUserId = document.getElementById("adminNotUser").value;
+      if (!targetUserId) {
+        alert("Please select a recipient user.");
+        return;
+      }
+      targets.push(targetUserId);
+    } else if (scope === "role") {
+      const targetRole = document.getElementById("adminNotRole").value;
+      metadata.target_role = targetRole;
+      const matching = allProfilesCached.filter(p => p.role === targetRole);
+      targets = matching.map(p => p.id);
+    } else {
+      // Broadcast to everyone
+      targets = allProfilesCached.map(p => p.id);
+    }
+
+    if (targets.length === 0) {
+      alert("No matching recipient profiles found for this scope.");
+      return;
+    }
+
+    // Prepare rows for bulk insert
+    const insertRows = targets.map(uid => ({
+      user_id: uid,
+      title: title,
+      message: message,
+      type: type,
+      status: "unread",
+      is_read: false,
+      channel: "push",
+      action_url: actionUrl || null,
+      metadata: metadata
+    }));
+
+    const { error } = await client.from("notifications").insert(insertRows);
+    if (error) throw error;
+
+    showSuccessNotification("Notification dispatched successfully!");
+    
+    // Reset Form
+    e.target.reset();
+    toggleAdminNotScope();
+
+    // Reload history
+    await syncAdminNotificationHistory();
+
+  } catch (err) {
+    console.error("Failed to dispatch notification:", err);
+    alert("Error sending notification: " + err.message);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = originalText;
+  }
+}
+
+async function deleteAdminNotification(id) {
+  if (!confirm("Are you sure you want to delete this notification record?")) return;
+  const client = window.supabaseClient;
+  if (!client) return;
+
+  try {
+    const { error } = await client.from("notifications").delete().eq("id", id);
+    if (error) throw error;
+
+    showSuccessNotification("Notification deleted.");
+    await syncAdminNotificationHistory();
+  } catch (err) {
+    console.error("Failed to delete notification:", err);
+    alert("Error deleting notification: " + err.message);
+  }
+}
+
+// Bind to window to allow HTML onclick access
+window.deleteAdminNotification = deleteAdminNotification;
+
+function showSuccessNotification(msg) {
+  const banner = document.getElementById("successBanner");
+  if (banner) {
+    banner.textContent = msg;
+    banner.classList.add("show");
+    setTimeout(() => {
+      banner.classList.remove("show");
+    }, 3000);
+  }
 }
 

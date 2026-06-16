@@ -225,10 +225,18 @@ function initSupabaseRealtimeSub() {
   const client = window.supabaseClient;
   if (!client) return;
 
+  // Clean up any existing active channels first to avoid duplicate listeners & memory leaks
+  if (window.supabaseActiveNotificationChannel) {
+    client.removeChannel(window.supabaseActiveNotificationChannel);
+  }
+  if (window.supabaseActiveBookingChannel) {
+    client.removeChannel(window.supabaseActiveBookingChannel);
+  }
+
   console.log("Initializing Supabase Real-time subscriptions...");
 
   // Subscribe to public.notifications
-  client
+  const notificationChannel = client
     .channel('public:notifications')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, async (payload) => {
       console.log('Realtime Notification Recv:', payload.new);
@@ -243,7 +251,7 @@ function initSupabaseRealtimeSub() {
       const isForAdmin = !newNot.user_id && window.isAdminPage;
 
       if (isForCurrentUser || isForAdmin) {
-        if (newNot.channel === 'push') {
+        if (newNot.channel === 'push' || newNot.type === 'emergency_announcement') {
           PushNotificationService.send(newNot.title, newNot.message);
         }
         if (window.showToast) {
@@ -255,6 +263,11 @@ function initSupabaseRealtimeSub() {
           await window.syncNotificationsList(window.currentUser.role, window.currentUser.id);
         }
 
+        // Refresh header notification dropdown
+        if (window.currentUser && typeof window.syncHeaderNotifications === 'function') {
+          await window.syncHeaderNotifications(window.currentUser.id, window.currentUser.role);
+        }
+
         // Refresh admin dashboard if bookings are loaded
         if (window.isAdminPage && typeof window.refreshBookings === 'function') {
           await window.refreshBookings();
@@ -264,7 +277,7 @@ function initSupabaseRealtimeSub() {
     .subscribe();
 
   // Subscribe to public.trial_bookings
-  client
+  const bookingChannel = client
     .channel('public:trial_bookings')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trial_bookings' }, async (payload) => {
       console.log('Realtime Booking Recv:', payload.new);
@@ -285,6 +298,25 @@ function initSupabaseRealtimeSub() {
       }
     })
     .subscribe();
+
+  window.supabaseActiveNotificationChannel = notificationChannel;
+  window.supabaseActiveBookingChannel = bookingChannel;
+}
+
+// Global cleanup for Supabase Real-time Subscriptions (on logout)
+function cleanupSupabaseRealtimeSub() {
+  const client = window.supabaseClient;
+  if (!client) return;
+
+  if (window.supabaseActiveNotificationChannel) {
+    client.removeChannel(window.supabaseActiveNotificationChannel);
+    window.supabaseActiveNotificationChannel = null;
+  }
+  if (window.supabaseActiveBookingChannel) {
+    client.removeChannel(window.supabaseActiveBookingChannel);
+    window.supabaseActiveBookingChannel = null;
+  }
+  console.log("Cleaned up Supabase Real-time subscriptions.");
 }
 
 // Bind to window objects
@@ -292,6 +324,8 @@ window.WhatsAppNotificationService = WhatsAppNotificationService;
 window.EmailNotificationService = EmailNotificationService;
 window.PushNotificationService = PushNotificationService;
 window.NotificationDispatcher = NotificationDispatcher;
+window.initSupabaseRealtimeSub = initSupabaseRealtimeSub;
+window.cleanupSupabaseRealtimeSub = cleanupSupabaseRealtimeSub;
 window.initSupabaseRealtimeSub = initSupabaseRealtimeSub;
 
 // ==========================================================================
