@@ -249,26 +249,26 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 CREATE TABLE IF NOT EXISTS public.parent_student_relations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     parent_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE(parent_id, student_id)
+    UNIQUE(parent_id, player_id)
 );
 
 -- Attendance Table
 CREATE TABLE IF NOT EXISTS public.attendance (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     date DATE NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('Present', 'Absent', 'Excused')),
     marked_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE(student_id, date)
+    UNIQUE(player_id, date)
 );
 
 -- Performance Reports Table
 CREATE TABLE IF NOT EXISTS public.performance_reports (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     coach_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     batting INTEGER DEFAULT 0 CHECK (batting BETWEEN 0 AND 10),
     bowling INTEGER DEFAULT 0 CHECK (bowling BETWEEN 0 AND 10),
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS public.performance_reports (
 -- Achievements / Certificates Table
 CREATE TABLE IF NOT EXISTS public.certificates (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     badge_type TEXT NOT NULL, -- 'Gold', 'Silver', 'Bronze', 'Elite', 'Rookie'
     date_issued DATE NOT NULL,
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS public.announcements (
 -- Payment History Table
 CREATE TABLE IF NOT EXISTS public.payment_history (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     amount NUMERIC NOT NULL,
     billing_date DATE NOT NULL,
     due_date DATE NOT NULL,
@@ -414,7 +414,7 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 -- Attendance Reports Summary Collection
 CREATE TABLE IF NOT EXISTS public.attendance_reports (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     month DATE NOT NULL,
     total_sessions INTEGER NOT NULL,
     present_sessions INTEGER NOT NULL,
@@ -428,7 +428,7 @@ CREATE TABLE IF NOT EXISTS public.attendance_reports (
 -- General Analytics Timeline Metrics Collection
 CREATE TABLE IF NOT EXISTS public.analytics (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     sport_type TEXT NOT NULL CHECK (sport_type IN ('cricket', 'baseball')),
     metric_name TEXT NOT NULL,
     metric_value NUMERIC NOT NULL,
@@ -438,7 +438,7 @@ CREATE TABLE IF NOT EXISTS public.analytics (
 -- Seasonal Player Statistics Collection
 CREATE TABLE IF NOT EXISTS public.player_statistics (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     sport_type TEXT NOT NULL CHECK (sport_type IN ('cricket', 'baseball')),
     matches_played INTEGER DEFAULT 0 NOT NULL,
     runs_scored INTEGER DEFAULT 0,
@@ -462,7 +462,7 @@ CREATE TABLE IF NOT EXISTS public.player_statistics (
 -- Coach Feedback & Goal Setting Collection
 CREATE TABLE IF NOT EXISTS public.coach_feedback (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    player_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     coach_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     topic TEXT NOT NULL,
     feedback TEXT NOT NULL,

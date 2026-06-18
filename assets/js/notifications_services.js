@@ -10,15 +10,15 @@ class WhatsAppNotificationService {
    */
   static async send(phone, templateName, variables) {
     console.log(`[WhatsApp Service] Dispatched message (template: "${templateName}") to phone: ${phone}`, variables);
-    
+
     // Simulate network latency
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     const messageText = this.formatTemplate(templateName, variables);
     if (window.showToast) {
       window.showToast(`[WhatsApp Dispatch] Sent: "${messageText.substring(0, 50)}..."`, "success");
     }
-    
+
     return {
       success: true,
       messageId: `wa-msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -50,10 +50,10 @@ class EmailNotificationService {
    */
   static async send(email, subject, templateName, variables) {
     console.log(`[Email Service] Dispatched email ("${subject}") to email: ${email}`, variables);
-    
+
     // Simulate network latency
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     const emailBody = this.formatTemplate(templateName, variables);
 
     // Integrate with FormSubmit.co for admin digests if configured
@@ -241,11 +241,11 @@ function initSupabaseRealtimeSub() {
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, async (payload) => {
       console.log('Realtime Notification Recv:', payload.new);
       const newNot = payload.new;
-      
+
       // Target checks
       const isForCurrentUser = window.currentUser && (
         newNot.user_id === window.currentUser.id ||
-        (window.currentUser.role === 'parent' && window.liveCache?.parent_student_relations?.some(r => r.parent_id === window.currentUser.id && r.student_id === newNot.user_id))
+        (window.currentUser.role === 'parent' && window.liveCache?.parent_student_relations?.some(r => r.parent_id === window.currentUser.id && r.player_id === newNot.user_id))
       );
 
       const isForAdmin = !newNot.user_id && window.isAdminPage;
@@ -257,7 +257,7 @@ function initSupabaseRealtimeSub() {
         if (window.showToast) {
           window.showToast(`🔔 ${newNot.title}: ${newNot.message}`, "info");
         }
-        
+
         // Refresh portal UI if user is on notification tab
         if (window.currentUser && typeof window.syncNotificationsList === 'function') {
           await window.syncNotificationsList(window.currentUser.role, window.currentUser.id);
@@ -349,7 +349,7 @@ async function acquireSlotLock(dateStr, slotStr) {
   if (window.isMockSession || !client) {
     const db = JSON.parse(localStorage.getItem("rsa_db")) || { booking_locks: [] };
     if (!db.booking_locks) db.booking_locks = [];
-    
+
     // Clear expired and session's own locks
     db.booking_locks = db.booking_locks.filter(l => new Date(l.expires_at) > new Date() && l.session_id !== sessionId);
 

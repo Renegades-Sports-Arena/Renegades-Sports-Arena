@@ -69,22 +69,22 @@ const DEFAULT_MOCK_DATA = {
     }
   ],
   parent_student_relations: [
-    { parent_id: "parent-1", student_id: "player-1" },
-    { parent_id: "parent-1", student_id: "player-2" }
+    { parent_id: "parent-1", player_id: "player-1" },
+    { parent_id: "parent-1", player_id: "player-2" }
   ],
   attendance: [
-    { student_id: "player-1", date: "2026-06-01", status: "Present", marked_by: "coach-1" },
-    { student_id: "player-1", date: "2026-06-04", status: "Present", marked_by: "coach-1" },
-    { student_id: "player-1", date: "2026-06-08", status: "Absent", marked_by: "coach-1" },
-    { student_id: "player-1", date: "2026-06-11", status: "Present", marked_by: "coach-1" },
-    { student_id: "player-2", date: "2026-06-01", status: "Present", marked_by: "coach-1" },
-    { student_id: "player-2", date: "2026-06-04", status: "Absent", marked_by: "coach-1" },
-    { student_id: "player-2", date: "2026-06-08", status: "Present", marked_by: "coach-1" },
-    { student_id: "player-2", date: "2026-06-11", status: "Present", marked_by: "coach-1" }
+    { player_id: "player-1", date: "2026-06-01", status: "Present", marked_by: "coach-1" },
+    { player_id: "player-1", date: "2026-06-04", status: "Present", marked_by: "coach-1" },
+    { player_id: "player-1", date: "2026-06-08", status: "Absent", marked_by: "coach-1" },
+    { player_id: "player-1", date: "2026-06-11", status: "Present", marked_by: "coach-1" },
+    { player_id: "player-2", date: "2026-06-01", status: "Present", marked_by: "coach-1" },
+    { player_id: "player-2", date: "2026-06-04", status: "Absent", marked_by: "coach-1" },
+    { player_id: "player-2", date: "2026-06-08", status: "Present", marked_by: "coach-1" },
+    { player_id: "player-2", date: "2026-06-11", status: "Present", marked_by: "coach-1" }
   ],
   performance_reports: [
     {
-      student_id: "player-1",
+      player_id: "player-1",
       coach_id: "coach-1",
       batting: 9,
       bowling: 5,
@@ -94,7 +94,7 @@ const DEFAULT_MOCK_DATA = {
       report_date: "2026-06-12"
     },
     {
-      student_id: "player-2",
+      player_id: "player-2",
       coach_id: "coach-1",
       batting: 8,
       bowling: 8,
@@ -107,7 +107,7 @@ const DEFAULT_MOCK_DATA = {
   certificates: [
     {
       id: "cert-a1",
-      student_id: "player-1",
+      player_id: "player-1",
       title: "MLB Development Excellence",
       badge_type: "Gold",
       date_issued: "2026-06-10",
@@ -115,7 +115,7 @@ const DEFAULT_MOCK_DATA = {
     },
     {
       id: "cert-a2",
-      student_id: "player-2",
+      player_id: "player-2",
       title: "Rookie Star Achievement",
       badge_type: "Rookie",
       date_issued: "2026-06-08",
@@ -161,7 +161,7 @@ const DEFAULT_MOCK_DATA = {
   payment_history: [
     {
       id: "pay-p1",
-      student_id: "player-1",
+      player_id: "player-1",
       amount: 1500,
       billing_date: "2026-06-01",
       due_date: "2026-06-15",
@@ -171,7 +171,7 @@ const DEFAULT_MOCK_DATA = {
     },
     {
       id: "pay-p2",
-      student_id: "player-1",
+      player_id: "player-1",
       amount: 1500,
       billing_date: "2026-07-01",
       due_date: "2026-07-15",
@@ -181,7 +181,7 @@ const DEFAULT_MOCK_DATA = {
     },
     {
       id: "pay-p3",
-      student_id: "player-2",
+      player_id: "player-2",
       amount: 1500,
       billing_date: "2026-06-01",
       due_date: "2026-06-15",
@@ -223,22 +223,22 @@ const DEFAULT_MOCK_DATA = {
     }
   ],
   attendance_reports: [
-    { student_id: "player-1", month: "2026-05-01", total_sessions: 12, present_sessions: 11, absent_sessions: 0, excused_sessions: 1, percentage: 91.6, remarks: "Consistent effort." },
-    { student_id: "player-1", month: "2026-06-01", total_sessions: 4, present_sessions: 3, absent_sessions: 1, excused_sessions: 0, percentage: 75.0, remarks: "Missed session on 8th." },
-    { student_id: "player-2", month: "2026-05-01", total_sessions: 12, present_sessions: 10, absent_sessions: 2, excused_sessions: 0, percentage: 83.3, remarks: "Satisfactory participation." },
-    { student_id: "player-2", month: "2026-06-01", total_sessions: 4, present_sessions: 3, absent_sessions: 1, excused_sessions: 0, percentage: 75.0, remarks: "Missed session on 4th." }
+    { player_id: "player-1", month: "2026-05-01", total_sessions: 12, present_sessions: 11, absent_sessions: 0, excused_sessions: 1, percentage: 91.6, remarks: "Consistent effort." },
+    { player_id: "player-1", month: "2026-06-01", total_sessions: 4, present_sessions: 3, absent_sessions: 1, excused_sessions: 0, percentage: 75.0, remarks: "Missed session on 8th." },
+    { player_id: "player-2", month: "2026-05-01", total_sessions: 12, present_sessions: 10, absent_sessions: 2, excused_sessions: 0, percentage: 83.3, remarks: "Satisfactory participation." },
+    { player_id: "player-2", month: "2026-06-01", total_sessions: 4, present_sessions: 3, absent_sessions: 1, excused_sessions: 0, percentage: 75.0, remarks: "Missed session on 4th." }
   ],
   analytics: [
-    { student_id: "player-1", sport_type: "cricket", metric_name: "batting_rating", metric_value: 9.0, timestamp: "2026-06-12" },
-    { student_id: "player-1", sport_type: "cricket", metric_name: "bowling_rating", metric_value: 5.0, timestamp: "2026-06-12" },
-    { student_id: "player-1", sport_type: "cricket", metric_name: "fitness_weight_kg", metric_value: 68, timestamp: "2026-06-01" },
-    { student_id: "player-1", sport_type: "cricket", metric_name: "fitness_weight_kg", metric_value: 67, timestamp: "2026-06-12" },
-    { student_id: "player-1", sport_type: "cricket", metric_name: "fitness_sprint_sec", metric_value: 7.2, timestamp: "2026-06-01" },
-    { student_id: "player-1", sport_type: "cricket", metric_name: "fitness_sprint_sec", metric_value: 6.9, timestamp: "2026-06-12" }
+    { player_id: "player-1", sport_type: "cricket", metric_name: "batting_rating", metric_value: 9.0, timestamp: "2026-06-12" },
+    { player_id: "player-1", sport_type: "cricket", metric_name: "bowling_rating", metric_value: 5.0, timestamp: "2026-06-12" },
+    { player_id: "player-1", sport_type: "cricket", metric_name: "fitness_weight_kg", metric_value: 68, timestamp: "2026-06-01" },
+    { player_id: "player-1", sport_type: "cricket", metric_name: "fitness_weight_kg", metric_value: 67, timestamp: "2026-06-12" },
+    { player_id: "player-1", sport_type: "cricket", metric_name: "fitness_sprint_sec", metric_value: 7.2, timestamp: "2026-06-01" },
+    { player_id: "player-1", sport_type: "cricket", metric_name: "fitness_sprint_sec", metric_value: 6.9, timestamp: "2026-06-12" }
   ],
   player_statistics: [
     {
-      student_id: "player-1",
+      player_id: "player-1",
       sport_type: "cricket",
       matches_played: 15,
       runs_scored: 540,
@@ -252,7 +252,7 @@ const DEFAULT_MOCK_DATA = {
       season: "2026 Summer"
     },
     {
-      student_id: "player-2",
+      player_id: "player-2",
       sport_type: "cricket",
       matches_played: 18,
       runs_scored: 620,
@@ -266,7 +266,7 @@ const DEFAULT_MOCK_DATA = {
       season: "2026 Summer"
     },
     {
-      student_id: "player-1",
+      player_id: "player-1",
       sport_type: "baseball",
       matches_played: 8,
       runs_scored: 12,
@@ -280,7 +280,7 @@ const DEFAULT_MOCK_DATA = {
       season: "2026 Summer"
     },
     {
-      student_id: "player-2",
+      player_id: "player-2",
       sport_type: "baseball",
       matches_played: 10,
       runs_scored: 15,
@@ -296,7 +296,7 @@ const DEFAULT_MOCK_DATA = {
   ],
   coach_feedback: [
     {
-      student_id: "player-1",
+      player_id: "player-1",
       coach_id: "coach-1",
       topic: "Stance Mechanics",
       feedback: "Needs to lower his center of gravity slightly. Bat swing speed is top tier.",
@@ -304,7 +304,7 @@ const DEFAULT_MOCK_DATA = {
       report_date: "2026-06-12"
     },
     {
-      student_id: "player-2",
+      player_id: "player-2",
       coach_id: "coach-1",
       topic: "Curveball Control",
       feedback: "Exceptional wrist snap. Need to focus on maintaining clean arm extensions.",
@@ -342,10 +342,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("signUpForm").addEventListener("submit", handleSignUpSubmit);
   document.getElementById("forgotForm").addEventListener("submit", handleForgotSubmit);
   document.getElementById("logoutBtn").addEventListener("click", handleLogout);
-  
+
   // Player Forms
   document.getElementById("playerProfileForm").addEventListener("submit", handlePlayerProfileSave);
-  
+
   const avatarFileEl = document.getElementById("playerProfAvatarFile");
   if (avatarFileEl) {
     avatarFileEl.addEventListener("change", handleAvatarFileChange);
@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  
+
   // Coach Forms
   document.getElementById("coachEvaluationForm").addEventListener("submit", handleCoachEvalSubmit);
   document.getElementById("coachSessionForm").addEventListener("submit", handleCoachSessionSubmit);
@@ -463,7 +463,7 @@ async function handleSignInSubmit(e) {
       // Create user profile on the fly if authentication passed but profile table has no entry
       const role = email.includes("coach") ? "coach" : (email.includes("parent") ? "parent" : "player");
       const defaultName = email.split("@")[0].toUpperCase();
-      
+
       const newProf = {
         user_id: authData.user.id,
         email: email,
@@ -477,7 +477,7 @@ async function handleSignInSubmit(e) {
         .insert(newProf)
         .select()
         .single();
-      
+
       if (insertError) throw insertError;
       currentUser = insertedProf;
     } else {
@@ -587,7 +587,7 @@ async function handleLogout() {
   }
   currentUser = null;
   isMockSession = false;
-  
+
   // Reset visibility
   document.getElementById("authSection").style.display = "block";
   document.getElementById("playerPortal").style.display = "none";
@@ -607,7 +607,7 @@ async function handleLogout() {
   if (window.cleanupSupabaseRealtimeSub) {
     window.cleanupSupabaseRealtimeSub();
   }
-  
+
   showToast("Logged out successfully.", "info");
 }
 
@@ -754,7 +754,7 @@ async function loadDashboard(profile) {
     const avatarUrl = profile.avatar_url || DEFAULT_BLANK_AVATAR;
     document.getElementById("playerAvatar").src = avatarUrl;
     document.getElementById("playerName").textContent = profile.name;
-    
+
     // Fill Profiles Form
     document.getElementById("playerProfName").value = profile.name;
     document.getElementById("playerProfPhone").value = profile.phone || "";
@@ -806,13 +806,13 @@ async function syncPlayerDashboardData(playerId) {
   if (isMockSession) {
     let db = getLocalDB();
     profile = db.profiles.find(p => p.id === playerId) || currentUser;
-    playerAttendance = db.attendance.filter(a => a.student_id === playerId);
-    performance = db.performance_reports.find(p => p.student_id === playerId);
-    invoices = db.payment_history.filter(p => p.student_id === playerId);
+    playerAttendance = db.attendance.filter(a => a.player_id === playerId);
+    performance = db.performance_reports.find(p => p.player_id === playerId);
+    invoices = db.payment_history.filter(p => p.player_id === playerId);
     roleAnnouncements = db.announcements.filter(a => a.target_role === "all" || a.target_role === "player");
-    playerCerts = db.certificates.filter(c => c.student_id === playerId);
-    feedbackRecord = db.coach_feedback.find(f => f.student_id === playerId);
-    attReport = db.attendance_reports.find(r => r.student_id === playerId && r.month === "2026-06-01");
+    playerCerts = db.certificates.filter(c => c.player_id === playerId);
+    feedbackRecord = db.coach_feedback.find(f => f.player_id === playerId);
+    attReport = db.attendance_reports.find(r => r.player_id === playerId && r.month === "2026-06-01");
     coaches = db.profiles.filter(p => p.role === "coach");
   } else {
     try {
@@ -831,16 +831,16 @@ async function syncPlayerDashboardData(playerId) {
         { data: statsData }
       ] = await Promise.all([
         client.from("profiles").select("*").eq("id", playerId).maybeSingle(),
-        client.from("attendance").select("*").eq("student_id", playerId),
-        client.from("performance_reports").select("*").eq("student_id", playerId),
-        client.from("payment_history").select("*").eq("student_id", playerId),
+        client.from("attendance").select("*").eq("player_id", playerId),
+        client.from("performance_reports").select("*").eq("player_id", playerId),
+        client.from("payment_history").select("*").eq("player_id", playerId),
         client.from("announcements").select("*").or("target_role.eq.all,target_role.eq.player").order("created_at", { ascending: false }),
-        client.from("certificates").select("*").eq("student_id", playerId),
-        client.from("coach_feedback").select("*").eq("student_id", playerId),
-        client.from("attendance_reports").select("*").eq("student_id", playerId).eq("month", "2026-06-01"),
+        client.from("certificates").select("*").eq("player_id", playerId),
+        client.from("coach_feedback").select("*").eq("player_id", playerId),
+        client.from("attendance_reports").select("*").eq("player_id", playerId).eq("month", "2026-06-01"),
         client.from("profiles").select("*").eq("role", "coach"),
-        client.from("analytics").select("*").eq("student_id", playerId),
-        client.from("player_statistics").select("*").eq("student_id", playerId)
+        client.from("analytics").select("*").eq("player_id", playerId),
+        client.from("player_statistics").select("*").eq("player_id", playerId)
       ]);
 
       if (profData) profile = profData;
@@ -887,7 +887,7 @@ async function syncPlayerDashboardData(playerId) {
   // Fees billing outstanding calculation
   const pendingFees = invoices.filter(p => p.status === "pending" || p.status === "overdue");
   const feesTotal = pendingFees.reduce((acc, current) => acc + Number(current.amount), 0);
-  
+
   const statusElement = document.getElementById("playerFeesStatus");
   const subtextElement = document.getElementById("playerFeesSubtext");
   if (feesTotal > 0) {
@@ -956,10 +956,10 @@ async function syncPlayerDashboardData(playerId) {
   if (invoices.length > 0) {
     invoices.forEach(inv => {
       const isPending = inv.status !== "paid";
-      const actionButton = isPending 
+      const actionButton = isPending
         ? `<button class="btn btn-outline-orange btn-sm" onclick="openPaymentModal('${inv.id}', ${inv.amount})">Pay Now</button>`
         : `<span style="color:#10B981; font-weight:700;">Complete ✓</span>`;
-      
+
       paymentsLog.innerHTML += `
         <tr>
           <td><strong>${inv.invoice_number}</strong></td>
@@ -979,7 +979,7 @@ async function syncPlayerDashboardData(playerId) {
   const skillsBreakdown = document.getElementById("playerSkillsBreakdown");
   skillsBreakdown.innerHTML = "";
   const critiqueText = document.getElementById("playerCoachCritique");
-  
+
   if (performance) {
     const skills = [
       { name: "Batting & Hitting", val: performance.batting },
@@ -987,7 +987,7 @@ async function syncPlayerDashboardData(playerId) {
       { name: "Fielding speed", val: performance.fielding },
       { name: "Fitness & Endurance", val: performance.fitness }
     ];
-    
+
     skills.forEach(s => {
       skillsBreakdown.innerHTML += `
         <div class="skill-bar-item">
@@ -1014,7 +1014,7 @@ async function syncPlayerDashboardData(playerId) {
   // Sync Goal Tracker Checklist
   const goalsContainer = document.getElementById("playerGoalsList");
   goalsContainer.innerHTML = "";
-  
+
   if (feedbackRecord && feedbackRecord.goals_set.length > 0) {
     feedbackRecord.goals_set.forEach((goal, i) => {
       const isCompleted = feedbackRecord.goals_completed ? feedbackRecord.goals_completed.includes(i) : (i === 2);
@@ -1035,7 +1035,7 @@ async function syncPlayerDashboardData(playerId) {
   // Sync Monthly Development Reports Summary block
   const devReportBox = document.getElementById("playerDevelopmentReportBox");
   const presencePercentage = attReport ? attReport.percentage : presenceRate;
-  
+
   devReportBox.innerHTML = `
     <div class="report-header-block">
       <h4 style="color:#fff;">Monthly Developmental Report - June 2026</h4>
@@ -1064,7 +1064,7 @@ function renderPlayerSkillsChart(playerId) {
   if (!canvas) return;
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  const performance = db.performance_reports.find(p => p.student_id === playerId) || {
+  const performance = db.performance_reports.find(p => p.player_id === playerId) || {
     batting: 5, bowling: 5, fielding: 5, fitness: 5
   };
 
@@ -1206,7 +1206,7 @@ async function handlePlayerProfileSave(e) {
         db.profiles[index].school = school;
         db.profiles[index].avatar_url = avatar;
         db.profiles[index].bio = bio;
-        
+
         saveLocalDB(db);
         currentUser = db.profiles[index];
         showToast("Profile details updated successfully!", "success");
@@ -1377,11 +1377,11 @@ async function syncParentDashboardData(parentId) {
         .from("parent_student_relations")
         .select("*")
         .eq("parent_id", parentId);
-      
+
       if (relError) throw relError;
 
-      const studentIds = (rels || []).map(r => r.student_id);
-      
+      const studentIds = (rels || []).map(r => r.player_id);
+
       let students = [];
       if (studentIds.length > 0) {
         const { data: studs, error: studError } = await client
@@ -1411,15 +1411,15 @@ async function syncParentDashboardData(parentId) {
   }
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  
+
   // Find linked children
   const relations = db.parent_student_relations.filter(r => r.parent_id === parentId);
   const studentSelector = document.getElementById("parentStudentSelector");
   studentSelector.innerHTML = "";
-  
+
   if (relations.length > 0) {
     relations.forEach(rel => {
-      const student = db.profiles.find(p => p.id === rel.student_id);
+      const student = db.profiles.find(p => p.id === rel.player_id);
       if (student) {
         studentSelector.innerHTML += `<option value="${student.id}">${student.name}</option>`;
       }
@@ -1471,15 +1471,15 @@ async function parentSelectStudent() {
         { data: statsData }
       ] = await Promise.all([
         client.from("profiles").select("*").eq("id", studentId).maybeSingle(),
-        client.from("attendance").select("*").eq("student_id", studentId),
-        client.from("performance_reports").select("*").eq("student_id", studentId),
-        client.from("payment_history").select("*").eq("student_id", studentId),
-        client.from("certificates").select("*").eq("student_id", studentId),
-        client.from("coach_feedback").select("*").eq("student_id", studentId),
-        client.from("attendance_reports").select("*").eq("student_id", studentId).eq("month", "2026-06-01"),
+        client.from("attendance").select("*").eq("player_id", studentId),
+        client.from("performance_reports").select("*").eq("player_id", studentId),
+        client.from("payment_history").select("*").eq("player_id", studentId),
+        client.from("certificates").select("*").eq("player_id", studentId),
+        client.from("coach_feedback").select("*").eq("player_id", studentId),
+        client.from("attendance_reports").select("*").eq("player_id", studentId).eq("month", "2026-06-01"),
         client.from("profiles").select("*").eq("role", "coach"),
-        client.from("analytics").select("*").eq("student_id", studentId),
-        client.from("player_statistics").select("*").eq("student_id", studentId)
+        client.from("analytics").select("*").eq("player_id", studentId),
+        client.from("player_statistics").select("*").eq("player_id", studentId)
       ]);
 
       liveCache.profiles = (liveCache.profiles || []).filter(p => p.id !== studentId).concat(childProf ? [childProf] : []).concat(coachData || []);
@@ -1502,13 +1502,13 @@ async function parentSelectStudent() {
   if (!child) return;
 
   // 1. Child presence calculation
-  const attendance = db.attendance.filter(a => a.student_id === studentId);
+  const attendance = db.attendance.filter(a => a.player_id === studentId);
   const presentCount = attendance.filter(a => a.status === "Present").length;
   const presenceRate = attendance.length > 0 ? Math.round((presentCount / attendance.length) * 100) : 0;
   document.getElementById("parentAttendanceRate").textContent = `${presenceRate}%`;
 
   // 2. Child evaluation skill rating average
-  const performance = db.performance_reports.find(p => p.student_id === studentId);
+  const performance = db.performance_reports.find(p => p.player_id === studentId);
   let skillAverage = 0;
   if (performance) {
     skillAverage = ((performance.batting + performance.bowling + performance.fielding + performance.fitness) / 4).toFixed(1);
@@ -1520,7 +1520,7 @@ async function parentSelectStudent() {
   }
 
   // 3. Child outstanding fee invoices
-  const invoices = db.payment_history.filter(p => p.student_id === studentId);
+  const invoices = db.payment_history.filter(p => p.player_id === studentId);
   const pendingInvoices = invoices.filter(inv => inv.status === "pending" || inv.status === "overdue");
   const feesTotal = pendingInvoices.reduce((acc, c) => acc + Number(c.amount), 0);
   document.getElementById("parentFeesValue").textContent = `₹${feesTotal}`;
@@ -1558,10 +1558,10 @@ async function parentSelectStudent() {
   if (invoices.length > 0) {
     invoices.forEach(inv => {
       const isPending = inv.status !== "paid";
-      const actionButton = isPending 
+      const actionButton = isPending
         ? `<button class="btn btn-outline-orange btn-sm" onclick="openPaymentModal('${inv.id}', ${inv.amount})">Pay Now</button>`
         : `<span style="color:#10B981; font-weight:700;">Complete ✓</span>`;
-      
+
       paymentTable.innerHTML += `
         <tr>
           <td><strong>${inv.invoice_number}</strong></td>
@@ -1577,7 +1577,7 @@ async function parentSelectStudent() {
   }
 
   // 6. Certificates List with download triggers
-  const childCerts = db.certificates.filter(c => c.student_id === studentId);
+  const childCerts = db.certificates.filter(c => c.player_id === studentId);
   const parentCertsLog = document.getElementById("parentCertificatesLog");
   parentCertsLog.innerHTML = "";
   if (childCerts.length > 0) {
@@ -1598,14 +1598,14 @@ async function parentSelectStudent() {
   // 7. Goals checklist milestones logs for child
   const parentGoalsList = document.getElementById("parentGoalsList");
   parentGoalsList.innerHTML = "";
-  const feedbackRecord = db.coach_feedback.find(f => f.student_id === studentId);
+  const feedbackRecord = db.coach_feedback.find(f => f.player_id === studentId);
   if (feedbackRecord && feedbackRecord.goals_set.length > 0) {
     feedbackRecord.goals_set.forEach((goal, idx) => {
       const isCompleted = feedbackRecord.goals_completed ? feedbackRecord.goals_completed.includes(idx) : (idx === 2);
       parentGoalsList.innerHTML += `
         <div class="goal-item">
           <div class="goal-desc-box">
-            <span style="font-size:1.1rem; color:${isCompleted ? '#10B981':'var(--accent-primary)'};">${isCompleted ? '✓' : '🎯'}</span>
+            <span style="font-size:1.1rem; color:${isCompleted ? '#10B981' : 'var(--accent-primary)'};">${isCompleted ? '✓' : '🎯'}</span>
             <label style="${isCompleted ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${goal}</label>
           </div>
           <span class="goal-status-badge ${isCompleted ? 'goal-completed' : 'goal-pending'}">${isCompleted ? 'Completed' : 'Active'}</span>
@@ -1618,9 +1618,9 @@ async function parentSelectStudent() {
 
   // 8. Developmental Report summaries
   const parentDevBox = document.getElementById("parentDevelopmentReportBox");
-  const attReport = db.attendance_reports.find(r => r.student_id === studentId && r.month === "2026-06-01");
+  const attReport = db.attendance_reports.find(r => r.player_id === studentId && r.month === "2026-06-01");
   const presencePercentage = attReport ? attReport.percentage : presenceRate;
-  
+
   parentDevBox.innerHTML = `
     <div class="report-header-block">
       <h4 style="color:#fff;">Monthly Development Report Summary - June 2026</h4>
@@ -1651,7 +1651,7 @@ function renderParentSkillsChart(studentId) {
   if (!canvas) return;
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  const performance = db.performance_reports.find(p => p.student_id === studentId) || {
+  const performance = db.performance_reports.find(p => p.player_id === studentId) || {
     batting: 5, bowling: 5, fielding: 5, fitness: 5
   };
 
@@ -1747,11 +1747,11 @@ async function syncCoachDashboardData() {
   const evalSelect = document.getElementById("evalStudentSelect");
   const certSelect = document.getElementById("certStudentSelect");
   const alertSelect = document.getElementById("alertStudentSelect");
-  
+
   if (evalSelect) evalSelect.innerHTML = "";
   if (certSelect) certSelect.innerHTML = "";
   if (alertSelect) alertSelect.innerHTML = "";
-  
+
   players.forEach(p => {
     const opt = `<option value="${p.id}">${p.name}</option>`;
     if (evalSelect) evalSelect.innerHTML += opt;
@@ -1800,9 +1800,9 @@ async function loadAttendanceRosterList() {
   attendanceMarkerList.innerHTML = "";
 
   players.forEach((p, idx) => {
-    const record = db.attendance.find(a => a.student_id === p.id && a.date === date);
+    const record = db.attendance.find(a => a.player_id === p.id && a.date === date);
     const isPresent = record ? record.status === "Present" : true; // default true/checked for ease
-    
+
     attendanceMarkerList.innerHTML += `
       <tr>
         <td>${idx + 1}</td>
@@ -1843,7 +1843,7 @@ function quickViewStudent(playerId) {
 async function submitBulkAttendance() {
   const date = document.getElementById("attendanceDatePicker").value;
   const topic = document.getElementById("attendanceTopicInput").value.trim() || "Regular Session";
-  
+
   if (!date) {
     showToast("Please pick a valid session date.", "error");
     return;
@@ -1851,13 +1851,13 @@ async function submitBulkAttendance() {
 
   const checks = document.querySelectorAll(".attendance-check");
   const records = [];
-  
+
   checks.forEach(chk => {
     const sId = chk.getAttribute("data-student-id");
     const isChecked = chk.checked;
     const status = isChecked ? "Present" : "Absent";
     records.push({
-      student_id: sId,
+      player_id: sId,
       date: date,
       status: status,
       marked_by: currentUser.id
@@ -1869,12 +1869,12 @@ async function submitBulkAttendance() {
       const client = window.supabaseClient;
       const { error } = await client
         .from("attendance")
-        .upsert(records, { onConflict: "student_id,date" });
+        .upsert(records, { onConflict: "player_id,date" });
       if (error) throw error;
 
       // Update cache
       records.forEach(rec => {
-        const idx = liveCache.attendance.findIndex(a => a.student_id === rec.student_id && a.date === date);
+        const idx = liveCache.attendance.findIndex(a => a.player_id === rec.player_id && a.date === date);
         if (idx !== -1) {
           liveCache.attendance[idx] = rec;
         } else {
@@ -1890,7 +1890,7 @@ async function submitBulkAttendance() {
   } else {
     const db = getLocalDB();
     records.forEach(rec => {
-      const idx = db.attendance.findIndex(a => a.student_id === rec.student_id && a.date === date);
+      const idx = db.attendance.findIndex(a => a.player_id === rec.player_id && a.date === date);
       if (idx !== -1) {
         db.attendance[idx] = rec;
       } else {
@@ -1914,10 +1914,10 @@ async function handleCoachEvalSubmit(e) {
   const date = new Date().toISOString().split("T")[0];
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  const existingReport = db.performance_reports.find(r => r.student_id === sId);
-  
+  const existingReport = db.performance_reports.find(r => r.player_id === sId);
+
   const report = {
-    student_id: sId,
+    player_id: sId,
     coach_id: currentUser.id,
     batting,
     bowling,
@@ -1932,10 +1932,10 @@ async function handleCoachEvalSubmit(e) {
 
   // Update Sport-Specific Statistics Profile
   const sport = document.getElementById("evalSportType").value;
-  let existingStats = db.player_statistics.find(s => s.student_id === sId && s.sport_type === sport);
-  
+  let existingStats = db.player_statistics.find(s => s.player_id === sId && s.sport_type === sport);
+
   let statObj = {
-    student_id: sId,
+    player_id: sId,
     sport_type: sport,
     season: "2026 Summer"
   };
@@ -1962,10 +1962,10 @@ async function handleCoachEvalSubmit(e) {
 
   // Update Coach Feedback & Target Goals
   const newGoalText = document.getElementById("evalNewGoal").value.trim();
-  let existingFeedback = db.coach_feedback.find(f => f.student_id === sId);
-  
+  let existingFeedback = db.coach_feedback.find(f => f.player_id === sId);
+
   let feedbackObj = {
-    student_id: sId,
+    player_id: sId,
     coach_id: currentUser.id,
     topic: "General Performance",
     feedback: feedback,
@@ -1986,7 +1986,7 @@ async function handleCoachEvalSubmit(e) {
 
   // Log timeline analytics record
   const analyticObj = {
-    student_id: sId,
+    player_id: sId,
     sport_type: sport,
     metric_name: "overall_evaluation",
     metric_value: Number(((batting + bowling + fielding + fitness) / 4).toFixed(1)),
@@ -2020,9 +2020,9 @@ async function handleCoachEvalSubmit(e) {
       const savedAnalytic = savedAnalyticRes.data && savedAnalyticRes.data.length > 0 ? savedAnalyticRes.data[0] : null;
 
       // Update cache
-      liveCache.performance_reports = (liveCache.performance_reports || []).filter(r => r.student_id !== sId).concat(savedReport ? [savedReport] : []);
-      liveCache.player_statistics = (liveCache.player_statistics || []).filter(s => !(s.student_id === sId && s.sport_type === sport)).concat(savedStats ? [savedStats] : []);
-      liveCache.coach_feedback = (liveCache.coach_feedback || []).filter(f => f.student_id !== sId).concat(savedFB ? [savedFB] : []);
+      liveCache.performance_reports = (liveCache.performance_reports || []).filter(r => r.player_id !== sId).concat(savedReport ? [savedReport] : []);
+      liveCache.player_statistics = (liveCache.player_statistics || []).filter(s => !(s.player_id === sId && s.sport_type === sport)).concat(savedStats ? [savedStats] : []);
+      liveCache.coach_feedback = (liveCache.coach_feedback || []).filter(f => f.player_id !== sId).concat(savedFB ? [savedFB] : []);
       liveCache.analytics = (liveCache.analytics || []).concat(savedAnalytic ? [savedAnalytic] : []);
 
       showToast("Performance report evaluation, statistics, and goals saved to Supabase!", "success");
@@ -2033,16 +2033,16 @@ async function handleCoachEvalSubmit(e) {
   } else {
     // Local DB update
     const mockDB = getLocalDB();
-    
-    const repIdx = mockDB.performance_reports.findIndex(r => r.student_id === sId);
+
+    const repIdx = mockDB.performance_reports.findIndex(r => r.player_id === sId);
     if (repIdx !== -1) mockDB.performance_reports[repIdx] = report;
     else mockDB.performance_reports.push(report);
 
-    const statIdx = mockDB.player_statistics.findIndex(s => s.student_id === sId && s.sport_type === sport);
+    const statIdx = mockDB.player_statistics.findIndex(s => s.player_id === sId && s.sport_type === sport);
     if (statIdx !== -1) mockDB.player_statistics[statIdx] = statObj;
     else mockDB.player_statistics.push(statObj);
 
-    const fbIdx = mockDB.coach_feedback.findIndex(f => f.student_id === sId);
+    const fbIdx = mockDB.coach_feedback.findIndex(f => f.player_id === sId);
     if (fbIdx !== -1) mockDB.coach_feedback[fbIdx] = feedbackObj;
     else mockDB.coach_feedback.push(feedbackObj);
 
@@ -2199,7 +2199,7 @@ async function handleCoachCertificateSubmit(e) {
     try {
       const client = window.supabaseClient;
       const newCert = {
-        student_id: sId,
+        player_id: sId,
         title,
         badge_type: badge,
         date_issued: date,
@@ -2221,7 +2221,7 @@ async function handleCoachCertificateSubmit(e) {
     const db = getLocalDB();
     const newCert = {
       id: `cert-${Date.now()}`,
-      student_id: sId,
+      player_id: sId,
       title,
       badge_type: badge,
       date_issued: date,
@@ -2381,7 +2381,7 @@ function openCertificateModal(certId) {
   const cert = db.certificates.find(c => c.id === certId);
   if (!cert) return;
 
-  const student = db.profiles.find(p => p.id === cert.student_id) || { name: "RSA Athlete" };
+  const student = db.profiles.find(p => p.id === cert.player_id) || { name: "RSA Athlete" };
   const printableArea = document.getElementById("printableCertificateContent");
 
   // Format dynamic badge emoji
@@ -2474,25 +2474,25 @@ function syncSportStatsView(role, sport) {
 
   if (!studentId) return;
 
-  const stat = db.player_statistics.find(s => s.student_id === studentId && s.sport_type === sport);
+  const stat = db.player_statistics.find(s => s.player_id === studentId && s.sport_type === sport);
 
   if (role === "player") {
     if (sport === "cricket") {
       document.getElementById("statBatAvg").textContent = stat ? stat.batting_average.toFixed(1) : "0.0";
-      document.getElementById("statBatRuns").textContent = stat 
+      document.getElementById("statBatRuns").textContent = stat
         ? `Runs: ${stat.runs_scored} | Strike Rate: ${stat.strike_rate || 0}`
         : "Runs: 0 | Strike Rate: 0";
       document.getElementById("statBowlWkts").textContent = stat ? stat.wickets_taken : "0";
-      document.getElementById("statBowlEcon").textContent = stat 
+      document.getElementById("statBowlEcon").textContent = stat
         ? `Econ: ${stat.economy_rate.toFixed(2)} | Avg: ${stat.bowling_average.toFixed(1)}`
         : "Econ: 0.00 | Avg: 0.0";
     } else {
       document.getElementById("statBaseBatAvg").textContent = stat ? `.${Math.round(stat.batting_average * 1000)}` : ".000";
-      document.getElementById("statBaseHits").textContent = stat 
+      document.getElementById("statBaseHits").textContent = stat
         ? `Hits: ${Math.round(stat.runs_scored * 1.5)} | Runs: ${stat.runs_scored}`
         : "Hits: 0 | Runs: 0";
       document.getElementById("statBaseEra").textContent = stat ? stat.pitching_era.toFixed(2) : "0.00";
-      document.getElementById("statBaseKs").textContent = stat 
+      document.getElementById("statBaseKs").textContent = stat
         ? `Innings: ${stat.pitching_innings.toFixed(1)} | SO: ${stat.pitching_strikeouts || 0}`
         : "Innings: 0.0 | SO: 0";
     }
@@ -2500,20 +2500,20 @@ function syncSportStatsView(role, sport) {
     // Parent View
     if (sport === "cricket") {
       document.getElementById("parentStatBatAvg").textContent = stat ? stat.batting_average.toFixed(1) : "0.0";
-      document.getElementById("parentStatBatRuns").textContent = stat 
+      document.getElementById("parentStatBatRuns").textContent = stat
         ? `Runs: ${stat.runs_scored} | SR: ${stat.strike_rate || 0}`
         : "Runs: 0 | SR: 0";
       document.getElementById("parentStatBowlWkts").textContent = stat ? stat.wickets_taken : "0";
-      document.getElementById("parentStatBowlEcon").textContent = stat 
+      document.getElementById("parentStatBowlEcon").textContent = stat
         ? `Econ: ${stat.economy_rate.toFixed(2)} | Avg: ${stat.bowling_average.toFixed(1)}`
         : "Econ: 0.00 | Avg: 0.0";
     } else {
       document.getElementById("parentStatBaseBatAvg").textContent = stat ? `.${Math.round(stat.batting_average * 1000)}` : ".000";
-      document.getElementById("parentStatBaseHits").textContent = stat 
+      document.getElementById("parentStatBaseHits").textContent = stat
         ? `Hits: ${Math.round(stat.runs_scored * 1.5)} | Runs: ${stat.runs_scored}`
         : "Hits: 0 | Runs: 0";
       document.getElementById("parentStatBaseEra").textContent = stat ? stat.pitching_era.toFixed(2) : "0.00";
-      document.getElementById("parentStatBaseKs").textContent = stat 
+      document.getElementById("parentStatBaseKs").textContent = stat
         ? `Innings: ${stat.pitching_innings.toFixed(1)} | SO: ${stat.pitching_strikeouts || 0}`
         : "Innings: 0.0 | SO: 0";
     }
@@ -2541,19 +2541,19 @@ async function loadStudentStatsForCoach() {
         { data: statsData },
         { data: feedbackData }
       ] = await Promise.all([
-        client.from("player_statistics").select("*").eq("student_id", sId),
-        client.from("coach_feedback").select("*").eq("student_id", sId)
+        client.from("player_statistics").select("*").eq("player_id", sId),
+        client.from("coach_feedback").select("*").eq("player_id", sId)
       ]);
 
-      liveCache.player_statistics = (liveCache.player_statistics || []).filter(s => s.student_id !== sId).concat(statsData || []);
-      liveCache.coach_feedback = (liveCache.coach_feedback || []).filter(f => f.student_id !== sId).concat(feedbackData || []);
+      liveCache.player_statistics = (liveCache.player_statistics || []).filter(s => s.player_id !== sId).concat(statsData || []);
+      liveCache.coach_feedback = (liveCache.coach_feedback || []).filter(f => f.player_id !== sId).concat(feedbackData || []);
     } catch (err) {
       console.error("Error loading student stats for coach:", err);
     }
   }
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  const performance = db.performance_reports.find(p => p.student_id === sId) || {
+  const performance = db.performance_reports.find(p => p.player_id === sId) || {
     batting: 5, bowling: 5, fielding: 5, fitness: 5, feedback: ""
   };
 
@@ -2564,7 +2564,7 @@ async function loadStudentStatsForCoach() {
   document.getElementById("evalFeedback").value = performance.feedback || "";
 
   const sport = document.getElementById("evalSportType").value;
-  const stats = db.player_statistics.find(s => s.student_id === sId && s.sport_type === sport);
+  const stats = db.player_statistics.find(s => s.player_id === sId && s.sport_type === sport);
 
   if (sport === "cricket") {
     document.getElementById("evalCricketMatches").value = stats ? stats.matches_played : 0;
@@ -2701,8 +2701,8 @@ async function syncNotificationsList(role, userId) {
         const { data: nData } = await client.from("notifications").select("*").eq("user_id", userId);
         data = nData || [];
       } else {
-        const { data: rels } = await client.from("parent_student_relations").select("student_id").eq("parent_id", userId);
-        const childIds = (rels || []).map(r => r.student_id);
+        const { data: rels } = await client.from("parent_student_relations").select("player_id").eq("parent_id", userId);
+        const childIds = (rels || []).map(r => r.player_id);
         const userIds = [userId, ...childIds];
         const { data: nData } = await client.from("notifications").select("*").in("user_id", userIds);
         data = nData || [];
@@ -2721,7 +2721,7 @@ async function syncNotificationsList(role, userId) {
   } else {
     // Parent sees notifications for parent profile + linked child profiles
     const relations = db.parent_student_relations.filter(r => r.parent_id === userId);
-    const childIds = relations.map(r => r.student_id);
+    const childIds = relations.map(r => r.player_id);
     const targetUserIds = [userId, ...childIds];
     notifications = db.notifications.filter(n => targetUserIds.includes(n.user_id));
   }
@@ -2819,8 +2819,8 @@ async function updateUnreadNotificationsBadge(role, userId) {
         const { data: nData } = await client.from("notifications").select("*").eq("user_id", userId);
         data = nData || [];
       } else {
-        const { data: rels } = await client.from("parent_student_relations").select("student_id").eq("parent_id", userId);
-        const childIds = (rels || []).map(r => r.student_id);
+        const { data: rels } = await client.from("parent_student_relations").select("player_id").eq("parent_id", userId);
+        const childIds = (rels || []).map(r => r.player_id);
         const userIds = [userId, ...childIds];
         const { data: nData } = await client.from("notifications").select("*").in("user_id", userIds);
         data = nData || [];
@@ -2838,7 +2838,7 @@ async function updateUnreadNotificationsBadge(role, userId) {
     notifications = db.notifications.filter(n => n.user_id === userId);
   } else {
     const relations = db.parent_student_relations.filter(r => r.parent_id === userId);
-    const childIds = relations.map(r => r.student_id);
+    const childIds = relations.map(r => r.player_id);
     const targetUserIds = [userId, ...childIds];
     notifications = db.notifications.filter(n => targetUserIds.includes(n.user_id));
   }
@@ -2863,25 +2863,25 @@ async function markAllNotificationsAsRead() {
   if (!isMockSession) {
     try {
       const client = window.supabaseClient;
-      
+
       let query;
       if (role === "player") {
         query = client.from("notifications").update({ status: "read", is_read: true }).eq("user_id", userId);
       } else {
-        const { data: rels } = await client.from("parent_student_relations").select("student_id").eq("parent_id", userId);
-        const childIds = (rels || []).map(r => r.student_id);
+        const { data: rels } = await client.from("parent_student_relations").select("player_id").eq("parent_id", userId);
+        const childIds = (rels || []).map(r => r.player_id);
         const userIds = [userId, ...childIds];
         query = client.from("notifications").update({ status: "read", is_read: true }).in("user_id", userIds);
       }
-      
+
       const { error } = await query;
       if (error) throw error;
-      
+
       liveCache.notifications.forEach(n => {
         n.status = "read";
         n.is_read = true;
       });
-      
+
       showToast("All notifications marked as read.", "success");
       await syncNotificationsList(role, userId);
       await syncHeaderNotifications(userId, role);
@@ -2899,7 +2899,7 @@ async function markAllNotificationsAsRead() {
         }
       } else {
         const relations = db.parent_student_relations.filter(r => r.parent_id === userId);
-        const childIds = relations.map(r => r.student_id);
+        const childIds = relations.map(r => r.player_id);
         const targetUserIds = [userId, ...childIds];
         if (targetUserIds.includes(n.user_id)) {
           n.status = "read";
@@ -2923,8 +2923,8 @@ async function syncHeaderNotifications(userId, role) {
         const { data: nData } = await client.from("notifications").select("*").eq("user_id", userId);
         data = nData || [];
       } else {
-        const { data: rels } = await client.from("parent_student_relations").select("student_id").eq("parent_id", userId);
-        const childIds = (rels || []).map(r => r.student_id);
+        const { data: rels } = await client.from("parent_student_relations").select("player_id").eq("parent_id", userId);
+        const childIds = (rels || []).map(r => r.player_id);
         const userIds = [userId, ...childIds];
         const { data: nData } = await client.from("notifications").select("*").in("user_id", userIds);
         data = nData || [];
@@ -2942,7 +2942,7 @@ async function syncHeaderNotifications(userId, role) {
     notifications = db.notifications.filter(n => n.user_id === userId);
   } else {
     const relations = db.parent_student_relations.filter(r => r.parent_id === userId);
-    const childIds = relations.map(r => r.student_id);
+    const childIds = relations.map(r => r.player_id);
     const targetUserIds = [userId, ...childIds];
     notifications = db.notifications.filter(n => targetUserIds.includes(n.user_id));
   }
@@ -2953,7 +2953,7 @@ async function syncHeaderNotifications(userId, role) {
   // Update badge count
   const unreadNotifications = notifications.filter(n => n.is_read === false || n.status === "unread");
   const unreadCount = unreadNotifications.length;
-  
+
   const badge = document.getElementById("headerNotificationBadge");
   if (badge) {
     if (unreadCount > 0) {
@@ -3003,7 +3003,7 @@ async function toggleGoalCompletion(playerId, idx, checked) {
   if (!isMockSession) {
     try {
       const client = window.supabaseClient;
-      const feedback = liveCache.coach_feedback.find(f => f.student_id === playerId);
+      const feedback = liveCache.coach_feedback.find(f => f.player_id === playerId);
       if (feedback) {
         if (!feedback.goals_completed) {
           feedback.goals_completed = [];
@@ -3032,7 +3032,7 @@ async function toggleGoalCompletion(playerId, idx, checked) {
   }
 
   const db = getLocalDB();
-  const feedback = db.coach_feedback.find(f => f.student_id === playerId);
+  const feedback = db.coach_feedback.find(f => f.player_id === playerId);
   if (feedback) {
     if (!feedback.goals_completed) {
       feedback.goals_completed = [];
@@ -3061,7 +3061,7 @@ function renderFitnessChart(canvasId, playerId) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  const logs = db.analytics.filter(a => a.student_id === playerId);
+  const logs = db.analytics.filter(a => a.player_id === playerId);
   const weights = logs.filter(a => a.metric_name === "fitness_weight_kg").sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   const sprints = logs.filter(a => a.metric_name === "fitness_sprint_sec").sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
@@ -3140,7 +3140,7 @@ function renderFitnessChart(canvasId, playerId) {
     const x = 40 + (canvas.width - 80) * (idx / (dates.length - 1));
     ctx.fillStyle = "#888";
     ctx.font = "9px sans-serif";
-    const label = new Date(d).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+    const label = new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     ctx.fillText(label, x - 15, canvas.height - 15);
   });
 
@@ -3165,7 +3165,7 @@ function renderAttendanceChart(canvasId, playerId) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const db = isMockSession ? getLocalDB() : liveCache;
-  const reports = db.attendance_reports.filter(r => r.student_id === playerId).sort((a, b) => new Date(a.month) - new Date(b.month));
+  const reports = db.attendance_reports.filter(r => r.player_id === playerId).sort((a, b) => new Date(a.month) - new Date(b.month));
 
   let data = reports;
   if (data.length === 0) {
@@ -3219,7 +3219,7 @@ function renderAttendanceChart(canvasId, playerId) {
     // X Axis Labels
     ctx.fillStyle = "#888";
     ctx.font = "9px sans-serif";
-    const label = new Date(r.month).toLocaleDateString(undefined, {month: 'short', year: '2-digit'});
+    const label = new Date(r.month).toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
     ctx.fillText(label, cx - 18, yBase + 15);
     ctx.fillText(`(Total: ${r.total_sessions})`, cx - 22, yBase + 27);
   });
@@ -3244,7 +3244,7 @@ function renderCoachTeamStatsChart() {
   const players = db.profiles.filter(p => p.role === "player");
 
   const ratings = players.map(p => {
-    const perf = db.performance_reports.find(r => r.student_id === p.id);
+    const perf = db.performance_reports.find(r => r.player_id === p.id);
     const avg = perf ? ((perf.batting + perf.bowling + perf.fielding + perf.fitness) / 4) : 5.0;
     return { name: p.name.split(" ")[0], rating: avg };
   });
@@ -3291,7 +3291,7 @@ function renderCoachTeamStatsChart() {
   const barWidth = 24;
   ratings.forEach((p, idx) => {
     const spacing = (canvas.width - 80) / Math.max(1, numPlayers);
-    const cx = 50 + idx * spacing + spacing/2;
+    const cx = 50 + idx * spacing + spacing / 2;
     const h = (p.rating / 10) * (canvas.height - 80);
     const yBase = canvas.height - 40;
 
@@ -3387,7 +3387,7 @@ function updateRoleComparison(role) {
 
   if (!studentId) return;
 
-  const perf = db.performance_reports.find(p => p.student_id === studentId);
+  const perf = db.performance_reports.find(p => p.player_id === studentId);
   const rating = perf ? ((perf.batting + perf.bowling + perf.fielding + perf.fitness) / 4) : 5.0;
 
   const targetSelector = document.getElementById(role === "player" ? "compareTargetSelector" : "parentCompareTargetSelector");
@@ -3452,9 +3452,9 @@ function downloadDevelopmentReport(role) {
   }
 
   const student = db.profiles.find(p => p.id === studentId);
-  const performance = db.performance_reports.find(p => p.student_id === studentId);
-  const feedbackRecord = db.coach_feedback.find(f => f.student_id === studentId);
-  const attendance = db.attendance.filter(a => a.student_id === studentId);
+  const performance = db.performance_reports.find(p => p.player_id === studentId);
+  const feedbackRecord = db.coach_feedback.find(f => f.player_id === studentId);
+  const attendance = db.attendance.filter(a => a.player_id === studentId);
   const presentCount = attendance.filter(a => a.status === "Present").length;
   const presenceRate = attendance.length > 0 ? Math.round((presentCount / attendance.length) * 100) : 0;
 
@@ -3486,8 +3486,8 @@ COACH DEVELOPMENT CRITIQUE NOTES
 ACTIVE CHALLENGES & MILESTONE GOALS ASSIGNED
 -----------------------------------------------------
 ${feedbackRecord && feedbackRecord.goals_set.length > 0
-  ? feedbackRecord.goals_set.map((g, idx) => `${idx + 1}. [${feedbackRecord.goals_completed && feedbackRecord.goals_completed.includes(idx) ? 'X' : ' '}] ${g}`).join("\n")
-  : "No specific goals assigned."}
+      ? feedbackRecord.goals_set.map((g, idx) => `${idx + 1}. [${feedbackRecord.goals_completed && feedbackRecord.goals_completed.includes(idx) ? 'X' : ' '}] ${g}`).join("\n")
+      : "No specific goals assigned."}
 
 =====================================================
 Renegades Sports Arena - Developing Elite Sports Talent
