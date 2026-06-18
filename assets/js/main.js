@@ -18,8 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initPrograms(config.programs);
   initPathway(config.renegadesPathway);
   initParentsChoose(config.whyParentsChoose);
-  initProShop(config.shop);
-  initKitBuilder(config.shop.products);
+  if (config.shop) {
+    initProShop(config.shop);
+    initKitBuilder(config.shop.products || []);
+  }
   initVisionMission(config.visionMission);
   //initCoaches(config.coaches);
   initFacilities(config.facilities);
@@ -1452,8 +1454,8 @@ Please confirm my spot!`);
         let data;
         if (window.isMockSession || !client) {
           const db = JSON.parse(localStorage.getItem("rsa_db")) || { trial_bookings: [] };
-          data = (db.trial_bookings || []).filter(b => 
-            (b.email && b.email.toLowerCase().includes(searchVal.toLowerCase())) || 
+          data = (db.trial_bookings || []).filter(b =>
+            (b.email && b.email.toLowerCase().includes(searchVal.toLowerCase())) ||
             (b.phone && b.phone.includes(searchVal))
           ).sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date));
         } else {
@@ -1584,9 +1586,9 @@ function updateSlotsGrid(gridContainer, occupancies, hiddenInput, selectedSlotVa
 
       // Acquire slot lock
       let selectedDate = "";
-      const dateInput = gridContainer.closest("form")?.querySelector("input[type='date']") || 
-                         gridContainer.closest(".reschedule-pane")?.querySelector("input[type='date']") ||
-                         document.getElementById("formDate");
+      const dateInput = gridContainer.closest("form")?.querySelector("input[type='date']") ||
+        gridContainer.closest(".reschedule-pane")?.querySelector("input[type='date']") ||
+        document.getElementById("formDate");
       if (dateInput) {
         selectedDate = dateInput.value;
       }
