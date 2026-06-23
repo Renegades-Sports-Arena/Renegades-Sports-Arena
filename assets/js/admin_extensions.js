@@ -35,6 +35,9 @@ async function initAdminExtensions() {
   // 5. Setup Registrations Manager
   initRegistrationsCMS();
 
+  // 6. Setup Coupon Codes Manager CMS
+  initCouponCMS();
+
   console.log("Admin Extensions initialized successfully.");
 }
 
@@ -1086,4 +1089,201 @@ function compressAdminImage(file, callback) {
       callback(compressedDataUrl);
     };
   };
+}
+
+/* ==========================================================================
+   COUPON CODES CMS MANAGER
+   ========================================================================== */
+async function initCouponCMS() {
+  const form = document.getElementById("adminCouponForm");
+  const tbody = document.getElementById("adminCouponsTableBody");
+  
+  if (!form || !tbody) return;
+
+  async function renderCoupons() {
+    tbody.innerHTML = "";
+    try {
+      const { data: coupons, error } = await window.supabaseClient
+        .from("coupon_codes")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const { data: usageLogs, error: usageError } = await window.supabaseClient
+        .from("coupon_usage")
+        .select("discount_amount");
+
+      if (usageError) throw usageError;
+
+      const totalCoupons = coupons ? coupons.length : 0;
+      const activeCoupons = coupons ? coupons.filter(c => c.is_active).length : 0;
+      let totalClaims = 0;
+      let totalSavings = 0;
+
+      if (coupons) {
+        coupons.forEach(c => {
+          totalClaims += c.uses_count || 0;
+        });
+      }
+
+      if (usageLogs) {
+        usageLogs.forEach(u => {
+          totalSavings += parseFloat(u.discount_amount) || 0;
+        });
+      }
+
+      document.getElementById("totalCouponsCount").textContent = totalCoupons;
+      document.getElementById("activeCouponsCount").textContent = activeCoupons;
+      document.getElementById("totalCouponClaims").textContent = totalClaims;
+      document.getElementById("totalDiscountSavings").textContent = `₹${totalSavings.toLocaleString('en-IN')}`;
+
+      if (!coupons || coupons.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-grey);">No coupon codes registered in the system. Create one above!</td></tr>`;
+        return;
+      }
+
+      coupons.forEach((c) => {
+        const tr = document.createElement("tr");
+        
+        const limitStr = c.usage_limit ? c.usage_limit : "∞";
+        const expiryStr = c.expiry_date ? new Date(c.expiry_date).toLocaleDateString('en-IN') : "Never";
+        const statusBadge = c.is_active 
+          ? `<span class="badge-status paid" style="cursor:pointer;" onclick="toggleCouponStatus('${c.id}', false)">Active</span>`
+          : `<span class="badge-status cancelled" style="cursor:pointer;" onclick="toggleCouponStatus('${c.id}', true)">Inactive</span>`;
+
+        tr.innerHTML = `
+          <td><strong>${c.code}</strong></td>
+          <td>${c.discount_percent}%</td>
+          <td>${expiryStr}</td>
+          <td>${c.uses_count} / ${limitStr}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem;" onclick="editCoupon('${c.id}')">Edit</button>
+            <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:#EF4444; box-shadow:none;" onclick="deleteCoupon('${c.id}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("Error rendering coupons tab CMS:", err);
+    }
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("adminCouponId").value;
+    const code = document.getElementById("adminCouponCode").value.trim().toUpperCase();
+    const discount = parseFloat(document.getElementById("adminCouponDiscount").value);
+    const limitInput = document.getElementById("adminCouponLimit").value.trim();
+    const expiryInput = document.getElementById("adminCouponExpiry").value;
+    const is_active = document.getElementById("adminCouponActive").value === "true";
+
+    if (!code || isNaN(discount)) {
+      alert("Please fill in coupon code and discount percentage.");
+      return;
+    }
+
+    const usage_limit = limitInput ? parseInt(limitInput) : null;
+    const expiry_date = expiryInput ? new Date(expiryInput).toISOString() : null;
+
+    const payload = {
+      code,
+      discount_percent: discount,
+      usage_limit,
+      expiry_date,
+      is_active
+    };
+
+    try {
+      if (id) {
+        const { error } = await window.supabaseClient
+          .from("coupon_codes")
+          .update(payload)
+          .eq("id", id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await window.supabaseClient
+          .from("coupon_codes")
+          .insert([payload]);
+
+        if (error) throw error;
+      }
+
+      form.reset();
+      document.getElementById("adminCouponId").value = "";
+      renderCoupons();
+    } catch (err) {
+      alert("Failed to save coupon code: " + err.message);
+    }
+  });
+
+  document.getElementById("adminCancelCouponBtn").addEventListener("click", () => {
+    form.reset();
+    document.getElementById("adminCouponId").value = "";
+  });
+
+  window.editCoupon = async (couponId) => {
+    try {
+      const { data, error } = await window.supabaseClient
+        .from("coupon_codes")
+        .select("*")
+        .eq("id", couponId)
+        .single();
+
+      if (error) throw error;
+
+      document.getElementById("adminCouponId").value = data.id;
+      document.getElementById("adminCouponCode").value = data.code;
+      document.getElementById("adminCouponDiscount").value = data.discount_percent;
+      document.getElementById("adminCouponLimit").value = data.usage_limit || "";
+      document.getElementById("adminCouponActive").value = String(data.is_active);
+      
+      if (data.expiry_date) {
+        const d = new Date(data.expiry_date);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        document.getElementById("adminCouponExpiry").value = `${yyyy}-${mm}-${dd}`;
+      } else {
+        document.getElementById("adminCouponExpiry").value = "";
+      }
+
+    } catch (err) {
+      alert("Error loading coupon: " + err.message);
+    }
+  };
+
+  window.deleteCoupon = async (couponId) => {
+    if (!confirm("Are you sure you want to delete this coupon code?")) return;
+    try {
+      const { error } = await window.supabaseClient
+        .from("coupon_codes")
+        .delete()
+        .eq("id", couponId);
+
+      if (error) throw error;
+      renderCoupons();
+    } catch (err) {
+      alert("Failed to delete coupon: " + err.message);
+    }
+  };
+
+  window.toggleCouponStatus = async (couponId, makeActive) => {
+    try {
+      const { error } = await window.supabaseClient
+        .from("coupon_codes")
+        .update({ is_active: makeActive })
+        .eq("id", couponId);
+
+      if (error) throw error;
+      renderCoupons();
+    } catch (err) {
+      alert("Failed to toggle status: " + err.message);
+    }
+  };
+
+  renderCoupons();
 }

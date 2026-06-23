@@ -77,7 +77,7 @@ function initScrollEffects() {
   // Bind smooth scroll anchors
   const scrollLinks = document.querySelectorAll(".scroll-link");
   scrollLinks.forEach(link => {
-    link.addEventListener("click", function(e) {
+    link.addEventListener("click", function (e) {
       const targetId = this.getAttribute("href");
       if (targetId && targetId.startsWith("#") && targetId.length > 1) {
         e.preventDefault();
@@ -118,13 +118,13 @@ function initScrollEffects() {
 function initMagneticButtons() {
   const btns = document.querySelectorAll(".btn, .btn-queens-primary, .btn-queens-secondary, .form-control");
   btns.forEach(btn => {
-    btn.addEventListener("mousemove", function(e) {
+    btn.addEventListener("mousemove", function (e) {
       const pos = btn.getBoundingClientRect();
       const x = e.clientX - pos.left - pos.width / 2;
       const y = e.clientY - pos.top - pos.height / 2;
       btn.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
     });
-    btn.addEventListener("mouseout", function() {
+    btn.addEventListener("mouseout", function () {
       btn.style.transform = "translate(0, 0)";
     });
   });
@@ -141,7 +141,7 @@ function initQueensGallery() {
 
   if (!lightbox) return;
 
-  window.openQueensLightbox = function(src, title) {
+  window.openQueensLightbox = function (src, title) {
     if (lightboxImg) lightboxImg.src = src;
     if (lightboxTitle) lightboxTitle.textContent = title || "";
     lightbox.classList.add("open");

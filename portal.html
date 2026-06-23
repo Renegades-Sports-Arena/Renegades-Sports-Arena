@@ -1284,15 +1284,23 @@
         to complete your fee transaction.</p>
 
       <div class="qr-box mt-4 mb-4" style="text-align:center;">
-        <img
+        <img id="portalPaymentQrImg"
           src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=renegades@upi&pn=Renegades%20Sports%20Arena&am=1500&cu=INR"
           alt="UPI QR Code" style="border: 4px solid #fff; border-radius:8px; display:inline-block;">
-        <p class="mt-2 text-orange" style="font-weight:bold; font-family:var(--font-display); font-size:1.1rem;">Amount:
+        <p class="mt-2 text-orange" id="portalPaymentAmountText" style="font-weight:bold; font-family:var(--font-display); font-size:1.1rem;">Amount:
           ₹1,500</p>
       </div>
 
       <form id="upiSubmitForm" onsubmit="confirmPayment(event)">
         <input type="hidden" id="payingInvoiceId">
+        <div class="form-group">
+          <label class="form-label">Coupon Code (Optional)</label>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <input type="text" id="portalCouponCode" class="form-control" placeholder="e.g. WELCOME8" style="text-transform: uppercase; background: var(--bg-input); color: #fff; border: 1px solid var(--glass-border);">
+            <button type="button" class="btn btn-outline-orange" id="btnApplyPortalCoupon" style="padding: 0.35rem 0.75rem;">Apply</button>
+          </div>
+          <div id="portalCouponMessage" style="font-size: 0.75rem; color: #10B981; margin-top: -0.5rem; margin-bottom: 0.75rem; display: none;"></div>
+        </div>
         <div class="form-group">
           <label class="form-label">Transaction Ref ID / UPI TXN ID *</label>
           <input type="text" id="upiTxnId" class="form-control" required
@@ -1304,9 +1312,9 @@
   </div>
 
   <!-- Scripts -->
+  <script src="assets/js/env.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase.js"></script>
-  <script src="assets/js/env.js"></script>
   <script src="assets/js/email.js"></script>
   <script src="assets/js/notifications_services.js"></script>
   <script src="assets/js/config.js"></script>

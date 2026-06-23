@@ -6,7 +6,7 @@
 class WhatsAppNotificationService {
   /**
    * Dispatch WhatsApp notification.
-   * Scalable architecture wrapping third-party APIs (e.g. Twilio, Meta Cloud API).
+   * Scalable architecture wrapping third-party APIs (e.g. Twilio, Meta Cloud API, Interakt).
    */
   static async send(phone, templateName, variables) {
     console.log(`[WhatsApp Service] Dispatched message (template: "${templateName}") to phone: ${phone}`, variables);
@@ -15,8 +15,74 @@ class WhatsAppNotificationService {
     await new Promise(resolve => setTimeout(resolve, 300));
 
     const messageText = this.formatTemplate(templateName, variables);
+    const provider = (window.env && window.env.WHATSAPP_PROVIDER) || 'twilio';
+
+    console.log(`[WhatsApp Service] Selected Provider: ${provider.toUpperCase()}`);
+
+    let payload = {};
+    let endpoint = "";
+    
+    // Construct request payloads depending on the selected provider
+    if (provider === 'twilio') {
+      endpoint = "https://api.twilio.com/2010-04-01/Accounts/ACmock/Messages.json";
+      payload = {
+        To: `whatsapp:${phone}`,
+        From: "whatsapp:+14155238886",
+        Body: messageText
+      };
+    } else if (provider === 'meta') {
+      endpoint = "https://graph.facebook.com/v17.0/1065403522mock/messages";
+      payload = {
+        messaging_product: "whatsapp",
+        to: phone,
+        type: "template",
+        template: {
+          name: templateName,
+          language: { code: "en_US" },
+          components: [
+            {
+              type: "body",
+              parameters: Object.keys(variables).map(key => ({
+                type: "text",
+                text: String(variables[key])
+              }))
+            }
+          ]
+        }
+      };
+    } else if (provider === 'interakt') {
+      endpoint = "https://api.interakt.ai/v1/public/message/";
+      payload = {
+        fullPhoneNumber: phone,
+        type: "Template",
+        template: {
+          name: templateName,
+          languageCode: "en",
+          bodyValues: Object.keys(variables).map(key => String(variables[key]))
+        }
+      };
+    }
+
+    console.log(`[WhatsApp Service] Mock Payload for ${provider.toUpperCase()}:`, JSON.stringify(payload, null, 2));
+
     if (window.showToast) {
-      window.showToast(`[WhatsApp Dispatch] Sent: "${messageText.substring(0, 50)}..."`, "success");
+      window.showToast(`[WhatsApp: ${provider.toUpperCase()}] Dispatch to ${phone}`, "success");
+    }
+
+    // Persist log in whatsapp_message_logs if connected
+    if (window.supabaseClient && !window.isMockSession) {
+      try {
+        await window.supabaseClient.from("whatsapp_message_logs").insert([{
+          phone_number: phone,
+          template_name: templateName,
+          message_text: messageText,
+          status: "sent",
+          provider_used: provider,
+          api_response_payload: { provider, payload }
+        }]);
+      } catch (err) {
+        console.error("Failed to insert WhatsApp message log in DB:", err);
+      }
     }
 
     return {
@@ -24,6 +90,7 @@ class WhatsAppNotificationService {
       messageId: `wa-msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       recipient: phone,
       text: messageText,
+      provider: provider,
       timestamp: new Date().toISOString()
     };
   }
@@ -33,7 +100,13 @@ class WhatsAppNotificationService {
       trial_confirmation: "Hello {name}, your trial session at Renegades Sports Arena is confirmed for {date} at {slot}.",
       fee_reminder: "Dear Parent, the training fee of INR {amount} for {student_name} is outstanding. Due: {due_date}.",
       booking_alert: "New trial booking from {name} on {date} at {slot}.",
-      payment_confirmation: "Hello {name}, we received your payment of INR {amount} for Invoice {invoice}."
+      payment_confirmation: "Hello {name}, we received your payment of INR {amount} for Invoice {invoice}.",
+      shop_order: "Hello {name}, your Renegades Pro Shop order {orderId} for {productName} of amount ₹{amount} has been successfully placed! We will message you when it is ready.",
+      tournament_registration: "Hello {name}, your tournament registration for {tournamentName} is confirmed! Pass code: {passCode}.",
+      ground_booking: "Hello {name}, your turf slot booking on {date} at {slot} is confirmed.",
+      academy_registration: "Hello {name}, welcome to Renegades Academy! Your registration is complete.",
+      coupon_confirmation: "Hello {name}, you have been granted coupon {couponCode} for {discountPercent}% off.",
+      admin_alert: "Admin Alert: {message}"
     };
     let format = templates[templateName] || "Notification from Renegades Sports Arena: {message}";
     for (const key in variables) {

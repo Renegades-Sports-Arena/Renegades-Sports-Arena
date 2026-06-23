@@ -1,30 +1,40 @@
 async function sendEmail(to, subject, html) {
-    try {
-        const response = await fetch(
-            window.env.EMAIL_FUNCTION_URL,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${window.env.SUPABASE_KEY}`,
-                    "apikey": window.env.SUPABASE_KEY
-                },
-                body: JSON.stringify({
-                    to,
-                    subject,
-                    html
-                })
-            }
-        );
+    let lastError = null;
+    let delay = 1000; // start with 1s delay
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            const response = await fetch(
+                window.env.EMAIL_FUNCTION_URL,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${window.env.SUPABASE_KEY}`,
+                        "apikey": window.env.SUPABASE_KEY
+                    },
+                    body: JSON.stringify({
+                        to,
+                        subject,
+                        html
+                    })
+                }
+            );
 
-        if (!response.ok) {
-            throw new Error(`Edge Function returned HTTP ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Edge Function returned HTTP ${response.status}`);
+            }
+            return await response.json();
+        } catch (err) {
+            console.warn(`Email attempt ${attempt} failed:`, err);
+            lastError = err;
+            if (attempt < 3) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2; // double delay for next attempt
+            }
         }
-        return await response.json();
-    } catch (err) {
-        console.error("Email Error:", err);
-        throw err; // Propagate error so outer catch knows it failed
     }
+    console.error("Email Error after 3 attempts:", lastError);
+    throw lastError;
 }
 
 //// EMAIL NOTIFICATIONS
@@ -462,3 +472,399 @@ async function sendTrialBookingEmails(details) {
 window.generatePlayerEmailHTML = generatePlayerEmailHTML;
 window.generateAdminEmailHTML = generateAdminEmailHTML;
 window.sendTrialBookingEmails = sendTrialBookingEmails;
+
+// ==========================================================================
+// OPERATIONAL & TRANSACTIONAL EMAIL TEMPLATES
+// ==========================================================================
+
+function getBaseEmailHTML(title, headerText, greetingName, bodyHTML) {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${title} | Renegades Sports Arena</title>
+        <style>
+            body {
+                font-family: 'Outfit', 'Inter', 'Segoe UI', Arial, sans-serif;
+                background-color: #0c0c0e;
+                margin: 0;
+                padding: 0;
+                color: #e2e8f0;
+                -webkit-font-smoothing: antialiased;
+            }
+            .email-container {
+                max-width: 600px;
+                margin: 40px auto;
+                background-color: #121216;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 107, 0, 0.15);
+            }
+            .email-header {
+                background: linear-gradient(135deg, #ff6b00 0%, #cc5200 100%);
+                padding: 40px 30px;
+                text-align: center;
+                border-bottom: 3px solid #ff7b1a;
+            }
+            .email-header h1 {
+                margin: 0;
+                font-size: 26px;
+                font-weight: 800;
+                color: #ffffff;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            }
+            .email-body {
+                padding: 40px 30px;
+                background: radial-gradient(circle at top right, rgba(255, 107, 0, 0.03) 0%, transparent 70%);
+            }
+            .greeting {
+                font-size: 18px;
+                color: #ffffff;
+                margin-bottom: 25px;
+                line-height: 1.5;
+            }
+            .intro-text {
+                font-size: 15px;
+                line-height: 1.6;
+                color: #94a3b8;
+                margin-bottom: 30px;
+            }
+            .details-card {
+                background-color: #1e1e24;
+                border-radius: 16px;
+                padding: 25px;
+                margin-bottom: 35px;
+                border: 1px solid rgba(255, 255, 255, 0.03);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+            .detail-item {
+                display: flex;
+                margin-bottom: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                padding-bottom: 12px;
+            }
+            .detail-item:last-child {
+                margin-bottom: 0;
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .detail-label {
+                width: 150px;
+                font-size: 13px;
+                font-weight: 700;
+                color: #ff6b00;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .detail-val {
+                flex: 1;
+                font-size: 15px;
+                color: #ffffff;
+                font-weight: 600;
+            }
+            .instructions-box {
+                background: rgba(255, 107, 0, 0.04);
+                border-left: 4px solid #ff6b00;
+                border-radius: 4px 12px 12px 4px;
+                padding: 20px;
+                margin-bottom: 35px;
+            }
+            .instructions-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #ffffff;
+                margin-top: 0;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .instructions-list {
+                margin: 0;
+                padding-left: 20px;
+                color: #cbd5e1;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            .tagline-container {
+                text-align: center;
+                margin: 40px 0 20px;
+                padding-top: 25px;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .tagline {
+                font-size: 20px;
+                font-weight: 900;
+                color: #ff6b00;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                margin: 0;
+            }
+            .email-footer {
+                background-color: #09090b;
+                padding: 30px;
+                text-align: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .footer-links {
+                margin-bottom: 15px;
+            }
+            .footer-links a {
+                color: #94a3b8;
+                text-decoration: none;
+                font-size: 12px;
+                margin: 0 10px;
+            }
+            .footer-info {
+                font-size: 12px;
+                color: #64748b;
+                line-height: 1.5;
+            }
+            .btn-action {
+                display: inline-block;
+                background: linear-gradient(135deg, #ff6b00 0%, #cc5200 100%);
+                color: #ffffff !important;
+                text-decoration: none;
+                font-weight: bold;
+                padding: 12px 30px;
+                border-radius: 8px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin: 20px 0;
+                border: 1px solid #ff7b1a;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="email-header">
+                <div style="font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #fff; margin-bottom: 8px; font-family: 'Impact', sans-serif;">RENEGADES SPORTS ARENA</div>
+                <h1>${headerText}</h1>
+            </div>
+            <div class="email-body">
+                <div class="greeting">Hello ${greetingName},</div>
+                ${bodyHTML}
+                <div class="tagline-container">
+                    <p class="tagline">Focus • Train • Dominate</p>
+                </div>
+            </div>
+            <div class="email-footer">
+                <div class="footer-links">
+                    <a href="https://www.instagram.com/p/DYlwjXOxmg2/?igsh=MThxNWJkbWRqNDRodA==" target="_blank">Instagram</a>
+                    <a href="mailto:renegadessportsarena@gmail.com">Contact Us</a>
+                </div>
+                <div class="footer-info">
+                    &copy; 2026 Renegades Sports Arena. All Rights Reserved.<br>
+                    Byandahalli, Bengaluru, Karnataka 562130
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+}
+
+async function sendPaymentReceiptEmail(to, name, receiptNo, amount, paymentType, date) {
+    const body = `
+    <div class="intro-text">
+        We have successfully received your payment. Here is your digital transaction receipt.
+    </div>
+    <div class="details-card">
+        <div class="detail-item">
+            <div class="detail-label">Receipt Number</div>
+            <div class="detail-val">${receiptNo}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Date</div>
+            <div class="detail-val">${date}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Payment Category</div>
+            <div class="detail-val">${paymentType}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Amount Paid</div>
+            <div class="detail-val" style="color: #ff6b00; font-size: 18px;">₹${parseFloat(amount).toLocaleString('en-IN')}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Status</div>
+            <div class="detail-val" style="color: #10B981;">SUCCESS</div>
+        </div>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Payment Receipt", "PAYMENT SUCCESSFUL", name, body);
+    return await sendEmail(to, `🏏 Payment Receipt: ${receiptNo} | Renegades Sports Arena`, html);
+}
+
+async function sendInvoiceEmail(to, name, invoiceNo, amount, dueDate, items = '') {
+    const body = `
+    <div class="intro-text">
+        A new invoice has been generated for your student account. Please find the payment details below.
+    </div>
+    <div class="details-card">
+        <div class="detail-item">
+            <div class="detail-label">Invoice Number</div>
+            <div class="detail-val">${invoiceNo}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Due Date</div>
+            <div class="detail-val">${dueDate}</div>
+        </div>
+        ${items ? `
+        <div class="detail-item">
+            <div class="detail-label">Description</div>
+            <div class="detail-val">${items}</div>
+        </div>` : ''}
+        <div class="detail-item">
+            <div class="detail-label">Total Amount Due</div>
+            <div class="detail-val" style="color: #ff6b00; font-size: 18px;">₹${parseFloat(amount).toLocaleString('en-IN')}</div>
+        </div>
+    </div>
+    <div class="instructions-box" style="text-align: center;">
+        <div class="instructions-title">Pay Instantly</div>
+        <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 15px;">Log into your Player Portal to clear this invoice.</p>
+        <a href="https://renegadessportsarena.com/portal.html" class="btn-action">GO TO PORTAL</a>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Billing Invoice", "NEW INVOICE GENERATED", name, body);
+    return await sendEmail(to, `🎫 Invoice Generated: ${invoiceNo} | Renegades Sports Arena`, html);
+}
+
+async function sendOrderConfirmationEmail(to, name, orderId, productName, amount) {
+    const body = `
+    <div class="intro-text">
+        Thank you for shopping at the Renegades Pro Shop! Your order has been placed and is currently being processed by our team.
+    </div>
+    <div class="details-card">
+        <div class="detail-item">
+            <div class="detail-label">Order Reference</div>
+            <div class="detail-val" style="font-family: monospace; color: #ff6b00;">${orderId}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Product Name</div>
+            <div class="detail-val">${productName}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Amount Paid</div>
+            <div class="detail-val">₹${parseFloat(amount).toLocaleString('en-IN')}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Status</div>
+            <div class="detail-val" style="color: #ffb300;">PROCESSING</div>
+        </div>
+    </div>
+    <div class="instructions-box">
+        <div class="instructions-title">📦 Next Steps</div>
+        <ul class="instructions-list">
+            <li>Our staff will verify your payment reference.</li>
+            <li>Once confirmed, you will receive a WhatsApp message when your gear is ready for pickup or dispatch.</li>
+        </ul>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Order Confirmed", "ORDER CONFIRMATION", name, body);
+    return await sendEmail(to, `🏏 Order Confirmed: ${orderId} | Renegades Sports Arena`, html);
+}
+
+async function sendRegistrationConfirmationEmail(to, name, tournamentName, passCode, category) {
+    const body = `
+    <div class="intro-text">
+        Your registration for the upcoming tournament is officially confirmed! See details and your Entry Pass Code below.
+    </div>
+    <div class="details-card">
+        <div class="detail-item">
+            <div class="detail-label">Tournament</div>
+            <div class="detail-val">${tournamentName}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Age Category</div>
+            <div class="detail-val">${category}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Pass Code</div>
+            <div class="detail-val" style="font-family: monospace; font-size: 18px; color: #ff6b00; font-weight: 700;">${passCode}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Status</div>
+            <div class="detail-val" style="color: #10B981;">REGISTERED</div>
+        </div>
+    </div>
+    <div class="instructions-box">
+        <div class="instructions-title">🏆 Tournament Pass Details</div>
+        <p style="color: #cbd5e1; font-size: 14px;">Please keep this Pass Code handy. You will need to show it at the registration desk upon reporting at the arena.</p>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Tournament Registered", "TOURNAMENT ENTRY PASS", name, body);
+    return await sendEmail(to, `🏆 Registration Confirmed: ${tournamentName} | Renegades Sports Arena`, html);
+}
+
+async function sendCouponConfirmationEmail(to, name, couponCode, discountPercent) {
+    const body = `
+    <div class="intro-text">
+        Congratulations! You have been granted an exclusive promo coupon code for Renegades Sports Arena.
+    </div>
+    <div class="details-card">
+        <div class="detail-item">
+            <div class="detail-label">Promo Code</div>
+            <div class="detail-val" style="font-family: monospace; font-size: 20px; color: #ff6b00; font-weight: 700; letter-spacing: 1px;">${couponCode}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Benefit</div>
+            <div class="detail-val">${discountPercent}% FLAT DISCOUNT</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Applicable To</div>
+            <div class="detail-val">Pro Shop, Academy, & Tournaments</div>
+        </div>
+    </div>
+    <div class="instructions-box">
+        <div class="instructions-title">💡 How to Redeem</div>
+        <p style="color: #cbd5e1; font-size: 14px; margin: 0;">Apply this code at checkout / invoicing to receive your discount instantly!</p>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Coupon Issued", "EXCLUSIVE PROMO INSIDE", name, body);
+    return await sendEmail(to, `🎫 Exclusive Promo Code Issued: ${couponCode} | Renegades Sports Arena`, html);
+}
+
+async function sendPasswordResetEmail(to, resetLink) {
+    const body = `
+    <div class="intro-text">
+        We received a request to reset the password for your Renegades Sports Arena account. Click the button below to configure a new password.
+    </div>
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="${resetLink}" class="btn-action">RESET PASSWORD</a>
+    </div>
+    <div class="instructions-box">
+        <div class="instructions-title">⚠️ Security Notice</div>
+        <p style="color: #cbd5e1; font-size: 13px; margin: 0;">If you did not initiate this request, you can safely ignore this email. This link will expire shortly.</p>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Reset Password", "PASSWORD RESET REQUEST", "User", body);
+    return await sendEmail(to, "🔒 Reset Your Password | Renegades Sports Arena", html);
+}
+
+async function sendAdminNotificationEmail(subject, message) {
+    const body = `
+    <div class="intro-text">
+        This is an operational system notification for the Renegades Sports Arena administrators.
+    </div>
+    <div class="details-card">
+        <div style="font-size: 14px; line-height: 1.6; color: #ffffff; white-space: pre-wrap;">${message}</div>
+    </div>
+    `;
+    const html = getBaseEmailHTML("Admin Notification", "ADMIN OPERATIONAL ALERT", "Admin", body);
+    const adminEmail = window.env ? (window.env.ADMIN_EMAIL || "renegadessportsarena@gmail.com") : "renegadessportsarena@gmail.com";
+    return await sendEmail(adminEmail, `⚠️ System Alert: ${subject}`, html);
+}
+
+// Bind new templates to window object to expose globally
+window.sendPaymentReceiptEmail = sendPaymentReceiptEmail;
+window.sendInvoiceEmail = sendInvoiceEmail;
+window.sendOrderConfirmationEmail = sendOrderConfirmationEmail;
+window.sendRegistrationConfirmationEmail = sendRegistrationConfirmationEmail;
+window.sendCouponConfirmationEmail = sendCouponConfirmationEmail;
+window.sendPasswordResetEmail = sendPasswordResetEmail;
+window.sendAdminNotificationEmail = sendAdminNotificationEmail;

@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 3. Wait for Supabase to connect and initialize database loading
   initDatabaseData();
+  initTourCouponVerification();
 });
 
 /* ==========================================================================
@@ -598,6 +599,9 @@ function renderPointsStandings() {
 /* ==========================================================================
    REGISTRATION SYSTEM & UPI PAYMENT SCANNER FLOW
    ========================================================================== */
+let tourAppliedCoupon = null;
+const originalTourFee = 1500;
+
 window.openRegistrationFlow = function(tournamentId, name, ageCategory) {
   const modal = document.getElementById("registrationModal");
   if (!modal) return;
@@ -606,6 +610,17 @@ window.openRegistrationFlow = function(tournamentId, name, ageCategory) {
   document.getElementById("regTournamentId").value = tournamentId;
   document.getElementById("regAgeGroup").value = ageCategory;
   
+  // Clear coupon inputs and messages
+  tourAppliedCoupon = null;
+  const couponInput = document.getElementById("regCouponCode");
+  if (couponInput) couponInput.value = "";
+  
+  const msgEl = document.getElementById("regCouponMessage");
+  if (msgEl) {
+    msgEl.style.display = "none";
+    msgEl.textContent = "";
+  }
+
   // Set default Step 1 visible
   showRegStep(1);
   modal.classList.add("active");
@@ -654,11 +669,19 @@ if (regForm) {
       return;
     }
 
+    const discAmt = tourAppliedCoupon ? Math.round(originalTourFee * (tourAppliedCoupon.discountPercent / 100)) : 0;
+    const finalAmount = originalTourFee - discAmt;
+
     // Load QR Code dynamically for simulated UPI
     const paymentQrContainer = document.getElementById("paymentQrCodeContainer");
-    const amount = 1500;
-    const upiLink = `upi://pay?pa=renegadessportsarena@okaxis&pn=Renegades%20Sports%20Arena&am=${amount}&cu=INR&tn=Tournament%20Registration`;
+    const upiLink = `upi://pay?pa=renegadessportsarena@okaxis&pn=Renegades%20Sports%20Arena&am=${finalAmount}&cu=INR&tn=Tournament%20Registration`;
     paymentQrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}" alt="Scan to Pay">`;
+
+    // Update final amount label in step 2
+    const step2P = document.querySelector("#regStep-2 p");
+    if (step2P) {
+      step2P.innerHTML = `Scan the QR code below from any UPI app (GPay, PhonePe, Paytm) to complete registration fees of <strong class="text-orange">₹${finalAmount.toLocaleString('en-IN')}</strong>.`;
+    }
 
     showRegStep(2);
   });
@@ -684,6 +707,10 @@ if (btnSimulatePayment) {
     const contactPhone = document.getElementById("regPhone").value;
     const ageCategory = document.getElementById("regAgeGroup").value;
     const passCode = "RSA-" + Math.random().toString(36).substr(2, 5).toUpperCase();
+    const selectedTournament = globalTournaments.find(t => t.id === tournamentId);
+    
+    const discAmt = tourAppliedCoupon ? Math.round(originalTourFee * (tourAppliedCoupon.discountPercent / 100)) : 0;
+    const finalAmount = originalTourFee - discAmt;
 
     try {
       // 1. Save registration into Supabase
@@ -703,8 +730,38 @@ if (btnSimulatePayment) {
 
       if (error) throw error;
 
-      // 2. Generate and display print ticket pass
-      const selectedTournament = globalTournaments.find(t => t.id === tournamentId);
+      // 2. Increment coupon uses and insert coupon usage
+      if (tourAppliedCoupon && window.supabaseClient) {
+        let couponId = tourAppliedCoupon.id;
+        
+        // Fetch coupon ID if not present
+        const { data: couponData } = await window.supabaseClient
+          .from("coupon_codes")
+          .select("id, uses_count")
+          .eq("code", tourAppliedCoupon.code)
+          .maybeSingle();
+
+        if (couponData) {
+          couponId = couponData.id;
+          
+          await window.supabaseClient
+            .from("coupon_codes")
+            .update({ uses_count: couponData.uses_count + 1 })
+            .eq("id", couponData.id);
+
+          await window.supabaseClient
+            .from("coupon_usage")
+            .insert([{
+              coupon_id: couponId,
+              user_id: null,
+              applied_to: 'tournament',
+              reference_id: data[0].id,
+              discount_amount: discAmt
+            }]);
+        }
+      }
+
+      // 3. Generate and display print ticket pass
       document.getElementById("ticketTournamentName").textContent = selectedTournament?.name || "RSA Championship";
       document.getElementById("ticketRegistrantName").textContent = registrantName;
       document.getElementById("ticketCategory").textContent = ageCategory;
@@ -714,7 +771,19 @@ if (btnSimulatePayment) {
       const ticketQrContainer = document.getElementById("ticketQrImageContainer");
       ticketQrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(passCode)}" alt="RSA Pass QR">`;
 
-      // 3. Move to Step 3 and trigger success celebrations (confetti)
+      // 4. Send dispatches (email and WhatsApp)
+      if (window.sendRegistrationConfirmationEmail) {
+        window.sendRegistrationConfirmationEmail(contactEmail, registrantName, selectedTournament?.name || "Renegades Tournament", passCode, ageCategory);
+      }
+      if (window.WhatsAppNotificationService && window.WhatsAppNotificationService.send) {
+        window.WhatsAppNotificationService.send(contactPhone, 'tournament_registration', {
+          name: registrantName,
+          tournamentName: selectedTournament?.name || "Tournament",
+          passCode: passCode
+        });
+      }
+
+      // 5. Move to Step 3 and trigger success celebrations (confetti)
       btnSimulatePayment.disabled = false;
       btnSimulatePayment.textContent = "CONFIRM MOCK PAYMENT";
       showRegStep(3);
@@ -804,3 +873,94 @@ window.switchDashboardTab = function(tabName, selectTournamentId = null) {
     });
   }
 };
+
+// ==========================================================================
+// TOURNAMENT COUPON CODES MANAGER
+// ==========================================================================
+
+async function validateTourCouponCode(code) {
+  if (!window.supabaseClient) {
+    if (code.toUpperCase() === 'WELCOME8') {
+      return { valid: true, discountPercent: 8, message: "Welcome Coupon Applied! (8% Off)" };
+    } else {
+      return { valid: false, message: "Invalid coupon code." };
+    }
+  }
+
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('coupon_codes')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .single();
+
+    if (error || !data) {
+      return { valid: false, message: "Coupon code not found." };
+    }
+
+    if (!data.is_active) {
+      return { valid: false, message: "This coupon is no longer active." };
+    }
+
+    if (data.expiry_date && new Date(data.expiry_date) < new Date()) {
+      return { valid: false, message: "This coupon has expired." };
+    }
+
+    if (data.usage_limit !== null && data.uses_count >= data.usage_limit) {
+      return { valid: false, message: "This coupon usage limit has been reached." };
+    }
+
+    return {
+      valid: true,
+      discountPercent: data.discount_percent,
+      id: data.id,
+      message: `Coupon Applied! (${data.discount_percent}% Off)`
+    };
+  } catch (err) {
+    console.error("Coupon validation error:", err);
+    return { valid: false, message: "Error validating coupon. Please try again." };
+  }
+}
+
+function initTourCouponVerification() {
+  const applyBtn = document.getElementById("btnApplyRegCoupon");
+  if (!applyBtn) return;
+
+  applyBtn.addEventListener("click", async () => {
+    const codeInput = document.getElementById("regCouponCode");
+    const code = codeInput.value.trim().toUpperCase();
+    const msgEl = document.getElementById("regCouponMessage");
+    
+    if (!code) {
+      msgEl.textContent = "Please enter a coupon code.";
+      msgEl.style.color = "#EF4444";
+      msgEl.style.display = "block";
+      return;
+    }
+
+    applyBtn.disabled = true;
+    applyBtn.textContent = "Checking...";
+
+    const res = await validateTourCouponCode(code);
+    
+    applyBtn.disabled = false;
+    applyBtn.textContent = "Apply";
+
+    if (res.valid) {
+      tourAppliedCoupon = {
+        code: code,
+        discountPercent: res.discountPercent,
+        id: res.id
+      };
+      
+      msgEl.textContent = res.message;
+      msgEl.style.color = "#10B981";
+      msgEl.style.display = "block";
+    } else {
+      tourAppliedCoupon = null;
+      msgEl.textContent = res.message;
+      msgEl.style.color = "#EF4444";
+      msgEl.style.display = "block";
+    }
+  });
+}

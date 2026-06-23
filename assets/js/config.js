@@ -446,9 +446,9 @@ window.RENEGADES_DEFAULT_CONFIG = DEFAULT_CONFIG;
 // Deep merge loaded configuration with DEFAULT_CONFIG
 function deepMergeConfig(defaultConfig, loadedConfig) {
   if (!loadedConfig) return { ...defaultConfig };
-  
+
   const merged = { ...defaultConfig };
-  
+
   for (const key in defaultConfig) {
     if (loadedConfig[key] !== undefined) {
       if (Array.isArray(defaultConfig[key])) {
@@ -471,7 +471,7 @@ let loadedConfig = configSource ? JSON.parse(configSource) : DEFAULT_CONFIG;
 window.RENEGADES_CONFIG = deepMergeConfig(DEFAULT_CONFIG, loadedConfig);
 
 // Expose getHallOfFameData following priority chain CMS -> Supabase -> Fallback
-window.getHallOfFameData = function() {
+window.getHallOfFameData = function () {
   const localConfigStr = localStorage.getItem("renegades_config");
   if (localConfigStr) {
     try {
@@ -506,31 +506,31 @@ async function loadSupabaseConfig() {
     window.RENEGADES_CONFIG = deepMergeConfig(DEFAULT_CONFIG, data.data);
     console.log("Loaded from Supabase");
 
-    setTimeout(() => {
-      // Re-initialize all sections to dynamically reflect Supabase changes
-      if (typeof initAnnouncement === "function") initAnnouncement(window.RENEGADES_CONFIG.general);
-      if (typeof initGeneral === "function") initGeneral(window.RENEGADES_CONFIG.general);
-      if (typeof initHero === "function") initHero(window.RENEGADES_CONFIG.hero);
-      if (typeof initWhyChooseUs === "function") initWhyChooseUs(window.RENEGADES_CONFIG.whyChooseUs);
-      if (typeof initFutureArena === "function") initFutureArena(window.RENEGADES_CONFIG.futureArena);
-      if (typeof initClubs === "function") initClubs(window.RENEGADES_CONFIG.clubs);
-      if (typeof initPrograms === "function") initPrograms(window.RENEGADES_CONFIG.programs);
-      if (typeof initPathway === "function") initPathway(window.RENEGADES_CONFIG.renegadesPathway);
-      if (typeof initParentsChoose === "function") initParentsChoose(window.RENEGADES_CONFIG.whyParentsChoose);
-      if (typeof initVisionMission === "function") initVisionMission(window.RENEGADES_CONFIG.visionMission);
-      if (typeof initFacilities === "function") initFacilities(window.RENEGADES_CONFIG.facilities);
-      if (typeof initGallery === "function") initGallery(window.RENEGADES_CONFIG.gallery);
-      if (typeof initReviews === "function") initReviews(window.RENEGADES_CONFIG.reviews);
-      if (typeof initAchievements === "function") initAchievements(window.RENEGADES_CONFIG.achievements);
-      if (typeof initHallOfFame === "function") initHallOfFame(window.getHallOfFameData());
-      if (typeof initProShop === "function") initProShop(window.RENEGADES_CONFIG.shop);
-      if (typeof initCoaches === "function") {
-        const coachData = window.RENEGADES_CONFIG?.coaches?.list?.length
-          ? window.RENEGADES_CONFIG.coaches
-          : DEFAULT_CONFIG.coaches;
-        initCoaches(coachData);
-      }
-    }, 500);
+    /* setTimeout(() => {
+       // Re-initialize all sections to dynamically reflect Supabase changes
+       if (typeof initAnnouncement === "function") initAnnouncement(window.RENEGADES_CONFIG.general);
+       if (typeof initGeneral === "function") initGeneral(window.RENEGADES_CONFIG.general);
+       if (typeof initHero === "function") initHero(window.RENEGADES_CONFIG.hero);
+       if (typeof initWhyChooseUs === "function") initWhyChooseUs(window.RENEGADES_CONFIG.whyChooseUs);
+       if (typeof initFutureArena === "function") initFutureArena(window.RENEGADES_CONFIG.futureArena);
+       if (typeof initClubs === "function") initClubs(window.RENEGADES_CONFIG.clubs);
+       if (typeof initPrograms === "function") initPrograms(window.RENEGADES_CONFIG.programs);
+       if (typeof initPathway === "function") initPathway(window.RENEGADES_CONFIG.renegadesPathway);
+       if (typeof initParentsChoose === "function") initParentsChoose(window.RENEGADES_CONFIG.whyParentsChoose);
+       if (typeof initVisionMission === "function") initVisionMission(window.RENEGADES_CONFIG.visionMission);
+       if (typeof initFacilities === "function") initFacilities(window.RENEGADES_CONFIG.facilities);
+       if (typeof initGallery === "function") initGallery(window.RENEGADES_CONFIG.gallery);
+       if (typeof initReviews === "function") initReviews(window.RENEGADES_CONFIG.reviews);
+       if (typeof initAchievements === "function") initAchievements(window.RENEGADES_CONFIG.achievements);
+       if (typeof initHallOfFame === "function") initHallOfFame(window.getHallOfFameData());
+       if (typeof initProShop === "function") initProShop(window.RENEGADES_CONFIG.shop);
+       if (typeof initCoaches === "function") {
+         const coachData = window.RENEGADES_CONFIG?.coaches?.list?.length
+           ? window.RENEGADES_CONFIG.coaches
+           : DEFAULT_CONFIG.coaches;
+         initCoaches(coachData);
+       }
+     }, 500);*/
   } else {
     console.log("Using localStorage/default config");
   }
@@ -538,6 +538,9 @@ async function loadSupabaseConfig() {
 
 window.addEventListener("load", () => {
   setTimeout(loadSupabaseConfig, 1000);
+  if (typeof initScrollEffects === "function") {
+    initScrollEffects();
+  }
 });
 
 // Ensure new gallery images from DEFAULT_CONFIG are present in loadedConfig

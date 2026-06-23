@@ -68,6 +68,7 @@
           Registrations</button>
         <button class="menu-item" data-target-tab="notifications-tab" style="color: #ffc107;">🔔 Notification
           Center</button>
+        <button class="menu-item" data-target-tab="coupons-tab" style="color: #FFB300;">🎫 Coupon Codes</button>
 
         <button class="menu-item" data-target-tab="export-tab"
           style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: var(--accent);">Export
@@ -1038,6 +1039,88 @@
           </div>
         </section>
 
+        <!-- Extended Tab: Coupon Code Manager -->
+        <section class="tab-panel" id="coupons-tab">
+          <!-- Create/Edit Coupon Form -->
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Create / Edit Coupon Code</h3>
+            <form id="adminCouponForm" novalidate>
+              <input type="hidden" id="adminCouponId">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Coupon Code *</label>
+                  <input type="text" id="adminCouponCode" class="form-input" required placeholder="e.g. WELCOME8" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Discount Percentage (%) *</label>
+                  <input type="number" id="adminCouponDiscount" class="form-input" required min="0" max="100" placeholder="e.g. 8">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Usage Limit (claims)</label>
+                  <input type="number" id="adminCouponLimit" class="form-input" placeholder="e.g. 100 (Leave blank for unlimited)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Expiry Date</label>
+                  <input type="date" id="adminCouponExpiry" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Status *</label>
+                  <select id="adminCouponActive" class="form-input">
+                    <option value="true">Active / Enabled</option>
+                    <option value="false">Inactive / Disabled</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn-save-master" style="flex:2;">Save Coupon</button>
+                <button type="button" class="btn-save-master" id="adminCancelCouponBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Coupon Analytics Cards -->
+          <div class="booking-stats-row" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+            <div class="booking-stat-card">
+              <div class="stat-num" id="totalCouponsCount">0</div>
+              <div class="stat-lbl">Total Coupons</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-orange" id="activeCouponsCount">0</div>
+              <div class="stat-lbl">Active Coupons</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-green" id="totalCouponClaims">0</div>
+              <div class="stat-lbl">Total Claims</div>
+            </div>
+            <div class="booking-stat-card">
+              <div class="stat-num text-green" id="totalDiscountSavings">₹0</div>
+              <div class="stat-lbl">Total Savings Granted</div>
+            </div>
+          </div>
+
+          <!-- Coupons List -->
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3>Active Coupons Database</h3>
+            <div class="table-responsive" style="margin-top:1rem;">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Discount</th>
+                    <th>Expiry Date</th>
+                    <th>Claims / Limit</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminCouponsTableBody">
+                  <!-- Loaded dynamically from database -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
       </div>
     </main>
 
@@ -1085,10 +1168,10 @@
   <!-- Success indicator banner -->
   <div class="save-success-notification" id="successBanner" role="alert">Changes Saved to Browser Storage!</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/supabase.js"></script>
   <script src="assets/js/env.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/config.js"></script>
   <script src="assets/js/email.js"></script>
   <script src="assets/js/notifications_services.js"></script>
   <script src="assets/js/admin.js"></script>

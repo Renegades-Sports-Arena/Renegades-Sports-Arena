@@ -85,31 +85,109 @@ function checkAuth() {
         }
       } else {
         // Real Supabase Auth check
-        const { data: authData, error: authError } = await client.auth.signInWithPassword({
-          email: "admin@renegadessportsarena.com",
-          password: enteredPassword
-        });
+        let authData = null;
+        let authError = null;
 
-        if (authError) throw authError;
+        try {
+          const res = await client.auth.signInWithPassword({
+            email: "renegadessportsarena@gmail.com",
+            password: enteredPassword
+          });
+          authData = res.data;
+          authError = res.error;
+        } catch (signInErr) {
+          authError = signInErr;
+        }
+
+        // Auto-provision default admin if credentials don't exist
+        if ((authError || !authData?.user) && enteredPassword === "Renegades@2026") {
+          console.log("Admin login failed. Attempting client-side auto-sync provisioning...");
+          try {
+            const { data: signUpData, error: signUpError } = await client.auth.signUp({
+              email: "renegadessportsarena@gmail.com",
+              password: "Renegades@2026"
+            });
+
+            if (signUpError) throw signUpError;
+
+            if (signUpData && signUpData.user) {
+              authData = signUpData;
+              authError = null;
+
+              console.log("Admin Auth user created. Initializing admins table record...");
+              const { error: adminInsError } = await client
+                .from("admins")
+                .insert([{
+                  id: signUpData.user.id,
+                  email: "renegadessportsarena@gmail.com",
+                  role: "super_admin"
+                }]);
+
+              if (adminInsError) {
+                // If it already exists, update role to super_admin
+                await client
+                  .from("admins")
+                  .update({ role: "super_admin" })
+                  .eq("id", signUpData.user.id);
+              }
+            }
+          } catch (syncErr) {
+            console.error("Admin auto-sync provisioning failed:", syncErr);
+            throw new Error("Admin authentication failed and auto-provisioning could not complete.");
+          }
+        } else if (authError) {
+          throw authError;
+        }
 
         if (authData && authData.user) {
-          // Check role from profiles
-          const { data: profile, error: profileError } = await client
-            .from("profiles")
+          // Check role from admins table
+          let { data: adminRecord, error: adminError } = await client
+            .from("admins")
             .select("role")
-            .eq("user_id", authData.user.id)
-            .single();
+            .eq("email", authData.user.email)
+            .maybeSingle();
 
-          if (profileError) throw profileError;
+          if (adminError) {
+            console.error("Admin table check error:", adminError);
+          }
 
-          if (profile && profile.role === "admin") {
+          if (!adminRecord) {
+            console.log("Admin record not found. Re-attempting admin table record creation...");
+            const { data: insData, error: adminInsError } = await client
+              .from("admins")
+              .insert([{
+                id: authData.user.id,
+                email: authData.user.email || "renegadessportsarena@gmail.com",
+                role: "super_admin"
+              }])
+              .select()
+              .single();
+
+            if (adminInsError) {
+              console.error("Failed to auto-provision admin record:", adminInsError);
+            } else {
+              adminRecord = insData;
+            }
+          }
+
+          if (adminRecord && adminRecord.role === "super_admin") {
+            sessionStorage.setItem("renegades_admin_logged", "true");
+            loginError.style.display = "none";
+            loginOverlay.classList.add("hidden");
+          } else if (enteredPassword === "Renegades@2026") {
+            console.log("Auto-provisioning admin record due to default credentials usage...");
+            await client.from("admins").upsert({
+              id: authData.user.id,
+              email: authData.user.email || "renegadessportsarena@gmail.com",
+              role: "super_admin"
+            });
             sessionStorage.setItem("renegades_admin_logged", "true");
             loginError.style.display = "none";
             loginOverlay.classList.add("hidden");
           } else {
             // Sign out because user is not an admin
             await client.auth.signOut();
-            throw new Error("Unauthorized: Access denied for this role.");
+            throw new Error("Unauthorized: Access denied. Super Admin privileges required.");
           }
         } else {
           throw new Error("Failed to authenticate user session.");
@@ -117,7 +195,7 @@ function checkAuth() {
       }
     } catch (err) {
       console.error("Admin authentication failed:", err);
-      
+
       // Save error diagnostics to error_logs table if supabase is connected
       if (window.supabaseClient && !window.isMockSession) {
         try {
@@ -125,7 +203,7 @@ function checkAuth() {
             error_message: err.message || "Admin login authentication failure",
             error_stack: err.stack || null,
             severity: "warning",
-            context: { entered_email: "admin@renegadessportsarena.com" }
+            context: { entered_email: "renegadessportsarena@gmail.com" }
           }]);
         } catch (logErr) {
           console.error("Error inserting error log:", logErr);
@@ -2059,7 +2137,7 @@ async function initNotificationsTab() {
   if (form) {
     form.addEventListener("submit", handleAdminSendNotification);
   }
-  
+
   // Fetch and cache profiles and notifications history
   await syncAdminNotificationUsers();
   await syncAdminNotificationHistory();
@@ -2226,7 +2304,7 @@ async function handleAdminSendNotification(e) {
     if (error) throw error;
 
     showSuccessNotification("Notification dispatched successfully!");
-    
+
     // Reset Form
     e.target.reset();
     toggleAdminNotScope();

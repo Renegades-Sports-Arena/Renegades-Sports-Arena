@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLoader();
   initHallOfFame(window.getHallOfFameData());
   initMagneticButtons();
+  initProShopCheckout();
 
   // Register PWA Service Worker
   if ("serviceWorker" in navigator) {
@@ -525,12 +526,12 @@ function initProShop(data) {
       const waText = encodeURIComponent(`Hello Renegades Sports Arena, I am interested in purchasing: ${p.name} (Price: ₹${p.price.toLocaleString('en-IN')})`);
       const waUrl = `https://wa.me/919731134665?text=${waText}`;
 
-      const buyBtnHtml = isOutOfStock
-        ? `<button class="btn btn-secondary product-buy-btn" disabled style="opacity: 0.5; cursor: not-allowed; width: 100%;">OUT OF STOCK</button>`
-        : `<a href="${waUrl}" class="btn btn-primary product-buy-btn" target="_blank" rel="noopener">BUY NOW</a>`;
-
       const imgUrl = p.image || "assets/images/logo.png";
       const srcUrl = imgUrl.startsWith('data:') ? imgUrl : `${imgUrl}?v=${Date.now()}`;
+
+      const buyBtnHtml = isOutOfStock
+        ? `<button class="btn btn-secondary product-buy-btn" disabled style="opacity: 0.5; cursor: not-allowed; width: 100%;">OUT OF STOCK</button>`
+        : `<button class="btn btn-primary product-buy-btn" data-product-id="${p.id}" data-product-name="${p.name}" data-product-price="${p.price}" data-product-image="${srcUrl}">BUY NOW</button>`;
 
       card.innerHTML = `
         <div class="product-img-wrapper">
@@ -713,27 +714,53 @@ function initCoaches(data) {
   console.count("initCoaches");
   console.log("INIT COACHES CALLED");
 
-  console.log(data);
-  console.log(document.getElementById("coachesGrid"));
-  if (!data || !data.list || !data.list.length) {
-
-    console.log("No coaches data received");
-
-    return;
-  }
   const container = document.getElementById("coachesGrid");
   if (!container) return;
 
   container.innerHTML = "";
-  data.list.forEach((c, idx) => {
+  const list = data?.list || [];
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="premium-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--bg-secondary); border: 1px dashed var(--glass-border); border-radius: 8px;">
+        <p style="color: var(--text-secondary);">No coaches listed yet. Check back soon.</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.forEach((c, idx) => {
     const card = document.createElement("div");
-    card.className = `coach-card reveal-element delay-${(idx % 3) + 1}`;
-    if (data.list.length === 1) {
+    card.className = `coach-card glass-card reveal-element glow-violet delay-${(idx % 3) + 1}`;
+    if (list.length === 1) {
       card.classList.add("coach-card-featured");
     }
+
+    // Build social links
+    let socialsHTML = "";
+    if (c.instagram) {
+      socialsHTML += `
+        <a href="${c.instagram}" class="coach-social-btn" target="_blank" rel="noopener" aria-label="${c.name} Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      `;
+    }
+    if (c.twitter) {
+      socialsHTML += `
+        <a href="${c.twitter}" class="coach-social-btn" target="_blank" rel="noopener" aria-label="${c.name} Twitter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+          </svg>
+        </a>
+      `;
+    }
+
     card.innerHTML = `
       <div class="coach-img-container" style="cursor: zoom-in;">
-        <img class="coach-img" src="${c.image}" alt="${c.name}" loading="lazy">
+        <img class="coach-img" src="${c.image || 'assets/images/logo.png'}" alt="${c.name}" loading="lazy">
         <div class="coach-zoom-badge">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
@@ -744,24 +771,21 @@ function initCoaches(data) {
           <span>Click to Zoom Poster</span>
         </div>
         <div class="coach-socials-overlay">
-          <a href="${c.instagram}" class="coach-social-btn" aria-label="Instagram" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-          </a>
-          <a href="${c.twitter}" class="coach-social-btn" aria-label="Twitter" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-          </a>
+          ${socialsHTML}
         </div>
       </div>
       <div class="coach-details">
-        <span class="coach-exp">${c.experience}</span>
+        <span class="coach-exp">${c.experience || 'Professional Coach'}</span>
         <h3>${c.name}</h3>
-        <span class="coach-desig">${c.designation}</span>
+        <span class="coach-desig">${c.designation || 'Instructor'}</span>
         <div class="coach-spec-box">
           <strong>Specialization & Focus:</strong>
-          ${c.specialization}
+          ${c.specialization || 'All-round coaching'}
+          ${c.achievements ? `
           <div style="margin-top:0.5rem; font-size:0.75rem; border-top:1px dashed var(--glass-border); padding-top:0.5rem;">
             <strong>Key Achievement:</strong> ${c.achievements}
           </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -771,15 +795,13 @@ function initCoaches(data) {
     imgContainer.addEventListener("click", (e) => {
       if (e.target.closest(".coach-social-btn")) return;
       if (window.openGenericLightbox) {
-        window.openGenericLightbox(c.image, `${c.name} - ${c.designation}`);
+        window.openGenericLightbox(c.image || 'assets/images/logo.png', `${c.name} - ${c.designation || 'Instructor'}`);
       }
     });
 
     container.appendChild(card);
     if (window.revealObserver) {
-
       window.revealObserver.observe(card);
-
     }
   });
 }
@@ -2077,86 +2099,6 @@ function initHallOfFame(data) {
   });
 }
 
-function initCoaches(data) {
-  const grid = document.getElementById("coachesGrid");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-  const list = data?.list || [];
-  if (list.length === 0) {
-    grid.innerHTML = `
-      <div class="premium-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--bg-secondary); border: 1px dashed var(--glass-border); border-radius: 8px;">
-        <p style="color: var(--text-secondary);">No coaches listed yet. Check back soon.</p>
-      </div>
-    `;
-    return;
-  }
-
-  list.forEach((coach, index) => {
-    const card = document.createElement("div");
-    card.className = `coach-card glass-card reveal-element glow-violet delay-${(index % 3) + 1}`;
-
-    // Build social links
-    let socialsHTML = "";
-    if (coach.instagram) {
-      socialsHTML += `
-        <a href="${coach.instagram}" class="coach-social-btn" target="_blank" rel="noopener" aria-label="${coach.name} Instagram">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-          </svg>
-        </a>
-      `;
-    }
-    if (coach.twitter) {
-      socialsHTML += `
-        <a href="${coach.twitter}" class="coach-social-btn" target="_blank" rel="noopener" aria-label="${coach.name} Twitter">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-          </svg>
-        </a>
-      `;
-    }
-
-    card.innerHTML = `
-      <div class="coach-img-container">
-        <span class="coach-zoom-badge" style="cursor: pointer;" onclick="window.openGenericLightbox('${coach.image || 'assets/images/logo.png'}', '${coach.name}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          View Photo
-        </span>
-        <img class="coach-img" src="${coach.image || 'assets/images/logo.png'}" alt="${coach.name}">
-        <div class="coach-socials-overlay">
-          ${socialsHTML}
-        </div>
-      </div>
-      <div class="coach-details">
-        <span class="coach-exp">${coach.experience || 'Professional Coach'}</span>
-        <h3>${coach.name}</h3>
-        <span class="coach-desig">${coach.designation || 'Instructor'}</span>
-        <div class="coach-spec-box">
-          <strong>Specialization:</strong>
-          ${coach.specialization || 'All-round coaching'}
-        </div>
-        ${coach.achievements ? `
-          <div class="coach-spec-box" style="margin-top: 1rem; border-color: rgba(245, 158, 11, 0.15);">
-            <strong style="color: var(--accent-gold-yellow);">Achievements:</strong>
-            ${coach.achievements}
-          </div>
-        ` : ''}
-      </div>
-    `;
-
-    grid.appendChild(card);
-
-    if (window.revealObserver) {
-      window.revealObserver.observe(card);
-    }
-  });
-}
 
 function initMagneticButtons() {
   const btns = document.querySelectorAll(".btn, .btn-primary, .btn-secondary, .btn-outline-orange, .slot-btn, .tab-btn, .dash-tab-btn");
@@ -2171,6 +2113,416 @@ function initMagneticButtons() {
       btn.style.transform = "translate(0, 0)";
     });
   });
+}
+
+// ==========================================================================
+// PRO SHOP CHECKOUT MODAL LOGIC & REPAY SIMULATOR
+// ==========================================================================
+
+let selectedProductForCheckout = null;
+let appliedCheckoutCoupon = null;
+
+async function validateCouponCode(code, originalPrice) {
+  if (window.isMockSession || !window.supabaseClient) {
+    if (code.toUpperCase() === 'WELCOME8') {
+      return { valid: true, discountPercent: 8, message: "Welcome Coupon Applied! (8% Off)" };
+    } else {
+      return { valid: false, message: "Invalid coupon code." };
+    }
+  }
+
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('coupon_codes')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .single();
+
+    if (error || !data) {
+      return { valid: false, message: "Coupon code not found." };
+    }
+
+    if (!data.is_active) {
+      return { valid: false, message: "This coupon is no longer active." };
+    }
+
+    if (data.expiry_date && new Date(data.expiry_date) < new Date()) {
+      return { valid: false, message: "This coupon has expired." };
+    }
+
+    if (data.usage_limit !== null && data.uses_count >= data.usage_limit) {
+      return { valid: false, message: "This coupon usage limit has been reached." };
+    }
+
+    return {
+      valid: true,
+      discountPercent: data.discount_percent,
+      message: `Coupon Applied! (${data.discount_percent}% Off)`
+    };
+  } catch (err) {
+    console.error("Coupon validation error:", err);
+    return { valid: false, message: "Error validating coupon. Please try again." };
+  }
+}
+
+window.openCheckoutModal = function(productId, productName, productPrice, productImg) {
+  const modal = document.getElementById("checkoutModal");
+  if (!modal) return;
+
+  selectedProductForCheckout = {
+    id: productId,
+    name: productName,
+    price: productPrice,
+    image: productImg
+  };
+  appliedCheckoutCoupon = null;
+
+  document.getElementById("checkoutProductImg").src = productImg;
+  document.getElementById("checkoutProductName").textContent = productName;
+  document.getElementById("checkoutProductPriceDisplay").textContent = `₹${productPrice.toLocaleString('en-IN')}`;
+  
+  document.getElementById("checkoutProductId").value = productId;
+  document.getElementById("checkoutProductPrice").value = productPrice;
+  
+  document.getElementById("checkoutSubtotal").textContent = `₹${productPrice.toLocaleString('en-IN')}`;
+  document.getElementById("checkoutTotal").textContent = `₹${productPrice.toLocaleString('en-IN')}`;
+  
+  document.getElementById("checkoutDiscountRow").style.display = "none";
+  const msgEl = document.getElementById("checkoutCouponMessage");
+  msgEl.style.display = "none";
+  msgEl.textContent = "";
+
+  document.getElementById("checkoutName").value = "";
+  document.getElementById("checkoutEmail").value = "";
+  document.getElementById("checkoutPhone").value = "";
+  document.getElementById("checkoutCoupon").value = "";
+
+  document.getElementById("checkoutStep-1").style.display = "block";
+  document.getElementById("checkoutStep-2").style.display = "none";
+  document.getElementById("checkoutStep-3").style.display = "none";
+
+  modal.style.display = "flex";
+};
+
+function initProShopCheckout() {
+  const modal = document.getElementById("checkoutModal");
+  const closeBtn = document.getElementById("closeCheckoutModal");
+  const applyCouponBtn = document.getElementById("btnApplyCheckoutCoupon");
+  const checkoutForm = document.getElementById("checkoutForm");
+  const backBtn = document.getElementById("btnBackToCheckoutForm");
+  const confirmPaymentBtn = document.getElementById("btnSimulateCheckoutPayment");
+  const finishBtn = document.getElementById("btnFinishCheckout");
+
+  if (!modal) return;
+
+  closeBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  applyCouponBtn.addEventListener("click", async () => {
+    const couponInput = document.getElementById("checkoutCoupon");
+    const code = couponInput.value.trim().toUpperCase();
+    const msgEl = document.getElementById("checkoutCouponMessage");
+    
+    if (!code) {
+      msgEl.textContent = "Please enter a coupon code.";
+      msgEl.style.color = "#EF4444";
+      msgEl.style.display = "block";
+      return;
+    }
+
+    applyCouponBtn.disabled = true;
+    applyCouponBtn.textContent = "Verifying...";
+
+    const res = await validateCouponCode(code, selectedProductForCheckout.price);
+    
+    applyCouponBtn.disabled = false;
+    applyCouponBtn.textContent = "Apply";
+
+    if (res.valid) {
+      appliedCheckoutCoupon = {
+        code: code,
+        discountPercent: res.discountPercent
+      };
+      
+      const discAmt = Math.round(selectedProductForCheckout.price * (res.discountPercent / 100));
+      const totalAmt = selectedProductForCheckout.price - discAmt;
+      
+      document.getElementById("checkoutDiscount").textContent = `₹${discAmt.toLocaleString('en-IN')}`;
+      document.getElementById("checkoutDiscountRow").style.display = "flex";
+      document.getElementById("checkoutTotal").textContent = `₹${totalAmt.toLocaleString('en-IN')}`;
+      
+      msgEl.textContent = res.message;
+      msgEl.style.color = "#10B981";
+      msgEl.style.display = "block";
+    } else {
+      appliedCheckoutCoupon = null;
+      document.getElementById("checkoutDiscountRow").style.display = "none";
+      document.getElementById("checkoutTotal").textContent = `₹${selectedProductForCheckout.price.toLocaleString('en-IN')}`;
+      
+      msgEl.textContent = res.message;
+      msgEl.style.color = "#EF4444";
+      msgEl.style.display = "block";
+    }
+  });
+
+  checkoutForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("checkoutName").value.trim();
+    const email = document.getElementById("checkoutEmail").value.trim();
+    const phone = document.getElementById("checkoutPhone").value.trim();
+
+    if (!name || !email || !phone) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    const price = selectedProductForCheckout.price;
+    const discAmt = appliedCheckoutCoupon ? Math.round(price * (appliedCheckoutCoupon.discountPercent / 100)) : 0;
+    const finalAmount = price - discAmt;
+    const orderId = 'RSA-SHOP-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+    document.getElementById("checkoutPaymentAmount").textContent = `₹${finalAmount.toLocaleString('en-IN')}`;
+    const upiLink = `upi://pay?pa=renegadessportsarena@okaxis&pn=Renegades%20Sports%20Arena&am=${finalAmount}&cu=INR&tn=${encodeURIComponent(orderId)}`;
+    
+    const qrContainer = document.getElementById("checkoutQrContainer");
+    qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}" alt="Scan to Pay">`;
+
+    if (window.supabaseClient && !window.isMockSession) {
+      try {
+        const { data: paymentData, error: paymentError } = await window.supabaseClient
+          .from("payments")
+          .insert([{
+            razorpay_order_id: 'order_' + Math.random().toString(36).substr(2, 9),
+            amount: finalAmount,
+            status: 'created',
+            payment_type: 'shop_purchase',
+            receipt_number: orderId
+          }])
+          .select()
+          .single();
+
+        if (paymentError) throw paymentError;
+
+        selectedProductForCheckout.paymentDbId = paymentData.id;
+
+        await window.supabaseClient.from("payment_logs").insert([{
+          payment_id: paymentData.id,
+          event: 'order_created',
+          payload: { order_id: orderId, name, email, phone, product: selectedProductForCheckout }
+        }]);
+
+        await window.supabaseClient.from("shop_orders").insert([{
+          total_amount: finalAmount,
+          status: 'pending_payment',
+          items: [{
+            product_id: selectedProductForCheckout.id,
+            product_name: selectedProductForCheckout.name,
+            price: selectedProductForCheckout.price,
+            quantity: 1
+          }],
+          payment_id: paymentData.id
+        }]);
+
+      } catch (err) {
+        console.error("Failed to create initial database records:", err);
+      }
+    }
+
+    document.getElementById("checkoutStep-1").style.display = "none";
+    document.getElementById("checkoutStep-2").style.display = "block";
+  });
+
+  backBtn.addEventListener("click", () => {
+    document.getElementById("checkoutStep-2").style.display = "none";
+    document.getElementById("checkoutStep-1").style.display = "block";
+  });
+
+  confirmPaymentBtn.addEventListener("click", async () => {
+    confirmPaymentBtn.disabled = true;
+    confirmPaymentBtn.textContent = "Processing Mock Payment...";
+
+    const name = document.getElementById("checkoutName").value.trim();
+    const email = document.getElementById("checkoutEmail").value.trim();
+    const phone = document.getElementById("checkoutPhone").value.trim();
+    const price = selectedProductForCheckout.price;
+    const discAmt = appliedCheckoutCoupon ? Math.round(price * (appliedCheckoutCoupon.discountPercent / 100)) : 0;
+    const finalAmount = price - discAmt;
+    const orderId = 'RSA-SHOP-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+    if (window.supabaseClient && !window.isMockSession && selectedProductForCheckout.paymentDbId) {
+      try {
+        const paymentDbId = selectedProductForCheckout.paymentDbId;
+        const razorpayPaymentId = 'pay_' + Math.random().toString(36).substr(2, 9);
+
+        await window.supabaseClient
+          .from("payments")
+          .update({
+            status: 'captured',
+            razorpay_payment_id: razorpayPaymentId
+          })
+          .eq("id", paymentDbId);
+
+        await window.supabaseClient.from("payment_logs").insert([{
+          payment_id: paymentDbId,
+          event: 'payment_captured',
+          payload: { razorpay_payment_id: razorpayPaymentId, transaction_time: new Date().toISOString() }
+        }]);
+
+        let profileId = null;
+        const { data: profile } = await window.supabaseClient
+          .from("profiles")
+          .select("id")
+          .eq("email", email)
+          .maybeSingle();
+        if (profile) profileId = profile.id;
+
+        const { data: shopOrderData } = await window.supabaseClient
+          .from("shop_orders")
+          .update({
+            status: 'paid',
+            player_id: profileId
+          })
+          .eq("payment_id", paymentDbId)
+          .select()
+          .maybeSingle();
+
+        if (appliedCheckoutCoupon) {
+          const { data: couponData } = await window.supabaseClient
+            .from("coupon_codes")
+            .select("id, uses_count")
+            .eq("code", appliedCheckoutCoupon.code)
+            .maybeSingle();
+
+          if (couponData) {
+            await window.supabaseClient
+              .from("coupon_codes")
+              .update({ uses_count: couponData.uses_count + 1 })
+              .eq("id", couponData.id);
+
+            await window.supabaseClient
+              .from("coupon_usage")
+              .insert([{
+                coupon_id: couponData.id,
+                user_id: profileId,
+                applied_to: 'shop',
+                reference_id: shopOrderData ? shopOrderData.id : null,
+                discount_amount: discAmt
+              }]);
+          }
+        }
+
+      } catch (err) {
+        console.error("Database updates on payment confirmation failed:", err);
+      }
+    }
+
+    document.getElementById("checkoutConfirmOrderId").textContent = orderId;
+    document.getElementById("checkoutConfirmProductName").textContent = selectedProductForCheckout.name;
+    document.getElementById("checkoutConfirmTotalPaid").textContent = `₹${finalAmount.toLocaleString('en-IN')}`;
+
+    if (window.sendOrderConfirmationEmail) {
+      window.sendOrderConfirmationEmail(email, name, orderId, selectedProductForCheckout.name, finalAmount);
+    }
+    if (window.WhatsAppNotificationService && window.WhatsAppNotificationService.send) {
+      window.WhatsAppNotificationService.send(phone, 'shop_order', {
+        name: name,
+        orderId: orderId,
+        productName: selectedProductForCheckout.name,
+        amount: finalAmount
+      });
+    }
+
+    if (typeof confetti === "function") {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    confirmPaymentBtn.disabled = false;
+    confirmPaymentBtn.textContent = "CONFIRM MOCK PAYMENT";
+
+    document.getElementById("checkoutStep-2").style.display = "none";
+    document.getElementById("checkoutStep-3").style.display = "block";
+  });
+
+  finishBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // Event Delegation for Shop BUY NOW buttons
+  const shopGrid = document.getElementById("shopGrid");
+  if (shopGrid) {
+    shopGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".product-buy-btn");
+      if (btn && btn.tagName === "BUTTON") {
+        e.preventDefault();
+        const pId = btn.getAttribute("data-product-id");
+        const pName = btn.getAttribute("data-product-name");
+        const pPrice = parseFloat(btn.getAttribute("data-product-price"));
+        const pImg = btn.getAttribute("data-product-image");
+        window.openCheckoutModal(pId, pName, pPrice, pImg);
+      }
+    });
+  }
+
+  // Intercept Order Full Kit
+  const orderBtn = document.querySelector(".btn-order-full-kit");
+  if (orderBtn) {
+    orderBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const products = window.RENEGADES_CONFIG?.shop?.products || [];
+      const bat = products.find(p => p.category === 'bats');
+      const pad = products.find(p => p.category === 'pads');
+      const glove = products.find(p => p.category === 'gloves');
+      const protection = products.find(p => p.category === 'protection');
+      const bag = products.find(p => p.category === 'bags');
+      
+      let priceTotal = 0;
+      [bat, pad, glove, protection, bag].forEach(p => {
+        if (p) priceTotal += p.price;
+      });
+      if (priceTotal === 0) priceTotal = 12790;
+
+      window.openCheckoutModal("full-kit", "Renegades Cricket Full Kit Package", priceTotal, "assets/images/logo.png");
+    });
+  }
+
+  // Intercept Custom Kit Buy Button
+  const customKitBtn = document.getElementById("btn-buy-custom-kit");
+  if (customKitBtn) {
+    customKitBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      let finalSubtotal = 0;
+      let selectedItems = [];
+      
+      const selects = [
+        { element: document.getElementById("select-bat"), label: "Bat" },
+        { element: document.getElementById("select-pads"), label: "Pads" },
+        { element: document.getElementById("select-gloves"), label: "Gloves" },
+        { element: document.getElementById("select-protection"), label: "Thigh Guard" },
+        { element: document.getElementById("select-bag"), label: "Kit Bag" }
+      ];
+
+      selects.forEach(sel => {
+        if (sel.element) {
+          const option = sel.element.options[sel.element.selectedIndex];
+          if (option && option.value !== "none") {
+            const discVal = parseFloat(option.getAttribute("data-disc") || "0");
+            finalSubtotal += discVal;
+            selectedItems.push(`${sel.label}: ${option.text.split(" (")[0]}`);
+          }
+        }
+      });
+
+      if (selectedItems.length === 0) return;
+
+      window.openCheckoutModal("custom-kit", `Custom Cricket Kit (${selectedItems.length} items)`, finalSubtotal, "assets/images/logo.png");
+    });
+  }
 }
 
 

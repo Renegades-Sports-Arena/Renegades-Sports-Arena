@@ -336,6 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDatabase();
   initAuthListener();
   hideLoader();
+  initPortalCouponVerification();
 
   // Register PWA Service Worker
   if ("serviceWorker" in navigator) {
@@ -2266,9 +2267,26 @@ async function handleCoachCertificateSubmit(e) {
 // ==========================================================================
 
 // --- UPI PAYMENT MODAL ---
+let portalAppliedCoupon = null;
+let originalInvoiceAmount = 0;
+
 function openPaymentModal(invoiceId, amount) {
   document.getElementById("payingInvoiceId").value = invoiceId;
   document.getElementById("upiTxnId").value = "";
+  
+  portalAppliedCoupon = null;
+  originalInvoiceAmount = parseFloat(amount) || 0;
+  
+  const couponInput = document.getElementById("portalCouponCode");
+  if (couponInput) couponInput.value = "";
+  
+  const msgEl = document.getElementById("portalCouponMessage");
+  if (msgEl) {
+    msgEl.style.display = "none";
+    msgEl.textContent = "";
+  }
+  
+  updatePortalPaymentDisplay(originalInvoiceAmount);
   document.getElementById("paymentModal").style.display = "flex";
 }
 
@@ -2286,6 +2304,9 @@ async function confirmPayment(e) {
     return;
   }
 
+  const discountAmount = portalAppliedCoupon ? Math.round(originalInvoiceAmount * (portalAppliedCoupon.discountPercent / 100)) : 0;
+  const finalPaidAmount = originalInvoiceAmount - discountAmount;
+
   if (!isMockSession) {
     try {
       const client = window.supabaseClient;
@@ -2294,12 +2315,44 @@ async function confirmPayment(e) {
         .update({ status: "paid" })
         .eq("id", invId);
       if (error) throw error;
+
+      // Log coupon usage in database
+      if (portalAppliedCoupon) {
+        let couponId = portalAppliedCoupon.id;
+        
+        // Fetch coupon ID if not present
+        const { data: couponData } = await client
+          .from("coupon_codes")
+          .select("id, uses_count")
+          .eq("code", portalAppliedCoupon.code)
+          .maybeSingle();
+
+        if (couponData) {
+          couponId = couponData.id;
+          // Increment claims
+          await client
+            .from("coupon_codes")
+            .update({ uses_count: couponData.uses_count + 1 })
+            .eq("id", couponData.id);
+
+          await client
+            .from("coupon_usage")
+            .insert([{
+              coupon_id: couponId,
+              user_id: currentUser ? currentUser.id : null,
+              applied_to: 'academy',
+              reference_id: invId,
+              discount_amount: discountAmount
+            }]);
+        }
+      }
+
       const idx = liveCache.payment_history.findIndex(p => p.id === invId);
-      let amount = 1500;
+      let amount = finalPaidAmount;
       let invoiceNum = "INV";
       if (idx !== -1) {
         liveCache.payment_history[idx].status = "paid";
-        amount = liveCache.payment_history[idx].amount;
+        amount = liveCache.payment_history[idx].amount - discountAmount;
         invoiceNum = liveCache.payment_history[idx].invoice_number;
       }
       showToast("UPI Transaction reference logged. Invoice status updated to Paid in Supabase!", "success");
@@ -2312,7 +2365,9 @@ async function confirmPayment(e) {
           invoice_number: invoiceNum,
           amount: amount,
           txn_id: txnId,
-          user_id: currentUser.id
+          user_id: currentUser.id,
+          coupon_applied: portalAppliedCoupon ? portalAppliedCoupon.code : null,
+          discount_amount: discountAmount
         });
       }
 
@@ -2353,7 +2408,7 @@ async function confirmPayment(e) {
   const idx = db.payment_history.findIndex(p => p.id === invId);
   if (idx !== -1) {
     db.payment_history[idx].status = "paid";
-    const amount = db.payment_history[idx].amount;
+    const amount = finalPaidAmount;
     const invoiceNum = db.payment_history[idx].invoice_number;
     saveLocalDB(db);
     showToast("UPI Transaction reference logged. Invoice status updated to Paid!", "success");
@@ -2366,7 +2421,9 @@ async function confirmPayment(e) {
         invoice_number: invoiceNum,
         amount: amount,
         txn_id: txnId,
-        user_id: currentUser.id
+        user_id: currentUser.id,
+        coupon_applied: portalAppliedCoupon ? portalAppliedCoupon.code : null,
+        discount_amount: discountAmount
       });
     }
 
@@ -3784,3 +3841,114 @@ window.switchLeaderboardTab = function (category) {
     body.innerHTML = rowsHTML;
   }, 400); // Small aesthetic loading delay
 };
+
+// ==========================================================================
+// PORTAL COUPON CODES INVOICES INTEGRATION
+// ==========================================================================
+
+async function validatePortalCouponCode(code) {
+  if (isMockSession || !window.supabaseClient) {
+    if (code.toUpperCase() === 'WELCOME8') {
+      return { valid: true, discountPercent: 8, message: "Welcome Coupon Applied! (8% Off)" };
+    } else {
+      return { valid: false, message: "Invalid coupon code." };
+    }
+  }
+
+  try {
+    const { data, error } = await window.supabaseClient
+      .from('coupon_codes')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .single();
+
+    if (error || !data) {
+      return { valid: false, message: "Coupon code not found." };
+    }
+
+    if (!data.is_active) {
+      return { valid: false, message: "This coupon is no longer active." };
+    }
+
+    if (data.expiry_date && new Date(data.expiry_date) < new Date()) {
+      return { valid: false, message: "This coupon has expired." };
+    }
+
+    if (data.usage_limit !== null && data.uses_count >= data.usage_limit) {
+      return { valid: false, message: "This coupon usage limit has been reached." };
+    }
+
+    return {
+      valid: true,
+      discountPercent: data.discount_percent,
+      id: data.id,
+      message: `Coupon Applied! (${data.discount_percent}% Off)`
+    };
+  } catch (err) {
+    console.error("Coupon validation error:", err);
+    return { valid: false, message: "Error validating coupon. Please try again." };
+  }
+}
+
+function updatePortalPaymentDisplay(amt) {
+  const amountText = document.getElementById("portalPaymentAmountText");
+  const qrImg = document.getElementById("portalPaymentQrImg");
+  const invId = document.getElementById("payingInvoiceId").value;
+  
+  if (amountText) {
+    amountText.textContent = `Amount: ₹${amt.toLocaleString('en-IN')}`;
+  }
+  
+  if (qrImg) {
+    const upiLink = `upi://pay?pa=renegades@upi&pn=Renegades%20Sports%20Arena&am=${amt}&cu=INR&tn=${encodeURIComponent(invId)}`;
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
+  }
+}
+
+function initPortalCouponVerification() {
+  const applyBtn = document.getElementById("btnApplyPortalCoupon");
+  if (!applyBtn) return;
+
+  applyBtn.addEventListener("click", async () => {
+    const codeInput = document.getElementById("portalCouponCode");
+    const code = codeInput.value.trim().toUpperCase();
+    const msgEl = document.getElementById("portalCouponMessage");
+    
+    if (!code) {
+      msgEl.textContent = "Please enter a coupon code.";
+      msgEl.style.color = "#EF4444";
+      msgEl.style.display = "block";
+      return;
+    }
+
+    applyBtn.disabled = true;
+    applyBtn.textContent = "Checking...";
+
+    const res = await validatePortalCouponCode(code);
+    
+    applyBtn.disabled = false;
+    applyBtn.textContent = "Apply";
+
+    if (res.valid) {
+      portalAppliedCoupon = {
+        code: code,
+        discountPercent: res.discountPercent,
+        id: res.id
+      };
+      const discAmt = Math.round(originalInvoiceAmount * (res.discountPercent / 100));
+      const finalAmt = originalInvoiceAmount - discAmt;
+      
+      updatePortalPaymentDisplay(finalAmt);
+      
+      msgEl.textContent = `Applied! ${res.discountPercent}% flat discount. Saved ₹${discAmt.toLocaleString('en-IN')}`;
+      msgEl.style.color = "#10B981";
+      msgEl.style.display = "block";
+    } else {
+      portalAppliedCoupon = null;
+      updatePortalPaymentDisplay(originalInvoiceAmount);
+      msgEl.textContent = res.message;
+      msgEl.style.color = "#EF4444";
+      msgEl.style.display = "block";
+    }
+  });
+}
