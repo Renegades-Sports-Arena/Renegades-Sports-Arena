@@ -56,14 +56,19 @@
         <button class="menu-item" data-target-tab="facilities-tab">Facilities</button>
         <button class="menu-item" data-target-tab="gallery-tab">Gallery Manager</button>
         <button class="menu-item" data-target-tab="reviews-tab">Google Reviews</button>
-        
+
         <!-- Extended CMS Panels -->
-        <button class="menu-item" data-target-tab="mlb-programs-tab" style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: #58A6FF;">⚾ MLB Programs</button>
-        <button class="menu-item" data-target-tab="tournament-cms-tab" style="color: var(--accent);">🏆 Tournament CMS</button>
-        <button class="menu-item" data-target-tab="fixtures-scoring-tab" style="color: var(--accent);">📅 Match Scoring</button>
-        <button class="menu-item" data-target-tab="registrations-cms-tab" style="color: var(--accent);">👥 Registrations</button>
-        <button class="menu-item" data-target-tab="notifications-tab" style="color: #ffc107;">🔔 Notification Center</button>
-        
+        <button class="menu-item" data-target-tab="mlb-programs-tab"
+          style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: #58A6FF;">⚾ MLB Programs</button>
+        <button class="menu-item" data-target-tab="tournament-cms-tab" style="color: var(--accent);">🏆 Tournament
+          CMS</button>
+        <button class="menu-item" data-target-tab="fixtures-scoring-tab" style="color: var(--accent);">📅 Match
+          Scoring</button>
+        <button class="menu-item" data-target-tab="registrations-cms-tab" style="color: var(--accent);">👥
+          Registrations</button>
+        <button class="menu-item" data-target-tab="notifications-tab" style="color: #ffc107;">🔔 Notification
+          Center</button>
+
         <button class="menu-item" data-target-tab="export-tab"
           style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: var(--accent);">Export
           Configuration</button>
@@ -108,9 +113,11 @@
 
           <!-- Main layout card -->
           <div class="form-section-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
-              <h3 style="border-bottom:none; margin-bottom:0; padding-bottom:0; color:var(--accent);">Trial Session Bookings</h3>
-              
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
+              <h3 style="border-bottom:none; margin-bottom:0; padding-bottom:0; color:var(--accent);">Trial Session
+                Bookings</h3>
+
               <!-- Tab switches inside bookings (Table View vs Calendar View) -->
               <div class="admin-view-toggle">
                 <button type="button" class="view-toggle-btn active" id="viewBookingsListBtn">List View</button>
@@ -120,7 +127,8 @@
 
             <!-- Filters block -->
             <div class="bookings-filters-bar" id="bookingsFiltersBar">
-              <input type="text" id="bookingsSearchInput" class="form-input" placeholder="Search by name, email, phone..." style="flex: 2;">
+              <input type="text" id="bookingsSearchInput" class="form-input"
+                placeholder="Search by name, email, phone..." style="flex: 2;">
               <select id="bookingsStatusFilter" class="form-input" style="flex: 1;">
                 <option value="all">All Statuses</option>
                 <option value="pending">Pending</option>
@@ -130,8 +138,10 @@
                 <option value="cancelled">Cancelled</option>
               </select>
               <input type="date" id="bookingsDateFilter" class="form-input" style="flex: 1;">
-              <button type="button" class="btn-save-master" id="bookingsClearFiltersBtn" style="background:var(--border-grey); box-shadow:none; padding: 0.8rem 1rem;">Clear</button>
-              <button type="button" class="btn-save-master" id="bookingsExportCsvBtn" style="padding: 0.8rem 1rem;">Export CSV</button>
+              <button type="button" class="btn-save-master" id="bookingsClearFiltersBtn"
+                style="background:var(--border-grey); box-shadow:none; padding: 0.8rem 1rem;">Clear</button>
+              <button type="button" class="btn-save-master" id="bookingsExportCsvBtn"
+                style="padding: 0.8rem 1rem;">Export CSV</button>
             </div>
 
             <!-- 1. List View Section -->
@@ -152,7 +162,8 @@
                   <!-- Populated dynamically -->
                 </tbody>
               </table>
-              <div id="bookingsTableEmpty" style="display:none; text-align:center; padding: 3rem 0; color: var(--text-grey);">
+              <div id="bookingsTableEmpty"
+                style="display:none; text-align:center; padding: 3rem 0; color: var(--text-grey);">
                 No bookings match the selected filters.
               </div>
             </div>
@@ -161,19 +172,28 @@
             <div id="bookingsCalendarContainer" style="display: none;">
               <div class="calendar-header-controls">
                 <button type="button" class="cal-nav-btn" id="calPrevMonthBtn">&lt; Prev</button>
-                <h4 id="calCurrentMonthTitle" style="color:var(--text-white); text-transform:none; margin:0;">June 2026</h4>
+                <h4 id="calCurrentMonthTitle" style="color:var(--text-white); text-transform:none; margin:0;">June 2026
+                </h4>
                 <button type="button" class="cal-nav-btn" id="calNextMonthBtn">Next &gt;</button>
               </div>
               <div class="calendar-weeks-grid">
-                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
               </div>
               <div class="calendar-days-grid" id="calendarDaysGrid">
                 <!-- Populated dynamically -->
               </div>
-              
+
               <!-- Inline Day Details Panel inside Calendar tab -->
-              <div class="calendar-day-details-panel" id="calendarDayDetailsPanel" style="display:none; margin-top:2rem; padding: 1.5rem; border: 1px solid var(--border-grey); border-radius: 6px; background: var(--bg-input);">
-                <h4 id="calendarDayDetailsTitle" style="color:var(--accent); text-transform:none; margin-bottom:1rem;">Bookings on June 15, 2026</h4>
+              <div class="calendar-day-details-panel" id="calendarDayDetailsPanel"
+                style="display:none; margin-top:2rem; padding: 1.5rem; border: 1px solid var(--border-grey); border-radius: 6px; background: var(--bg-input);">
+                <h4 id="calendarDayDetailsTitle" style="color:var(--accent); text-transform:none; margin-bottom:1rem;">
+                  Bookings on June 15, 2026</h4>
                 <div id="calendarDayDetailsList"></div>
               </div>
             </div>
@@ -532,7 +552,8 @@
             <div id="adminMlbProgramsList" class="list-items-wrapper">
               <!-- Populated dynamically via JS -->
             </div>
-            <button class="btn-add-item" id="adminAddMlbProgramBtn" style="margin-top: 1.5rem;">+ Create New Baseball Program</button>
+            <button class="btn-add-item" id="adminAddMlbProgramBtn" style="margin-top: 1.5rem;">+ Create New Baseball
+              Program</button>
           </div>
         </section>
 
@@ -588,12 +609,14 @@
                 <div class="form-group form-group-full">
                   <label class="form-label">Poster Image Banner Link / File Upload</label>
                   <input type="text" id="adminTournamentPoster" class="form-input">
-                  <input type="file" class="form-input" accept="image/*" id="adminTournamentPosterFile" style="margin-top:0.5rem;">
+                  <input type="file" class="form-input" accept="image/*" id="adminTournamentPosterFile"
+                    style="margin-top:0.5rem;">
                 </div>
               </div>
               <div style="display:flex; gap:1rem; margin-top:1.5rem;">
                 <button type="submit" class="btn-save-master" style="flex:2;">Save Tournament</button>
-                <button type="button" class="btn-save-master" id="adminCancelTournamentBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
+                <button type="button" class="btn-save-master" id="adminCancelTournamentBtn"
+                  style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
               </div>
             </form>
           </div>
@@ -637,7 +660,8 @@
             <div id="adminTeamsList" class="list-items-wrapper" style="margin-top: 1.5rem;">
               <!-- Dynamic teams list in selected tournament -->
             </div>
-            <button class="btn-add-item" id="adminAddTeamBtn" style="margin-top: 1.5rem;">+ Add Team to Tournament</button>
+            <button class="btn-add-item" id="adminAddTeamBtn" style="margin-top: 1.5rem;">+ Add Team to
+              Tournament</button>
           </div>
         </section>
 
@@ -645,7 +669,7 @@
         <section class="tab-panel" id="fixtures-scoring-tab">
           <div class="form-section-card">
             <h3 style="color:var(--accent);">Generate & Edit Match Fixtures</h3>
-            
+
             <div class="form-grid">
               <div class="form-group" style="max-width: 300px;">
                 <label class="form-label">Select Tournament</label>
@@ -657,11 +681,15 @@
 
             <div class="fixture-generator-card" id="adminFixtureGeneratorBox">
               <h4>Tournament Bracket Auto-Scheduler</h4>
-              <p style="color:var(--text-grey); font-size:0.85rem;">Automatically generate a fixture roster based on all registered teams in the selected tournament.</p>
+              <p style="color:var(--text-grey); font-size:0.85rem;">Automatically generate a fixture roster based on all
+                registered teams in the selected tournament.</p>
               <div class="generator-action-row">
-                <button type="button" class="btn-save-master" onclick="generateFixtures('knockout')">Generate Knockout Tree</button>
-                <button type="button" class="btn-save-master" onclick="generateFixtures('league')" style="background:#0066CC;">Generate Round-Robin League</button>
-                <button type="button" class="btn-save-master" onclick="clearFixtures()" style="background:#EF4444; box-shadow:none;">Clear Roster</button>
+                <button type="button" class="btn-save-master" onclick="generateFixtures('knockout')">Generate Knockout
+                  Tree</button>
+                <button type="button" class="btn-save-master" onclick="generateFixtures('league')"
+                  style="background:#0066CC;">Generate Round-Robin League</button>
+                <button type="button" class="btn-save-master" onclick="clearFixtures()"
+                  style="background:#EF4444; box-shadow:none;">Clear Roster</button>
               </div>
             </div>
 
@@ -687,13 +715,15 @@
           </div>
 
           <!-- Scoring Panel (Visible when scoring a match) -->
-          <div class="form-section-card" id="adminMatchScorerConsole" style="display:none; border: 1px solid var(--accent);">
-            <h3 style="color:var(--accent);">Scoring Dashboard: <span id="scoringMatchHeader">Team A vs Team B</span></h3>
-            
+          <div class="form-section-card" id="adminMatchScorerConsole"
+            style="display:none; border: 1px solid var(--accent);">
+            <h3 style="color:var(--accent);">Scoring Dashboard: <span id="scoringMatchHeader">Team A vs Team B</span>
+            </h3>
+
             <form id="adminMatchScoringForm" novalidate>
               <input type="hidden" id="scoringMatchId">
               <input type="hidden" id="scoringSportType">
-              
+
               <div class="form-grid">
                 <div class="form-group">
                   <label class="form-label">Match Status</label>
@@ -706,14 +736,15 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Current Innings / Game Status Details</label>
-                  <input type="text" id="scoringInningsStatus" class="form-input" placeholder="e.g. Overs 14.2 or Top of 4th">
+                  <input type="text" id="scoringInningsStatus" class="form-input"
+                    placeholder="e.g. Overs 14.2 or Top of 4th">
                 </div>
               </div>
 
               <!-- Cricket Scoring Inputs -->
               <div class="score-board-console" id="cricketScoringInputs" style="display:none;">
                 <h4 style="color:#fff;">Cricket Scores Configuration</h4>
-                
+
                 <div class="score-grid-admin">
                   <div class="score-input-item">
                     <label id="lblCricketRunsA">Team A Runs</label>
@@ -787,9 +818,12 @@
               </div>
 
               <!-- Completed Match Results inputs -->
-              <div class="score-board-console" id="completedMatchInputs" style="display:none; border-color:var(--color-grass);">
-                <h4 style="color:#fff; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem; margin-bottom:1rem;">Winner & Awards (Required on Completion)</h4>
-                
+              <div class="score-board-console" id="completedMatchInputs"
+                style="display:none; border-color:var(--color-grass);">
+                <h4
+                  style="color:#fff; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem; margin-bottom:1rem;">
+                  Winner & Awards (Required on Completion)</h4>
+
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">Winner Team</label>
@@ -799,7 +833,8 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">Match Summary Details</label>
-                    <input type="text" id="scoringResultDetails" class="form-input" placeholder="e.g. Renegades U-11 won by 6 runs">
+                    <input type="text" id="scoringResultDetails" class="form-input"
+                      placeholder="e.g. Renegades U-11 won by 6 runs">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Match MVP Player</label>
@@ -807,19 +842,22 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">Special Awards / Highlights</label>
-                    <input type="text" id="scoringAwards" class="form-input" placeholder="e.g. Best Batsman / Gold Medalist">
+                    <input type="text" id="scoringAwards" class="form-input"
+                      placeholder="e.g. Best Batsman / Gold Medalist">
                   </div>
                   <div class="form-group form-group-full">
                     <label class="form-label">Match Highlights Photo URL</label>
                     <input type="text" id="scoringPhoto" class="form-input">
-                    <input type="file" class="form-input" accept="image/*" id="scoringPhotoFile" style="margin-top:0.5rem;">
+                    <input type="file" class="form-input" accept="image/*" id="scoringPhotoFile"
+                      style="margin-top:0.5rem;">
                   </div>
                 </div>
               </div>
 
               <div style="display:flex; gap:1.5rem; margin-top:2rem;">
                 <button type="submit" class="btn-save-master" style="flex:2;">Confirm Scores</button>
-                <button type="button" class="btn-save-master" id="adminCloseScorerBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Cancel</button>
+                <button type="button" class="btn-save-master" id="adminCloseScorerBtn"
+                  style="flex:1; background:var(--border-grey); box-shadow:none;">Cancel</button>
               </div>
             </form>
           </div>
@@ -843,8 +881,10 @@
           </div>
 
           <div class="form-section-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
-              <h3 style="border-bottom:none; margin-bottom:0; padding-bottom:0; color:var(--accent);">Tournament Registrations List</h3>
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
+              <h3 style="border-bottom:none; margin-bottom:0; padding-bottom:0; color:var(--accent);">Tournament
+                Registrations List</h3>
             </div>
 
             <!-- Filter Controls -->
@@ -857,7 +897,8 @@
                 <option value="paid">Confirmed Paid</option>
                 <option value="pending">Pending Review</option>
               </select>
-              <button type="button" class="btn-save-master" id="adminExportRegsCsvBtn" style="padding: 0.8rem 1rem;">Export CSV</button>
+              <button type="button" class="btn-save-master" id="adminExportRegsCsvBtn"
+                style="padding: 0.8rem 1rem;">Export CSV</button>
             </div>
 
             <!-- Table List -->
@@ -878,7 +919,8 @@
                   <!-- Populated by JS -->
                 </tbody>
               </table>
-              <div id="adminRegsTableEmpty" style="display:none; text-align:center; padding:3rem 0; color:var(--text-grey);">
+              <div id="adminRegsTableEmpty"
+                style="display:none; text-align:center; padding:3rem 0; color:var(--text-grey);">
                 No tournament registrations found for this filter combination.
               </div>
             </div>
@@ -967,9 +1009,11 @@
               </div>
               <div class="form-group" style="margin-top: 1rem;">
                 <label class="form-label">Notification Message *</label>
-                <textarea id="adminNotMessage" class="form-input" rows="4" required placeholder="Enter notification message here..."></textarea>
+                <textarea id="adminNotMessage" class="form-input" rows="4" required
+                  placeholder="Enter notification message here..."></textarea>
               </div>
-              <button type="submit" class="btn-action btn-action-primary" style="margin-top: 1rem;" id="btnSendNotification">Send Notification</button>
+              <button type="submit" class="btn-action btn-action-primary" style="margin-top: 1rem;"
+                id="btnSendNotification">Send Notification</button>
             </form>
           </div>
 
@@ -1002,26 +1046,37 @@
   <!-- Reschedule Overlay Modal Dialog -->
   <div class="login-overlay hidden" id="adminRescheduleModal" style="z-index: 10002;">
     <div class="login-card" style="max-width: 480px; text-align:left;">
-      <h3 style="font-family:var(--font-display); color:var(--accent); font-size:1.3rem; margin-bottom:1rem; text-transform:uppercase;">Reschedule Trial Slot</h3>
+      <h3
+        style="font-family:var(--font-display); color:var(--accent); font-size:1.3rem; margin-bottom:1rem; text-transform:uppercase;">
+        Reschedule Trial Slot</h3>
       <div class="form-group">
         <label class="form-label">Selected Date</label>
         <input type="date" id="adminRescheduleDate" class="form-input">
       </div>
       <div class="form-group">
         <label class="form-label">Time Slot</label>
-        <div class="slots-grid" id="adminRescheduleSlotsGrid" style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="6 AM">6 AM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="7 AM">7 AM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="8 AM">8 AM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="4 PM">4 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="5 PM">5 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="6 PM">6 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
-          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="7 PM">7 PM <span class="slot-count" style="font-size:0.55rem;">-</span></button>
+        <div class="slots-grid" id="adminRescheduleSlotsGrid"
+          style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="6 AM">6 AM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="7 AM">7 AM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="8 AM">8 AM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="4 PM">4 PM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="5 PM">5 PM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="6 PM">6 PM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
+          <button type="button" class="slot-btn" style="padding: 0.5rem;" data-slot="7 PM">7 PM <span class="slot-count"
+              style="font-size:0.55rem;">-</span></button>
         </div>
         <input type="hidden" id="adminRescheduleSlotInput">
       </div>
       <div style="display:flex; gap:1.5rem; margin-top: 2rem;">
-        <button type="button" class="login-btn" style="background:var(--border-grey);" id="adminRescheduleCancelBtn">Cancel</button>
+        <button type="button" class="login-btn" style="background:var(--border-grey);"
+          id="adminRescheduleCancelBtn">Cancel</button>
         <button type="button" class="login-btn" id="adminRescheduleSaveBtn">Save Slot</button>
       </div>
     </div>
@@ -1033,6 +1088,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/env.js"></script>
+  <script src="assets/js/email.js"></script>
   <script src="assets/js/notifications_services.js"></script>
   <script src="assets/js/admin.js"></script>
   <script src="assets/js/admin_extensions.js"></script>

@@ -165,7 +165,7 @@ async function initMlbProgramsCMS() {
     }
   };
 
-  window.uploadMlbImage = function(input, id) {
+  window.uploadMlbImage = function (input, id) {
     const file = input.files[0];
     if (!file) return;
     compressAdminImage(file, async (base64) => {
@@ -219,7 +219,7 @@ function initTournamentCMS() {
     adminTournaments.forEach((t) => {
       const tr = document.createElement("tr");
       const poster = t.poster_url ? `<img src="${t.poster_url}" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;">` : "N/A";
-      
+
       tr.innerHTML = `
         <td>${poster}</td>
         <td><strong>${t.name}</strong></td>
@@ -362,7 +362,7 @@ function initTournamentCMS() {
 
     for (let idx = 0; idx < tournamentTeams.length; idx++) {
       const team = tournamentTeams[idx];
-      
+
       // Fetch players inside this team
       const { data: players, error } = await window.supabaseClient
         .from("players")
@@ -516,7 +516,7 @@ function initTournamentCMS() {
 function initFixtureScoringCMS() {
   const scoringSelect = document.getElementById("adminScoringTournamentSelect");
   const tbody = document.getElementById("adminFixturesTableBody");
-  
+
   if (!scoringSelect || !tbody) return;
 
   function renderFixturesList() {
@@ -536,7 +536,7 @@ function initFixtureScoringCMS() {
     tournamentFixtures.forEach((f) => {
       const teamA = adminTeams.find(t => t.id === f.team_a_id)?.name || "TBD";
       const teamB = adminTeams.find(t => t.id === f.team_b_id)?.name || "TBD";
-      const matchDateStr = new Date(f.match_date).toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+      const matchDateStr = new Date(f.match_date).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -584,7 +584,7 @@ function initFixtureScoringCMS() {
         // Simple Knockout scheduler
         // Pairs teams sequentially. E.g. 4 teams -> Team 1 vs 2, Team 3 vs 4, and a final placeholder
         const teamCount = tournamentTeams.length;
-        
+
         // Schedule Semifinals
         for (let i = 0; i < Math.floor(teamCount / 2); i++) {
           const matchDate = new Date(baseDate);
@@ -668,7 +668,7 @@ function initFixtureScoringCMS() {
   const scorerConsole = document.getElementById("adminMatchScorerConsole");
   const scoringForm = document.getElementById("adminMatchScoringForm");
 
-  window.openMatchScoringConsole = function(matchId) {
+  window.openMatchScoringConsole = function (matchId) {
     const m = adminFixtures.find(x => x.id === matchId);
     if (!m) return;
 
@@ -813,45 +813,39 @@ function initFixtureScoringCMS() {
     }
 
     try {
-      // 1. Update fixture scores
-      const { error: fErr } = await window.supabaseClient.from("fixtures").update(updates).eq("id", id);
-      if (fErr) throw fErr;
+      // Call public.submit_fixture_scoring RPC for transactional consistency
+      const winnerVal = status === 'completed' ? document.getElementById("scoringWinnerId").value : '';
+      const winner_id = winnerVal === 'draw' || winnerVal === '' ? null : winnerVal;
+      const score_details = status === 'completed' ? document.getElementById("scoringResultDetails").value.trim() : null;
+      const mvp_player = status === 'completed' ? document.getElementById("scoringMvp").value.trim() : null;
+      const awards_details = status === 'completed' ? document.getElementById("scoringAwards").value.trim() : null;
+      const photo_url = status === 'completed' ? (document.getElementById("scoringPhoto").value.trim() || scoringBase64Photo) : null;
 
-      // 2. If status is Completed, save results
-      if (status === 'completed') {
-        const winnerVal = document.getElementById("scoringWinnerId").value;
-        const score_details = document.getElementById("scoringResultDetails").value.trim();
-        const mvp_player = document.getElementById("scoringMvp").value.trim();
-        const awards_details = document.getElementById("scoringAwards").value.trim();
-        const photo_url = document.getElementById("scoringPhoto").value.trim() || scoringBase64Photo;
+      const { error } = await window.supabaseClient.rpc("submit_fixture_scoring", {
+        p_fixture_id: id,
+        p_status: status,
+        p_current_innings_status: current_innings_status,
+        p_cricket_runs_a: updates.cricket_runs_a || 0,
+        p_cricket_wickets_a: updates.cricket_wickets_a || 0,
+        p_cricket_overs_a: updates.cricket_overs_a || 0.0,
+        p_cricket_runs_b: updates.cricket_runs_b || 0,
+        p_cricket_wickets_b: updates.cricket_wickets_b || 0,
+        p_cricket_overs_b: updates.cricket_overs_b || 0.0,
+        p_baseball_innings: updates.baseball_innings || 1,
+        p_baseball_runs_a: updates.baseball_runs_a || 0,
+        p_baseball_hits_a: updates.baseball_hits_a || 0,
+        p_baseball_errors_a: updates.baseball_errors_a || 0,
+        p_baseball_runs_b: updates.baseball_runs_b || 0,
+        p_baseball_hits_b: updates.baseball_hits_b || 0,
+        p_baseball_errors_b: updates.baseball_errors_b || 0,
+        p_winner_id: winner_id,
+        p_score_details: score_details,
+        p_mvp_player: mvp_player,
+        p_awards_details: awards_details,
+        p_photo_url: photo_url
+      });
 
-        const winner_id = winnerVal === 'draw' || winnerVal === '' ? null : winnerVal;
-
-        const resultsPayload = {
-          fixture_id: id,
-          winner_id,
-          score_details,
-          mvp_player,
-          awards_details,
-          photo_url
-        };
-
-        // Check if results record already exists
-        const exResult = adminResults.find(r => r.fixture_id === id);
-        if (exResult) {
-          const { error: rErr } = await window.supabaseClient.from("results").update(resultsPayload).eq("id", exResult.id);
-          if (rErr) throw rErr;
-        } else {
-          const { error: rErr } = await window.supabaseClient.from("results").insert([resultsPayload]);
-          if (rErr) throw rErr;
-        }
-      } else {
-        // If status changed back from completed, remove results record if any
-        const exResult = adminResults.find(r => r.fixture_id === id);
-        if (exResult) {
-          await window.supabaseClient.from("results").delete().eq("id", exResult.id);
-        }
-      }
+      if (error) throw error;
 
       scorerConsole.style.display = "none";
       scoringForm.reset();
@@ -903,8 +897,8 @@ function initRegistrationsCMS() {
 
       // Filter by payment status selection
       const statusVal = paymentFilter.value;
-      const filtered = statusVal === 'all' 
-        ? tournamentRegistrations 
+      const filtered = statusVal === 'all'
+        ? tournamentRegistrations
         : tournamentRegistrations.filter(r => r.payment_status === statusVal);
 
       // Render stats counters

@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initKitBuilder(config.shop.products || []);
   }
   initVisionMission(config.visionMission);
-  //initCoaches(config.coaches);
+  const coachData = config?.coaches?.list?.length ? config.coaches : window.RENEGADES_DEFAULT_CONFIG.coaches;
+  initCoaches(coachData);
   initFacilities(config.facilities);
   initGallery(config.gallery);
   initReviews(config.reviews);
@@ -32,6 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
   initScrollEffects();
   initMobileNav();
   initLoader();
+  initHallOfFame(window.getHallOfFameData());
+  initMagneticButtons();
+
+  // Register PWA Service Worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js")
+        .then(reg => console.log("PWA Service Worker registered:", reg.scope))
+        .catch(err => console.error("PWA Service Worker registration failed:", err));
+    });
+  }
 
   // Request browser push notification permissions on load
   if (window.PushNotificationService) {
@@ -517,16 +529,12 @@ function initProShop(data) {
         ? `<button class="btn btn-secondary product-buy-btn" disabled style="opacity: 0.5; cursor: not-allowed; width: 100%;">OUT OF STOCK</button>`
         : `<a href="${waUrl}" class="btn btn-primary product-buy-btn" target="_blank" rel="noopener">BUY NOW</a>`;
 
+      const imgUrl = p.image || "assets/images/logo.png";
+      const srcUrl = imgUrl.startsWith('data:') ? imgUrl : `${imgUrl}?v=${Date.now()}`;
+
       card.innerHTML = `
         <div class="product-img-wrapper">
-         <img
-class="product-img"
-src="${p.image.startsWith('data:')
-          ? p.image
-          : `${p.image}?v=${Date.now()}`
-        }"
-alt="${p.name}"
-loading="eager">
+          <img class="product-img" src="${srcUrl}" alt="${p.name}" loading="eager">
           ${badgeHtml}
           ${discountBadgeHtml}
           ${stockBadgeHtml}
@@ -1280,7 +1288,7 @@ function initContactForm(generalData) {
     const submitBtn = document.getElementById("formTrialBtn");
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = "BOOKING...";
+    submitBtn.textContent = "Booking your session...";
 
     try {
       let bookingId;
@@ -1306,39 +1314,42 @@ function initContactForm(generalData) {
         localStorage.setItem("rsa_db", JSON.stringify(db));
         bookingId = newBooking.id;
       } else {
-        // 1. Insert into Supabase
-        const { data, error } = await client
-          .from("trial_bookings")
-          .insert([{
-            name,
-            age,
-            parent_name: parentName || null,
-            phone,
-            email,
-            skill_level: skillLevel,
-            booking_date: bookingDate,
-            booking_slot: bookingSlot,
-            message: message || "No details provided.",
-            status: "pending"
-          }])
-          .select();
+        const sessionId = window.getSessionId ? window.getSessionId() : "anon-session";
+        const { data, error } =
+          await client.functions.invoke(
+            "create_trial_booking",
+            {
+              body: {
+                name: name,
+                age: age,
+                parent_name: parentName || null,
+                phone: phone,
+                email: email,
+                skill_level: skillLevel,
+                message: message || "No details provided.",
+                booking_date: bookingDate,
+                booking_slot: bookingSlot,
+                session_id: sessionId
+              }
+            }
+          );
 
         if (error) throw error;
-        if (data && data.length > 0) {
-          bookingId = data[0].id;
+        if (data) {
+          bookingId = data.id;
         }
       }
 
-      // Write audit log
-      if (window.writeAuditLog && bookingId) {
+      // Write audit log (only in mock session since RPC handles it in DB)
+      if ((window.isMockSession || !client) && window.writeAuditLog && bookingId) {
         await window.writeAuditLog(bookingId, 'create', 'user', {
           booking_date: bookingDate,
           booking_slot: bookingSlot
         });
       }
 
-      // Release lock
-      if (window.releaseSlotLock) {
+      // Release lock (only in mock session since RPC handles it in DB)
+      if ((window.isMockSession || !client) && window.releaseSlotLock) {
         await window.releaseSlotLock();
       }
 
@@ -1363,27 +1374,38 @@ function initContactForm(generalData) {
         });
       }
 
-      // 2. Email Notification using FormSubmit.co
-      const payload = {
-        "Name": name,
-        "Age": age,
-        "Parent Name": parentName || "N/A",
-        "Phone": phone,
-        "Email": email,
-        "Skill Level": skillLevel,
-        "Booking Date": bookingDate,
-        "Time Slot": bookingSlot,
-        "Details": message || "None",
-        "_subject": "New Trial Booking Request - Renegades Arena",
-        "_captcha": "false"
-      };
+      //// EMAIL NOTIFICATIONS
+      let emailSucceeded = false;
+      try {
+        //// TRIAL BOOKING FLOW
+        const emailDetails = {
+          name: name,
+          age: age,
+          parentName: parentName || "N/A",
+          phone: phone,
+          email: email,
+          skillLevel: skillLevel,
+          date: bookingDate,
+          slot: bookingSlot,
+          message: message || "No details provided.",
+          adminEmail: generalData.email || 'renegadessportsarena@gmail.com',
+          timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        };
 
-      // Fire and forget email submission to not block user
-      fetch(`https://formsubmit.co/ajax/${generalData.email || 'renegadessportsarena@gmail.com'}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(e => console.log("Email notify error:", e));
+        console.log("[Booking Flow] Triggering operations for confirmation and admin alerts...");
+
+        //// PLAYER CONFIRMATION
+        // Sends confirmation email to the player (via sendTrialBookingEmails)
+
+        //// ADMIN NOTIFICATION
+        // Sends notification email to the admin (via sendTrialBookingEmails)
+
+        const emailResult = await window.sendTrialBookingEmails(emailDetails);
+        emailSucceeded = emailResult.allSuccess;
+      } catch (emailErr) {
+        console.error("Email notification flow failed:", emailErr);
+        emailSucceeded = false;
+      }
 
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
@@ -1410,9 +1432,14 @@ Slot: ${bookingSlot}
 Please confirm my spot!`);
         const waLink = `https://wa.me/${generalData.whatsappNumber || '919731134665'}?text=${waText}`;
 
+        const emailStatusText = emailSucceeded
+          ? "Trial booked successfully. Confirmation email sent."
+          : "Trial booked successfully. Email notification will be retried.";
+
         successBox.innerHTML = `
           <h3 style="color: var(--accent-primary); margin-bottom: 0.5rem; font-size:1.2rem;">TRIAL BOOKING REQUESTED SUCCESSFULLY!</h3>
-          <p style="color: #fff; margin-bottom: 1.25rem; font-size: 0.9rem;">Your trial request for <strong>${bookingDate}</strong> at <strong>${bookingSlot}</strong> is now registered. Please click the button below to confirm instantly via WhatsApp.</p>
+          <p style="color: #fff; margin-bottom: 0.75rem; font-size: 0.9rem;">Your trial request for <strong>${bookingDate}</strong> at <strong>${bookingSlot}</strong> is now registered. ${emailStatusText}</p>
+          <p style="color: #cbd5e1; margin-bottom: 1.25rem; font-size: 0.85rem;">Please click the button below to confirm instantly via WhatsApp.</p>
           <a href="${waLink}" class="btn btn-primary" target="_blank" rel="noopener" style="padding: 0.8rem 1.5rem; font-size: 0.85rem; width: 100%;">
             CONFIRM ON WHATSAPP NOW
           </a>
@@ -1576,6 +1603,7 @@ function updateSlotsGrid(gridContainer, occupancies, hiddenInput, selectedSlotVa
     btn.onclick = async (e) => {
       e.preventDefault();
       if (btn.classList.contains("disabled")) return;
+      if (btn.classList.contains("active")) return;
 
       // Deactivate all sibling buttons
       const allBtns = gridContainer.parentElement.parentElement.querySelectorAll(".slot-btn");
@@ -1883,7 +1911,7 @@ function bindScrollLinks() {
   scrollLinks.forEach(link => {
     link.addEventListener("click", function (e) {
       const targetId = this.getAttribute("href");
-      if (targetId.startsWith("#")) {
+      if (targetId && targetId.startsWith("#") && targetId.length > 1) {
         e.preventDefault();
         const targetSection = document.querySelector(targetId);
         if (targetSection) {
@@ -1975,4 +2003,175 @@ window.openGenericLightbox = function (src, title) {
   if (lightboxClose) lightboxClose.addEventListener("click", cleanUp);
   lightbox.addEventListener("click", backdropClick);
 };
+
+// ==========================================================================
+// 18. DYNAMIC HALL OF FAME RENDERER
+// ==========================================================================
+function initHallOfFame(data) {
+  const grid = document.getElementById("hallOfFameGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  if (!data || data.length === 0) {
+    grid.innerHTML = `
+      <div class="premium-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; background: rgba(18, 18, 18, 0.6); border: 1px dashed var(--glass-border); border-radius: 8px; box-shadow: var(--orange-glow);">
+        <div class="empty-state-icon" style="font-size: 4rem; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px var(--accent-primary));">🏆</div>
+        <h3 style="font-size: 1.8rem; margin-bottom: 0.75rem; color: #fff; font-family: var(--font-display); font-weight: 800;">No Hall of Fame members yet</h3>
+        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto; line-height: 1.6; font-size: 1.05rem;">Future champions will be celebrated here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  data.forEach((player, index) => {
+    const card = document.createElement("div");
+
+    // Premium glow class matching badge text
+    let glowClass = "glow-violet";
+    let badgeClass = "card-badge-violet";
+    const badgeText = (player.badge || "").toLowerCase();
+    if (badgeText.includes("ksca") || badgeText.includes("division") || badgeText.includes("mvp")) {
+      glowClass = "glow-gold";
+      badgeClass = "card-badge-gold";
+    } else if (badgeText.includes("scholarship") || badgeText.includes("elite")) {
+      glowClass = "glow-red";
+      badgeClass = "card-badge-red";
+    }
+
+    card.className = `sports-card reveal-element ${glowClass} delay-${(index % 3) + 1}`;
+
+    let statsHTML = "";
+    if (player.stats && Array.isArray(player.stats)) {
+      statsHTML = player.stats.map(stat => `
+        <div class="card-stat-box">
+          <div class="card-stat-val">${stat.val}</div>
+          <div class="card-stat-lbl">${stat.lbl}</div>
+        </div>
+      `).join("");
+    }
+
+    card.innerHTML = `
+      <div class="sports-card-glow"></div>
+      <div class="sports-card-inner">
+        <div class="card-top">
+          <span class="card-badge ${badgeClass}">${player.badge || "PROSPECT"}</span>
+          ${player.scholarship ? `<span class="card-scholarship">${player.scholarship}</span>` : ""}
+        </div>
+        <img class="card-player-img" src="${player.image || "https://images.unsplash.com/photo-1540747737956-37872404a82f?auto=format&fit=crop&w=500&q=80"}" alt="${player.name}" style="cursor: zoom-in;" onclick="window.openGenericLightbox('${player.image}', '${player.name} - ${player.role}')">
+        <div class="card-info">
+          <h3 class="card-name">${player.name}</h3>
+          <span class="card-role">${player.role}</span>
+        </div>
+        <div class="card-stats-grid">
+          ${statsHTML}
+        </div>
+        <div class="card-achievement">${player.achievement || "Rising Star"}</div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+
+    if (window.revealObserver) {
+      window.revealObserver.observe(card);
+    }
+  });
+}
+
+function initCoaches(data) {
+  const grid = document.getElementById("coachesGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  const list = data?.list || [];
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div class="premium-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: var(--bg-secondary); border: 1px dashed var(--glass-border); border-radius: 8px;">
+        <p style="color: var(--text-secondary);">No coaches listed yet. Check back soon.</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.forEach((coach, index) => {
+    const card = document.createElement("div");
+    card.className = `coach-card glass-card reveal-element glow-violet delay-${(index % 3) + 1}`;
+
+    // Build social links
+    let socialsHTML = "";
+    if (coach.instagram) {
+      socialsHTML += `
+        <a href="${coach.instagram}" class="coach-social-btn" target="_blank" rel="noopener" aria-label="${coach.name} Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      `;
+    }
+    if (coach.twitter) {
+      socialsHTML += `
+        <a href="${coach.twitter}" class="coach-social-btn" target="_blank" rel="noopener" aria-label="${coach.name} Twitter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+          </svg>
+        </a>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="coach-img-container">
+        <span class="coach-zoom-badge" style="cursor: pointer;" onclick="window.openGenericLightbox('${coach.image || 'assets/images/logo.png'}', '${coach.name}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          View Photo
+        </span>
+        <img class="coach-img" src="${coach.image || 'assets/images/logo.png'}" alt="${coach.name}">
+        <div class="coach-socials-overlay">
+          ${socialsHTML}
+        </div>
+      </div>
+      <div class="coach-details">
+        <span class="coach-exp">${coach.experience || 'Professional Coach'}</span>
+        <h3>${coach.name}</h3>
+        <span class="coach-desig">${coach.designation || 'Instructor'}</span>
+        <div class="coach-spec-box">
+          <strong>Specialization:</strong>
+          ${coach.specialization || 'All-round coaching'}
+        </div>
+        ${coach.achievements ? `
+          <div class="coach-spec-box" style="margin-top: 1rem; border-color: rgba(245, 158, 11, 0.15);">
+            <strong style="color: var(--accent-gold-yellow);">Achievements:</strong>
+            ${coach.achievements}
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    grid.appendChild(card);
+
+    if (window.revealObserver) {
+      window.revealObserver.observe(card);
+    }
+  });
+}
+
+function initMagneticButtons() {
+  const btns = document.querySelectorAll(".btn, .btn-primary, .btn-secondary, .btn-outline-orange, .slot-btn, .tab-btn, .dash-tab-btn");
+  btns.forEach(btn => {
+    btn.addEventListener("mousemove", function (e) {
+      const position = btn.getBoundingClientRect();
+      const x = e.clientX - position.left - position.width / 2;
+      const y = e.clientY - position.top - position.height / 2;
+      btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+    });
+    btn.addEventListener("mouseout", function () {
+      btn.style.transform = "translate(0, 0)";
+    });
+  });
+}
+
+
 

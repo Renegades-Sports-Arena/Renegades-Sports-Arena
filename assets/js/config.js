@@ -393,16 +393,103 @@ const DEFAULT_CONFIG = {
       { label: "Tournament Participations", count: 50, suffix: "+" },
       { label: "KSCA Division Club Relationships", count: 5, suffix: "+" }
     ]
-  }
+  },
+  hallOfFame: [
+    {
+      name: "Rohan Sharma",
+      role: "All-Rounder",
+      badge: "KSCA Division Player",
+      scholarship: "100% Scholarship",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80",
+      achievement: "Kadamba Cup MVP",
+      stats: [
+        { val: "450", lbl: "Runs" },
+        { val: "18", lbl: "Wickets" },
+        { val: "135.2", lbl: "S/R" },
+        { val: "24", lbl: "Matches" }
+      ]
+    },
+    {
+      name: "Harshith",
+      role: "Leg Spinner",
+      badge: "Under-16 Star",
+      scholarship: "50% Scholarship",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80",
+      achievement: "Best Bowler U-16",
+      stats: [
+        { val: "85", lbl: "Runs" },
+        { val: "32", lbl: "Wkts" },
+        { val: "4.12", lbl: "Econ" },
+        { val: "20", lbl: "Matches" }
+      ]
+    },
+    {
+      name: "Priyanka Sen",
+      role: "Top-Order Batter",
+      badge: "State Selector Camp",
+      scholarship: "Elite Athlete",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=80",
+      achievement: "Highest Run-Scorer",
+      stats: [
+        { val: "620", lbl: "Runs" },
+        { val: "44.2", lbl: "Avg" },
+        { val: "122.5", lbl: "S/R" },
+        { val: "18", lbl: "Matches" }
+      ]
+    }
+  ]
 };
 
 // Expose default config globally for self-healing fallbacks
 window.RENEGADES_DEFAULT_CONFIG = DEFAULT_CONFIG;
 
+// Deep merge loaded configuration with DEFAULT_CONFIG
+function deepMergeConfig(defaultConfig, loadedConfig) {
+  if (!loadedConfig) return { ...defaultConfig };
+  
+  const merged = { ...defaultConfig };
+  
+  for (const key in defaultConfig) {
+    if (loadedConfig[key] !== undefined) {
+      if (Array.isArray(defaultConfig[key])) {
+        merged[key] = Array.isArray(loadedConfig[key]) && loadedConfig[key].length > 0
+          ? loadedConfig[key]
+          : defaultConfig[key];
+      } else if (typeof defaultConfig[key] === 'object' && defaultConfig[key] !== null) {
+        merged[key] = { ...defaultConfig[key], ...loadedConfig[key] };
+      } else {
+        merged[key] = loadedConfig[key];
+      }
+    }
+  }
+  return merged;
+}
+
 // Retrieve configuration from local storage if edited in admin, otherwise default
 const configSource = localStorage.getItem("renegades_config");
 let loadedConfig = configSource ? JSON.parse(configSource) : DEFAULT_CONFIG;
-window.RENEGADES_CONFIG = loadedConfig;
+window.RENEGADES_CONFIG = deepMergeConfig(DEFAULT_CONFIG, loadedConfig);
+
+// Expose getHallOfFameData following priority chain CMS -> Supabase -> Fallback
+window.getHallOfFameData = function() {
+  const localConfigStr = localStorage.getItem("renegades_config");
+  if (localConfigStr) {
+    try {
+      const localConfig = JSON.parse(localConfigStr);
+      if (localConfig.hallOfFame && Array.isArray(localConfig.hallOfFame) && localConfig.hallOfFame.length > 0) {
+        return localConfig.hallOfFame;
+      }
+    } catch (e) {
+      console.error("Error parsing local CMS config:", e);
+    }
+  }
+
+  if (window.RENEGADES_CONFIG && window.RENEGADES_CONFIG.hallOfFame && Array.isArray(window.RENEGADES_CONFIG.hallOfFame) && window.RENEGADES_CONFIG.hallOfFame.length > 0) {
+    return window.RENEGADES_CONFIG.hallOfFame;
+  }
+
+  return DEFAULT_CONFIG.hallOfFame || [];
+};
 
 async function loadSupabaseConfig() {
   if (!window.supabaseClient) {
@@ -416,28 +503,31 @@ async function loadSupabaseConfig() {
     .eq("id", 1)
     .single();
   if (!error && data) {
-    window.RENEGADES_CONFIG = data.data;
+    window.RENEGADES_CONFIG = deepMergeConfig(DEFAULT_CONFIG, data.data);
     console.log("Loaded from Supabase");
 
     setTimeout(() => {
-      if (typeof initHero === "function")
-        initHero(window.RENEGADES_CONFIG.hero);
-
-      if (typeof initProShop === "function")
-        initProShop(window.RENEGADES_CONFIG.shop);
-
-      if (typeof initGallery === "function")
-        initGallery(window.RENEGADES_CONFIG.gallery);
-
-      if (typeof initPrograms === "function")
-        initPrograms(window.RENEGADES_CONFIG.programs);
-
+      // Re-initialize all sections to dynamically reflect Supabase changes
+      if (typeof initAnnouncement === "function") initAnnouncement(window.RENEGADES_CONFIG.general);
+      if (typeof initGeneral === "function") initGeneral(window.RENEGADES_CONFIG.general);
+      if (typeof initHero === "function") initHero(window.RENEGADES_CONFIG.hero);
+      if (typeof initWhyChooseUs === "function") initWhyChooseUs(window.RENEGADES_CONFIG.whyChooseUs);
+      if (typeof initFutureArena === "function") initFutureArena(window.RENEGADES_CONFIG.futureArena);
+      if (typeof initClubs === "function") initClubs(window.RENEGADES_CONFIG.clubs);
+      if (typeof initPrograms === "function") initPrograms(window.RENEGADES_CONFIG.programs);
+      if (typeof initPathway === "function") initPathway(window.RENEGADES_CONFIG.renegadesPathway);
+      if (typeof initParentsChoose === "function") initParentsChoose(window.RENEGADES_CONFIG.whyParentsChoose);
+      if (typeof initVisionMission === "function") initVisionMission(window.RENEGADES_CONFIG.visionMission);
+      if (typeof initFacilities === "function") initFacilities(window.RENEGADES_CONFIG.facilities);
+      if (typeof initGallery === "function") initGallery(window.RENEGADES_CONFIG.gallery);
+      if (typeof initReviews === "function") initReviews(window.RENEGADES_CONFIG.reviews);
+      if (typeof initAchievements === "function") initAchievements(window.RENEGADES_CONFIG.achievements);
+      if (typeof initHallOfFame === "function") initHallOfFame(window.getHallOfFameData());
+      if (typeof initProShop === "function") initProShop(window.RENEGADES_CONFIG.shop);
       if (typeof initCoaches === "function") {
-        const coachData =
-          window.RENEGADES_CONFIG?.coaches?.list?.length
-            ? window.RENEGADES_CONFIG.coaches
-            : DEFAULT_CONFIG.coaches;
-
+        const coachData = window.RENEGADES_CONFIG?.coaches?.list?.length
+          ? window.RENEGADES_CONFIG.coaches
+          : DEFAULT_CONFIG.coaches;
         initCoaches(coachData);
       }
     }, 500);
@@ -449,10 +539,10 @@ async function loadSupabaseConfig() {
 window.addEventListener("load", () => {
   setTimeout(loadSupabaseConfig, 1000);
 });
+
 // Ensure new gallery images from DEFAULT_CONFIG are present in loadedConfig
 if (configSource && loadedConfig && loadedConfig.gallery && Array.isArray(loadedConfig.gallery.list)) {
   const loadedUrls = new Set(loadedConfig.gallery.list.map(item => item.url));
-  // Keep track of added items to insert them in the same order
   const toAdd = [];
   DEFAULT_CONFIG.gallery.list.forEach(item => {
     if (!loadedUrls.has(item.url)) {
@@ -469,4 +559,5 @@ if (configSource && loadedConfig && loadedConfig.gallery && Array.isArray(loaded
   }
 }
 
-window.RENEGADES_CONFIG = loadedConfig;
+
+

@@ -9,6 +9,7 @@
   <meta name="keywords"
     content="cricket academy bengaluru, sports facility bangalore, KSCA division club trial, cricket coaching hsr layout, cricket turf box nets bengaluru">
   <meta name="author" content="Renegades Sports Arena">
+  <meta name="theme-color" content="#FF6B00">
   <meta property="og:title" content="Renegades Sports Arena | Elite Cricket Academy Bengaluru">
   <meta property="og:description"
     content="Train like a champion. Play like a renegade. Professional coaching, box nets, and pathways into KSCA-affiliated cricket clubs.">
@@ -17,12 +18,63 @@
 
   <title>RENEGADES SPORTS ARENA | Train Like a Champion. Play Like a Renegade.</title>
 
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+
+  <!-- Sitemap Link -->
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
+
   <!-- Style Sheets -->
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/mlb_tournaments.css">
 
   <!-- Favicon Mock -->
   <link rel="icon" type="image/png" href="assets/images/logo.png">
+
+  <!-- Structured Data JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SportsActivityLocation",
+    "name": "Renegades Sports Arena",
+    "image": "https://renegadessportsarena.com/assets/images/logo.png",
+    "@id": "https://renegadessportsarena.com/#academy",
+    "url": "https://renegadessportsarena.com",
+    "telephone": "+91-9731134665",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Reliable Woods, HSR Layout Sector 2",
+      "addressLocality": "Bengaluru",
+      "postalCode": "560102",
+      "addressRegion": "Karnataka",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 12.9103,
+      "longitude": 77.6432
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "05:00",
+      "closes": "23:00"
+    },
+    "sameAs": [
+      "https://www.instagram.com/renegadessportsarena/",
+      "https://www.facebook.com/renegadessportsarena/"
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -68,6 +120,8 @@
         <a href="#gallery" class="nav-link scroll-link">Gallery</a>
         <a href="#shop" class="nav-link scroll-link">Shop</a>
         <a href="#tournaments" class="nav-link scroll-link">🏆 Tournaments</a>
+        <a href="#hall-of-fame" class="nav-link scroll-link">⭐ Hall of Fame</a>
+        <a href="queens.html" class="nav-link" style="color: #A78BFA; font-weight: 700;">👸 Queens</a>
         <a href="portal.html" class="nav-link" style="color: var(--accent-primary); font-weight: 700;">Portal Login</a>
         <a href="#contact" class="btn btn-outline-orange header-cta scroll-link">Contact</a>
       </nav>
@@ -129,6 +183,24 @@
 
       <div class="why-grid" id="whyGrid">
         <!-- Rendered Dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       HALL OF FAME & PLAYER SPOTLIGHT
+       ========================================================================== -->
+  <section class="section section-alt diagonal-split reveal-element" id="hall-of-fame">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">ELITE PERFORMERS</span>
+        <h2 class="section-title">Renegades Hall of Fame</h2>
+        <p class="section-desc">Spotlighting our star athletes who have delivered outstanding performances in KSCA
+          leagues, tournaments, and training milestones.</p>
+      </div>
+
+      <div class="spotlight-grid" id="hallOfFameGrid">
+        <!-- Rendered Dynamically via JS (sports cards) -->
       </div>
     </div>
   </section>
@@ -278,7 +350,9 @@
           <span>🌍 INTERNATIONAL SPORTS DEVELOPMENT</span>
         </div>
         <h2 class="section-title">Developing India's Next Generation of Baseball Talent</h2>
-        <p class="section-desc">Renegades Sports Arena proudly offers baseball coaching and development opportunities through our Major League Baseball (MLB) connections, introducing young athletes to international coaching methodologies and global sporting opportunities.</p>
+        <p class="section-desc">Renegades Sports Arena proudly offers baseball coaching and development opportunities
+          through our Major League Baseball (MLB) connections, introducing young athletes to international coaching
+          methodologies and global sporting opportunities.</p>
       </div>
 
       <div class="mlb-program-grid" id="mlbProgramsGrid">
@@ -286,29 +360,48 @@
         <div class="mlb-card reveal-element delay-1">
           <div class="mlb-card-icon">⚾</div>
           <h3 class="mlb-card-title">MLB U-11 Development Program</h3>
-          <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Introducing basic baseball fundamentals in a highly engaging environment.</p>
+          <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Introducing basic baseball fundamentals in a
+            highly engaging environment.</p>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Baseball fundamentals</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Throwing mechanics</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Catching and fielding</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Hand-eye coordination</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Speed and agility training</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Fun and engaging skill development modules</span>
           </div>
         </div>
@@ -316,68 +409,101 @@
         <div class="mlb-card reveal-element delay-2">
           <div class="mlb-card-icon">⚾</div>
           <h3 class="mlb-card-title">MLB U-13 Advanced Development Program</h3>
-          <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Advanced skill refinement and tactical training for competitive league paths.</p>
+          <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Advanced skill refinement and tactical
+            training for competitive league paths.</p>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Advanced batting mechanics</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Pitching development</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Position-specific coaching</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Match strategy and game intelligence</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Tournament preparation</span>
           </div>
           <div class="mlb-card-bullet">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span>Leadership and teamwork development</span>
           </div>
         </div>
       </div>
 
       <!-- Animated Premium cards for benefits -->
-      <h3 style="text-align: center; margin-top: 5rem; font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff; text-transform: uppercase;">
+      <h3
+        style="text-align: center; margin-top: 5rem; font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff; text-transform: uppercase;">
         Development Pillars
       </h3>
-      <div class="mlb-program-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 2rem;">
-        <div class="why-card glass-card reveal-element delay-1" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+      <div class="mlb-program-grid"
+        style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 2rem;">
+        <div class="why-card glass-card reveal-element delay-1"
+          style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
           <div class="why-icon" style="font-size: 2.5rem;">🌎</div>
           <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">International Exposure</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">Pathways to global development tournaments and coaching clinics.</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Pathways to global development tournaments and
+            coaching clinics.</p>
         </div>
-        <div class="why-card glass-card reveal-element delay-2" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+        <div class="why-card glass-card reveal-element delay-2"
+          style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
           <div class="why-icon" style="font-size: 2.5rem;">⚾</div>
           <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">MLB Methodologies</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">Advanced drills, analytical video feedback, and pitcher-specific logs.</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Advanced drills, analytical video feedback, and
+            pitcher-specific logs.</p>
         </div>
-        <div class="why-card glass-card reveal-element delay-3" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+        <div class="why-card glass-card reveal-element delay-3"
+          style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
           <div class="why-icon" style="font-size: 2.5rem;">🏆</div>
           <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Talent Identification</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">Direct access to scouts and national baseball trials network.</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Direct access to scouts and national baseball
+            trials network.</p>
         </div>
-        <div class="why-card glass-card reveal-element delay-4" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+        <div class="why-card glass-card reveal-element delay-4"
+          style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
           <div class="why-icon" style="font-size: 2.5rem;">📈</div>
           <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Athlete Development</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">Physiological and athletic profiling tailored for modern players.</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Physiological and athletic profiling tailored for
+            modern players.</p>
         </div>
-        <div class="why-card glass-card reveal-element delay-5" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+        <div class="why-card glass-card reveal-element delay-5"
+          style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
           <div class="why-icon" style="font-size: 2.5rem;">🤝</div>
           <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Professional Mentorship</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">One-on-one reviews and strategy talks with active professional baseballers.</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">One-on-one reviews and strategy talks with active
+            professional baseballers.</p>
         </div>
-        <div class="why-card glass-card reveal-element delay-6" style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
+        <div class="why-card glass-card reveal-element delay-6"
+          style="border: 1px solid rgba(255, 107, 0, 0.15); padding: 2rem;">
           <div class="why-icon" style="font-size: 2.5rem;">🌟</div>
           <h3 style="font-size: 1.2rem; margin: 1rem 0 0.5rem;">Character & Leadership</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary);">Building off-field discipline, respect, academic drive, and team values.</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Building off-field discipline, respect, academic
+            drive, and team values.</p>
         </div>
       </div>
     </div>
@@ -386,8 +512,10 @@
   <!-- Cinematic full-width section with stadium quotes -->
   <section class="cinematic-quote-wrap">
     <div class="container">
-      <h2 class="cinematic-quote-title">"From the cricket grounds of Bengaluru to international baseball opportunities, Renegades Sports Arena empowers young athletes to compete beyond boundaries."</h2>
-      <p class="cinematic-quote-author">"Champions are not born in comfort zones. They are built through discipline, opportunity, and the courage to dream globally."</p>
+      <h2 class="cinematic-quote-title">"From the cricket grounds of Bengaluru to international baseball opportunities,
+        Renegades Sports Arena empowers young athletes to compete beyond boundaries."</h2>
+      <p class="cinematic-quote-author">"Champions are not born in comfort zones. They are built through discipline,
+        opportunity, and the courage to dream globally."</p>
     </div>
   </section>
 
@@ -673,19 +801,25 @@
   <!-- ==========================================================================
        🏆 TOURNAMENT MANAGEMENT MODULE
        ========================================================================== -->
-  <section class="section section-alt stadium-lights-section" id="tournaments" style="border-top: 1px solid var(--glass-border);">
+  <section class="section section-alt stadium-lights-section" id="tournaments"
+    style="border-top: 1px solid var(--glass-border);">
     <div class="container">
       <div class="section-header reveal-element">
         <span class="section-subtitle">ELITE COMPETITIONS</span>
         <h2 class="section-title">🏆 Renegades Championship Series</h2>
-        <p class="section-desc">Hosting elite cricket and baseball competitions that inspire young athletes to perform at their highest level.</p>
+        <p class="section-desc">Hosting elite cricket and baseball competitions that inspire young athletes to perform
+          at their highest level.</p>
       </div>
 
       <!-- Video / Cinematic Background Visual Placeholder block -->
-      <div class="future-arena-hero-card reveal-element" style="margin-bottom: 3rem; background-image: linear-gradient(180deg, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.7) 100%), url('https://images.unsplash.com/photo-1540747737956-37872404471d?auto=format&fit=crop&w=1200&q=80');">
+      <div class="future-arena-hero-card reveal-element"
+        style="margin-bottom: 3rem; background-image: linear-gradient(180deg, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.7) 100%), url('https://images.unsplash.com/photo-1540747737956-37872404471d?auto=format&fit=crop&w=1200&q=80');">
         <span class="arena-badge">LIVE CHAMPIONSHIPS</span>
-        <h3 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">REN-CHAMP SERIES 2026</h3>
-        <p style="color: var(--text-secondary); max-width: 600px; margin-bottom: 1.5rem;">Experience stadium lights, professional turf grounds, digital score tracking, and KSCA & MLB development scouts live on-ground.</p>
+        <h3
+          style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">
+          REN-CHAMP SERIES 2026</h3>
+        <p style="color: var(--text-secondary); max-width: 600px; margin-bottom: 1.5rem;">Experience stadium lights,
+          professional turf grounds, digital score tracking, and KSCA & MLB development scouts live on-ground.</p>
         <div class="arena-features-box">
           <ul class="arena-features-horizontal">
             <li>🏏 Cricket Tournaments</li>
@@ -733,12 +867,14 @@
         <div class="tournament-tab-content" id="tabContent-brackets" style="display: none;">
           <div class="fixtures-panel-container">
             <div class="form-group" style="max-width: 300px; margin-bottom: 2rem;">
-              <label for="bracketTournamentSelect" class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">Select Tournament:</label>
-              <select id="bracketTournamentSelect" class="form-control" style="background: var(--bg-input); border: 1px solid var(--glass-border); color: #fff;">
+              <label for="bracketTournamentSelect" class="form-label"
+                style="font-size: 0.8rem; color: var(--text-secondary);">Select Tournament:</label>
+              <select id="bracketTournamentSelect" class="form-control"
+                style="background: var(--bg-input); border: 1px solid var(--glass-border); color: #fff;">
                 <!-- Filled by JS -->
               </select>
             </div>
-            
+
             <div class="bracket-wrapper" id="tournamentBracketContainer">
               <!-- Rendered Dynamically -->
             </div>
@@ -749,8 +885,10 @@
         <div class="tournament-tab-content" id="tabContent-standings" style="display: none;">
           <div class="fixtures-panel-container">
             <div class="form-group" style="max-width: 300px; margin-bottom: 2rem;">
-              <label for="standingsTournamentSelect" class="form-label" style="font-size: 0.8rem; color: var(--text-secondary);">Select Tournament:</label>
-              <select id="standingsTournamentSelect" class="form-control" style="background: var(--bg-input); border: 1px solid var(--glass-border); color: #fff;">
+              <label for="standingsTournamentSelect" class="form-label"
+                style="font-size: 0.8rem; color: var(--text-secondary);">Select Tournament:</label>
+              <select id="standingsTournamentSelect" class="form-control"
+                style="background: var(--bg-input); border: 1px solid var(--glass-border); color: #fff;">
                 <!-- Filled by JS -->
               </select>
             </div>
@@ -784,7 +922,7 @@
   <div class="modal-overlay" id="registrationModal">
     <div class="modal-content-card">
       <button class="modal-close-btn" id="closeRegistrationModal">&times;</button>
-      
+
       <!-- Step indicators -->
       <div class="steps-indicator-bar">
         <div class="step-dot active" id="dot-step1"></div>
@@ -799,28 +937,33 @@
           <input type="hidden" id="regTournamentId">
           <div class="form-group">
             <label for="regType" class="form-label">Registration Type *</label>
-            <select id="regType" class="form-control" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+            <select id="regType" class="form-control" required
+              style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
               <option value="team">Register as a Team</option>
               <option value="individual">Register as an Individual</option>
             </select>
           </div>
           <div class="form-group">
             <label for="regName" class="form-label" id="regNameLabel">Team Name *</label>
-            <input type="text" id="regName" class="form-control" placeholder="Enter name" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+            <input type="text" id="regName" class="form-control" placeholder="Enter name" required
+              style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
           </div>
           <div class="form-group-row">
             <div class="form-group">
               <label for="regEmail" class="form-label">Contact Email *</label>
-              <input type="email" id="regEmail" class="form-control" placeholder="name@domain.com" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+              <input type="email" id="regEmail" class="form-control" placeholder="name@domain.com" required
+                style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
             </div>
             <div class="form-group">
               <label for="regPhone" class="form-label">Contact Phone (WhatsApp) *</label>
-              <input type="tel" id="regPhone" class="form-control" placeholder="10-digit number" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+              <input type="tel" id="regPhone" class="form-control" placeholder="10-digit number" required
+                style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
             </div>
           </div>
           <div class="form-group">
             <label for="regAgeGroup" class="form-label">Age Group Category *</label>
-            <select id="regAgeGroup" class="form-control" required style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
+            <select id="regAgeGroup" class="form-control" required
+              style="background: var(--bg-input); color:#fff; border: 1px solid var(--glass-border);">
               <option value="U-11">Under-11 Championship</option>
               <option value="U-13">Under-13 Championship</option>
               <option value="U-15">Under-15 Championship</option>
@@ -828,41 +971,52 @@
               <option value="Open">Open Invitational Cup</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1.5rem;">PROCEED TO PAYMENT</button>
+          <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1.5rem;">PROCEED TO
+            PAYMENT</button>
         </form>
       </div>
 
       <!-- Step 2: Simulated UPI Payment Scan -->
       <div class="registration-step" id="regStep-2">
         <h3 class="registration-step-title" style="text-align: center;">Scan UPI QR Code</h3>
-        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem;">Scan the QR code below from any UPI app (GPay, PhonePe, Paytm) to complete registration fees of <strong class="text-orange">₹1,500</strong>.</p>
-        
+        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem;">Scan the QR code below from any
+          UPI app (GPay, PhonePe, Paytm) to complete registration fees of <strong class="text-orange">₹1,500</strong>.
+        </p>
+
         <div class="upi-sim-panel">
           <div class="upi-qrcode-image" id="paymentQrCodeContainer">
             <!-- Injected by API -->
           </div>
-          <p style="font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: #fff;">BHIM UPI PAYMENTS</p>
-          <p style="font-size: 0.75rem; color: var(--text-grey); margin-top: 0.25rem;">Merchant: Renegades Sports Arena</p>
+          <p style="font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: #fff;">BHIM UPI
+            PAYMENTS</p>
+          <p style="font-size: 0.75rem; color: var(--text-grey); margin-top: 0.25rem;">Merchant: Renegades Sports Arena
+          </p>
         </div>
 
         <div style="display: flex; gap: 1rem;">
           <button type="button" class="btn btn-outline-orange" id="btnBackToForm" style="flex: 1;">BACK</button>
-          <button type="button" class="btn btn-primary" id="btnSimulatePayment" style="flex: 2;">CONFIRM MOCK PAYMENT</button>
+          <button type="button" class="btn btn-primary" id="btnSimulatePayment" style="flex: 2;">CONFIRM MOCK
+            PAYMENT</button>
         </div>
       </div>
 
       <!-- Step 3: QR Pass Generation -->
       <div class="registration-step" id="regStep-3">
-        <h3 class="registration-step-title" style="text-align: center; color: var(--color-grass);">✓ REGISTRATION CONFIRMED!</h3>
-        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Your registration passcode has been generated. Show this pass on-ground for verification.</p>
-        
+        <h3 class="registration-step-title" style="text-align: center; color: var(--color-grass);">✓ REGISTRATION
+          CONFIRMED!</h3>
+        <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Your
+          registration passcode has been generated. Show this pass on-ground for verification.</p>
+
         <!-- Ticket Box -->
         <div class="ticket-pass" id="ticketPassBox">
           <div class="ticket-header">
             <img src="assets/images/logo.png" alt="Emblem" style="height: 35px;">
             <div style="line-height: 1.2;">
-              <span style="font-family: var(--font-display); font-weight: 900; color: #fff; font-size: 0.95rem; text-transform: uppercase;">RENEGADES CHAMPIONSHIP</span>
-              <span style="display: block; font-size: 0.65rem; color: var(--text-grey); letter-spacing: 1px;">ENTRY VERIFICATION PASS</span>
+              <span
+                style="font-family: var(--font-display); font-weight: 900; color: #fff; font-size: 0.95rem; text-transform: uppercase;">RENEGADES
+                CHAMPIONSHIP</span>
+              <span style="display: block; font-size: 0.65rem; color: var(--text-grey); letter-spacing: 1px;">ENTRY
+                VERIFICATION PASS</span>
             </div>
           </div>
           <div class="ticket-body-grid">
@@ -888,8 +1042,10 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem;">
-          <button type="button" class="btn btn-primary" id="btnPrintTicketPass" style="width: 100%;">PRINT / DOWNLOAD PASS</button>
-          <button type="button" class="btn btn-outline-orange" id="btnFinishRegistration" style="width: 100%;">DONE</button>
+          <button type="button" class="btn btn-primary" id="btnPrintTicketPass" style="width: 100%;">PRINT / DOWNLOAD
+            PASS</button>
+          <button type="button" class="btn btn-outline-orange" id="btnFinishRegistration"
+            style="width: 100%;">DONE</button>
         </div>
       </div>
 
@@ -1127,7 +1283,8 @@
     <div class="container" style="position: relative; z-index: 2;">
       <h2 class="brand-showcase-title">RENEGADES <span>SPORTS ARENA</span></h2>
       <p style="color: var(--text-secondary); max-width: 750px; margin: 0 auto; font-size: 1.15rem; line-height: 1.6;">
-        Developing Champions in Cricket and Baseball Through International Standards, Character, Discipline, and Global Opportunities.
+        Developing Champions in Cricket and Baseball Through International Standards, Character, Discipline, and Global
+        Opportunities.
       </p>
 
       <!-- Animated Taglines -->
@@ -1219,6 +1376,7 @@
           <li><a href="#why-choose-us" class="scroll-link">Why Choose Us</a></li>
           <li><a href="#gallery" class="scroll-link">Academy Gallery</a></li>
           <li><a href="#reviews" class="scroll-link">Reviews</a></li>
+          <li><a href="queens.html" style="color: #A78BFA; font-weight: 700;">Queens Franchise</a></li>
         </ul>
       </div>
 
@@ -1277,6 +1435,8 @@
   <!-- Dynamic Javascript Config and Core script -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/env.js"></script>
+  <script src="assets/js/email.js"></script>
   <script src="assets/js/notifications_services.js"></script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/main.js"></script>

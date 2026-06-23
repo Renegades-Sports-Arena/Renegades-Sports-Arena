@@ -1,0 +1,19 @@
+{
+  "name": "Renegades Sports Arena",
+  "short_name": "Renegades Arena",
+  "description": "Elite Cricket Academy and KSCA pathways program in Bengaluru.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0A0A0A",
+  "theme_color": "#FF6B00",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Renegades Sports Arena - System Health Check</title>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .healthy {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border: 1px solid #10b981;
+    }
+
+    .unhealthy {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+    }
+
+    .checking {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border: 1px solid #f59e0b;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: #1f2937;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #374151;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-value {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .details {
+      background: #030712;
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #34d399;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #111827;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      background: #ff6b00;
+      color: #fff;
+      border: none;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #e05e00;
+    }
+  </style>
+  <script src="assets/js/env.example.js"></script>
+  <script src="assets/js/env.js"
+    onerror="console.log('No local env.js found, using env.example.js default/fallback keys')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/email.js"></script>
+</head>
+
+<body>
+  <div class="card">
+    <div class="header">
+      <span class="title">System Health Diagnostics</span>
+      <span id="healthBadge" class="badge checking">checking...</span>
+    </div>
+
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="metric-label">DB Connection</div>
+        <div id="dbStatus" class="metric-value">Checking...</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Latency</div>
+        <div id="latencyVal" class="metric-value">0ms</div>
+      </div>
+    </div>
+
+    <div class="details" id="logDetails">Initializing system diagnostics tests...</div>
+
+    <button class="btn" onclick="runDiagnostics()">Run Diagnostics Tests</button>
+  </div>
+
+  <script>
+    async function runDiagnostics() {
+      const badge = document.getElementById("healthBadge");
+      const dbStatus = document.getElementById("dbStatus");
+      const latencyVal = document.getElementById("latencyVal");
+      const logDetails = document.getElementById("logDetails");
+
+      badge.className = "badge checking";
+      badge.textContent = "checking...";
+      dbStatus.textContent = "Testing...";
+      logDetails.textContent = "Running diagnostics against Supabase...\n";
+
+      const client = window.supabaseClient;
+      if (!client) {
+        badge.className = "badge unhealthy";
+        badge.textContent = "unhealthy";
+        dbStatus.textContent = "Disconnected";
+        logDetails.textContent += "Error: Supabase client is not loaded or configured.\n";
+        return;
+      }
+
+      const startTime = performance.now();
+      try {
+        const { data, error, status } = await client
+          .from("website_config")
+          .select("id")
+          .limit(1);
+
+        const endTime = performance.now();
+        const latency = Math.round(endTime - startTime);
+        latencyVal.textContent = `${latency}ms`;
+
+        if (error) {
+          throw error;
+        }
+
+        badge.className = "badge healthy";
+        badge.textContent = "healthy";
+        dbStatus.textContent = "Connected";
+        logDetails.textContent += `Success: Supabase query returned HTTP status ${status}.\n`;
+        logDetails.textContent += `Latency check resolved in ${latency}ms.\n`;
+        logDetails.textContent += `Config verified: Database is active and authenticated.\n`;
+      } catch (err) {
+        const endTime = performance.now();
+        const latency = Math.round(endTime - startTime);
+        latencyVal.textContent = `${latency}ms`;
+
+        badge.className = "badge unhealthy";
+        badge.textContent = "unhealthy";
+        dbStatus.textContent = "Failed";
+        logDetails.textContent += `Error during DB connection test: ${err.message || err}\n`;
+        logDetails.textContent += `Diagnostics test resolved in ${latency}ms with errors.\n`;
+      }
+    }
+
+    // Auto-run on load
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(runDiagnostics, 800);
+    });
+  </script>
+</body>
+
+</html>

@@ -337,6 +337,15 @@ document.addEventListener("DOMContentLoaded", () => {
   initAuthListener();
   hideLoader();
 
+  // Register PWA Service Worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js")
+        .then(reg => console.log("PWA Service Worker registered from Portal:", reg.scope))
+        .catch(err => console.error("PWA Service Worker registration from Portal failed:", err));
+    });
+  }
+
   // Handle forms
   document.getElementById("signInForm").addEventListener("submit", handleSignInSubmit);
   document.getElementById("signUpForm").addEventListener("submit", handleSignUpSubmit);
@@ -1050,9 +1059,24 @@ async function syncPlayerDashboardData(playerId) {
     <p style="color:var(--text-secondary);"><strong>Target Milestones Assigned:</strong> ${feedbackRecord ? feedbackRecord.goals_set.join(", ") : 'No targets logged yet.'}</p>
   `;
 
+  // Set Dynamic Greeting
+  const hour = new Date().getHours();
+  let greet = "Welcome Back";
+  if (hour < 12) greet = "Good morning";
+  else if (hour < 17) greet = "Good afternoon";
+  else greet = "Good evening";
+  const welcomeTitle = document.querySelector(".dashboard-banner h2");
+  if (welcomeTitle) {
+    welcomeTitle.innerHTML = `${greet}, <span class="player-name-placeholder">${profile.name}</span>!`;
+  }
+
   // Re-display player placeholders
   const namePlaceholders = document.querySelectorAll(".player-name-placeholder");
   namePlaceholders.forEach(ph => ph.textContent = profile.name);
+
+  // Initialize digital ID card and leaderboards
+  initPlayerIdCard(profile);
+  initLeaderboard();
 
   // Sync Notifications count and badge
   await updateUnreadNotificationsBadge("player", playerId);
@@ -2883,6 +2907,7 @@ async function markAllNotificationsAsRead() {
       });
 
       showToast("All notifications marked as read.", "success");
+
       await syncNotificationsList(role, userId);
       await syncHeaderNotifications(userId, role);
     } catch (err) {
@@ -3504,3 +3529,258 @@ Renegades Sports Arena - Developing Elite Sports Talent
   URL.revokeObjectURL(url);
   showToast("Monthly Development Report downloaded successfully!", "success");
 }
+
+// ==========================================================================
+// PORTAL UPGRADES: ID CARD & LEADERBOARDS ENGINE
+// ==========================================================================
+
+function getPlayerName(playerId) {
+  const db = isMockSession ? getLocalDB() : liveCache;
+  const profile = db.profiles ? db.profiles.find(p => p.id === playerId || p.user_id === playerId) : null;
+  return profile ? profile.name : `Player (${playerId.substring(0, 4)})`;
+}
+
+function generateMockQRCodeSVG(data) {
+  const size = 21;
+  const grid = Array(size).fill().map(() => Array(size).fill(0));
+  
+  const setFinderPattern = (row, col) => {
+    for (let r = 0; r < 7; r++) {
+      for (let c = 0; c < 7; c++) {
+        if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+          grid[row + r][col + c] = 1;
+        }
+      }
+    }
+  };
+  
+  setFinderPattern(0, 0); // Top-Left
+  setFinderPattern(0, size - 7); // Top-Right
+  setFinderPattern(size - 7, 0); // Bottom-Left
+  
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    hash = data.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const isFinder = (r < 8 && c < 8) || (r < 8 && c >= size - 8) || (r >= size - 8 && c < 8);
+      if (!isFinder) {
+        const bit = ((hash >> (r * c)) & 1) ^ (((r + c) % 2) === 0 ? 1 : 0);
+        grid[r][c] = bit;
+      }
+    }
+  }
+  
+  const boxSize = 10;
+  let paths = "";
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (grid[r][c] === 1) {
+        paths += `M${c * boxSize},${r * boxSize} h${boxSize} v${boxSize} h-${boxSize} z `;
+      }
+    }
+  }
+  
+  return `
+    <svg viewBox="0 0 ${size * boxSize} ${size * boxSize}" style="width:100%; height:100%;" fill="#000000">
+      <path d="${paths}" />
+    </svg>
+  `;
+}
+
+function initPlayerIdCard(profile) {
+  const container = document.getElementById("playerIdCardContainer");
+  if (!container) return;
+
+  const idLink = `https://renegadessportsarena.com/verify-athlete?id=${profile.id}`;
+  const qrCodeSVG = generateMockQRCodeSVG(idLink);
+
+  container.innerHTML = `
+    <div class="athlete-id-card" id="printableIdCard">
+      <div class="id-card-header">
+        <div class="id-card-logo-text">RENEGADES <span>ARENA</span></div>
+        <span class="id-card-badge">OFFICIAL ID</span>
+      </div>
+      <div class="id-card-body">
+        <div class="id-card-photo-wrapper">
+          <img class="id-card-photo" src="${profile.avatar_url || DEFAULT_BLANK_AVATAR}" alt="${profile.name}">
+        </div>
+        <div class="id-card-details">
+          <h4 class="id-card-name">${profile.name}</h4>
+          <span class="id-card-role">${profile.role || 'ATHLETE'}</span>
+          <div class="id-card-meta-row">
+            <span><strong>Age:</strong> ${profile.age || 'N/A'}</span>
+            <span><strong>School:</strong> ${profile.school || 'N/A'}</span>
+            <span><strong>UID:</strong> ${profile.id ? profile.id.substring(0, 8).toUpperCase() : 'N/A'}</span>
+          </div>
+        </div>
+      </div>
+      <div class="id-card-footer">
+        <div class="id-card-qr-box">
+          ${qrCodeSVG}
+        </div>
+        <button class="id-card-print-btn" onclick="printIdCard()">
+          Print ID Card
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+window.printIdCard = function () {
+  window.print();
+};
+
+function initLeaderboard() {
+  const container = document.getElementById("portalLeaderboardContainer");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="leaderboard-wrapper">
+      <div class="leaderboard-tabs">
+        <button class="leaderboard-tab-btn active" onclick="switchLeaderboardTab('runs')">🏏 Top Runs</button>
+        <button class="leaderboard-tab-btn" onclick="switchLeaderboardTab('wickets')">🔴 Top Wickets</button>
+        <button class="leaderboard-tab-btn" onclick="switchLeaderboardTab('attendance')">📅 Attendance</button>
+      </div>
+      <div class="leaderboard-table-container">
+        <table class="leaderboard-table">
+          <thead>
+            <tr id="leaderboardHeader">
+              <!-- Header populated dynamically -->
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Rows populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  switchLeaderboardTab("runs");
+}
+
+window.switchLeaderboardTab = function (category) {
+  const tabs = document.querySelectorAll(".leaderboard-tab-btn");
+  tabs.forEach(tab => {
+    tab.classList.remove("active");
+    if (category === "runs" && tab.textContent.includes("Runs")) tab.classList.add("active");
+    if (category === "wickets" && tab.textContent.includes("Wickets")) tab.classList.add("active");
+    if (category === "attendance" && tab.textContent.includes("Attendance")) tab.classList.add("active");
+  });
+
+  const header = document.getElementById("leaderboardHeader");
+  const body = document.getElementById("leaderboardBody");
+  if (!header || !body) return;
+
+  const db = isMockSession ? getLocalDB() : liveCache;
+  const statsList = db.player_statistics || [];
+  const attendanceReports = db.attendance_reports || [];
+
+  // Show Skeleton loader while preparing data
+  body.innerHTML = `
+    <tr>
+      <td colspan="4" style="padding: 1.5rem 1rem;">
+        <div class="skeleton-loader skeleton-text" style="height: 14px; margin-bottom: 0.8rem; border-radius: 4px;"></div>
+        <div class="skeleton-loader skeleton-text short" style="height: 14px; width: 60%; border-radius: 4px;"></div>
+      </td>
+    </tr>
+  `;
+
+  setTimeout(() => {
+    let rowsHTML = "";
+    if (category === "runs") {
+      header.innerHTML = `
+        <th>Rank</th>
+        <th>Player</th>
+        <th>Matches</th>
+        <th>Runs Scored</th>
+      `;
+
+      const cricketStats = statsList
+        .filter(s => s.sport_type === "cricket")
+        .sort((a, b) => (b.runs_scored || 0) - (a.runs_scored || 0));
+
+      if (cricketStats.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No runs statistics logged yet.</td></tr>`;
+        return;
+      }
+
+      cricketStats.forEach((stat, index) => {
+        const rank = index + 1;
+        const name = getPlayerName(stat.player_id);
+        const rankClass = rank <= 3 ? `top-rank-${rank}` : "";
+        rowsHTML += `
+          <tr class="${rankClass}">
+            <td><span class="rank-badge">${rank}</span></td>
+            <td><strong>${name}</strong></td>
+            <td>${stat.matches_played || 0}</td>
+            <td><strong>${stat.runs_scored || 0}</strong></td>
+          </tr>
+        `;
+      });
+    } else if (category === "wickets") {
+      header.innerHTML = `
+        <th>Rank</th>
+        <th>Player</th>
+        <th>Matches</th>
+        <th>Wickets</th>
+      `;
+
+      const cricketStats = statsList
+        .filter(s => s.sport_type === "cricket")
+        .sort((a, b) => (b.wickets_taken || 0) - (a.wickets_taken || 0));
+
+      if (cricketStats.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No wickets statistics logged yet.</td></tr>`;
+        return;
+      }
+
+      cricketStats.forEach((stat, index) => {
+        const rank = index + 1;
+        const name = getPlayerName(stat.player_id);
+        const rankClass = rank <= 3 ? `top-rank-${rank}` : "";
+        rowsHTML += `
+          <tr class="${rankClass}">
+            <td><span class="rank-badge">${rank}</span></td>
+            <td><strong>${name}</strong></td>
+            <td>${stat.matches_played || 0}</td>
+            <td><strong>${stat.wickets_taken || 0}</strong></td>
+          </tr>
+        `;
+      });
+    } else if (category === "attendance") {
+      header.innerHTML = `
+        <th>Rank</th>
+        <th>Player</th>
+        <th>Month</th>
+        <th>Percentage</th>
+      `;
+
+      const sortedReports = [...attendanceReports].sort((a, b) => (b.percentage || 0) - (a.percentage || 0));
+
+      if (sortedReports.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No attendance reports logged yet.</td></tr>`;
+        return;
+      }
+
+      sortedReports.forEach((report, index) => {
+        const rank = index + 1;
+        const name = getPlayerName(report.player_id);
+        const rankClass = rank <= 3 ? `top-rank-${rank}` : "";
+        rowsHTML += `
+          <tr class="${rankClass}">
+            <td><span class="rank-badge">${rank}</span></td>
+            <td><strong>${name}</strong></td>
+            <td>${report.month ? new Date(report.month).toLocaleString('default', { month: 'short', year: '2-digit' }) : 'N/A'}</td>
+            <td><strong>${report.percentage || 0}%</strong></td>
+          </tr>
+        `;
+      });
+    }
+
+    body.innerHTML = rowsHTML;
+  }, 400); // Small aesthetic loading delay
+};

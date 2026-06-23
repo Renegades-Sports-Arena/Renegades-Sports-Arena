@@ -405,15 +405,15 @@ async function releaseSlotLock() {
 
 async function writeAuditLog(bookingId, action, actor, details) {
   const client = window.supabaseClient;
-  const logEntry = {
-    booking_id: bookingId,
-    action: action,
-    actor: actor,
-    details: details || {},
-    created_at: new Date().toISOString()
-  };
 
   if (window.isMockSession || !client) {
+    const logEntry = {
+      booking_id: bookingId,
+      action: action,
+      actor: actor,
+      details: details || {},
+      created_at: new Date().toISOString()
+    };
     const db = JSON.parse(localStorage.getItem("rsa_db")) || { audit_logs: [] };
     if (!db.audit_logs) db.audit_logs = [];
     logEntry.id = `audit-${Date.now()}`;
@@ -423,7 +423,15 @@ async function writeAuditLog(bookingId, action, actor, details) {
   }
 
   try {
-    await client.from("audit_logs").insert([logEntry]);
+    const dbEntry = {
+      action: action,
+      role: actor === 'user' ? 'player' : (actor === 'admin' ? 'admin' : (actor === 'coach' ? 'coach' : 'anonymous')),
+      new_value: {
+        booking_id: bookingId,
+        ...details
+      }
+    };
+    await client.from("audit_logs").insert([dbEntry]);
   } catch (err) {
     console.error("Error writing audit log to Supabase:", err);
   }

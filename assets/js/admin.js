@@ -61,25 +61,100 @@ function checkAuth() {
     loginOverlay.classList.add("hidden");
   }
 
-  loginForm.addEventListener("submit", (e) => {
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const enteredPassword = loginPassInput.value;
 
-    // Default Password check
-    if (enteredPassword === "renegades_admin") {
-      sessionStorage.setItem("renegades_admin_logged", "true");
-      loginError.style.display = "none";
-      loginOverlay.classList.add("hidden");
-    } else {
+    const submitBtn = loginForm.querySelector("button[type='submit']");
+    const originalText = submitBtn ? submitBtn.textContent : "Submit";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Authenticating...";
+    }
+
+    try {
+      const client = window.supabaseClient;
+      if (window.isMockSession || !client) {
+        // Default Mock Password check
+        if (enteredPassword === "renegades_admin") {
+          sessionStorage.setItem("renegades_admin_logged", "true");
+          loginError.style.display = "none";
+          loginOverlay.classList.add("hidden");
+        } else {
+          throw new Error("Invalid password");
+        }
+      } else {
+        // Real Supabase Auth check
+        const { data: authData, error: authError } = await client.auth.signInWithPassword({
+          email: "admin@renegadessportsarena.com",
+          password: enteredPassword
+        });
+
+        if (authError) throw authError;
+
+        if (authData && authData.user) {
+          // Check role from profiles
+          const { data: profile, error: profileError } = await client
+            .from("profiles")
+            .select("role")
+            .eq("user_id", authData.user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          if (profile && profile.role === "admin") {
+            sessionStorage.setItem("renegades_admin_logged", "true");
+            loginError.style.display = "none";
+            loginOverlay.classList.add("hidden");
+          } else {
+            // Sign out because user is not an admin
+            await client.auth.signOut();
+            throw new Error("Unauthorized: Access denied for this role.");
+          }
+        } else {
+          throw new Error("Failed to authenticate user session.");
+        }
+      }
+    } catch (err) {
+      console.error("Admin authentication failed:", err);
+      
+      // Save error diagnostics to error_logs table if supabase is connected
+      if (window.supabaseClient && !window.isMockSession) {
+        try {
+          await window.supabaseClient.from("error_logs").insert([{
+            error_message: err.message || "Admin login authentication failure",
+            error_stack: err.stack || null,
+            severity: "warning",
+            context: { entered_email: "admin@renegadessportsarena.com" }
+          }]);
+        } catch (logErr) {
+          console.error("Error inserting error log:", logErr);
+        }
+      }
+
+      loginError.textContent = err.message || "Invalid Password";
       loginError.style.display = "block";
       loginPassInput.value = "";
       loginPassInput.focus();
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
     }
   });
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
       sessionStorage.removeItem("renegades_admin_logged");
+      const client = window.supabaseClient;
+      if (client && !window.isMockSession) {
+        try {
+          await client.auth.signOut();
+        } catch (err) {
+          console.error("Error signing out from Supabase:", err);
+        }
+      }
       window.location.reload();
     });
   }
@@ -1839,6 +1914,7 @@ function updateRescheduleSlotsGrid(gridContainer, occupancies, hiddenInput, sele
     btn.onclick = async (e) => {
       e.preventDefault();
       if (btn.classList.contains("disabled")) return;
+      if (btn.classList.contains("active")) return;
       buttons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       hiddenInput.value = slot;
