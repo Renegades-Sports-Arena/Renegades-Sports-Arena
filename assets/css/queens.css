@@ -307,3 +307,118 @@ body.queens-theme {
     gap: 3rem;
   }
 }
+
+/* ==========================================================================
+   QUEENS ROSTER SQUAD
+   ========================================================================== */
+.queens-squad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-top: 3rem;
+}
+
+.queens-player-card {
+  background: var(--queens-bg-secondary);
+  border: 1px solid var(--queens-glass-border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.queens-player-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--queens-glass-border-hover);
+  box-shadow: var(--queens-glow);
+}
+
+.queens-player-img-wrapper {
+  position: relative;
+  height: 380px;
+  overflow: hidden;
+}
+
+.queens-player-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.queens-player-card:hover .queens-player-img {
+  transform: scale(1.05);
+}
+
+.queens-player-card-inner {
+  padding: 1.5rem;
+}
+
+.queens-player-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(139, 92, 246, 0.2);
+  color: var(--queens-lavender);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 0.8rem;
+}
+
+.queens-player-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.queens-player-role {
+  font-size: 0.9rem;
+  color: var(--queens-violet);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.queens-player-desc {
+  font-size: 0.9rem;
+  color: var(--queens-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+.queens-player-achievement {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--queens-gold);
+  border-top: 1px solid rgba(139, 92, 246, 0.1);
+  padding-top: 0.8rem;
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.queens-player-socials {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.queens-player-social-link {
+  color: var(--queens-text-secondary);
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.queens-player-social-link:hover {
+  color: var(--queens-violet);
+}
+

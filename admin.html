@@ -69,6 +69,10 @@
         <button class="menu-item" data-target-tab="notifications-tab" style="color: #ffc107;">🔔 Notification
           Center</button>
         <button class="menu-item" data-target-tab="coupons-tab" style="color: #FFB300;">🎫 Coupon Codes</button>
+        <button class="menu-item" data-target-tab="hall-of-fame-tab" style="color: #FFD700;">🏆 Hall of Fame</button>
+        <button class="menu-item" data-target-tab="queens-cms-tab" style="color: #BB86FC;">👑 Renegades Queens</button>
+        <button class="menu-item" data-target-tab="audio-cms-tab" style="color: #03DAC6;">🎵 Audio Manager</button>
+        <button class="menu-item" data-target-tab="media-manager-tab" style="color: #4FC3F7;">📁 Media Manager</button>
 
         <button class="menu-item" data-target-tab="export-tab"
           style="border-top: 1px solid var(--border-grey); margin-top: 0.5rem; color: var(--accent);">Export
@@ -1052,8 +1056,19 @@
                   <input type="text" id="adminCouponCode" class="form-input" required placeholder="e.g. WELCOME8" style="text-transform: uppercase;">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Discount Percentage (%) *</label>
-                  <input type="number" id="adminCouponDiscount" class="form-input" required min="0" max="100" placeholder="e.g. 8">
+                  <label class="form-label">Discount Type *</label>
+                  <select id="adminCouponType" class="form-input">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed Amount (₹)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" id="lblAdminCouponDiscount">Discount Value *</label>
+                  <input type="number" id="adminCouponDiscount" class="form-input" required min="0" placeholder="e.g. 8 or 500">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Minimum Purchase Amount (₹)</label>
+                  <input type="number" id="adminCouponMinPurchase" class="form-input" placeholder="e.g. 1000 (Leave blank for none)" min="0">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Usage Limit (claims)</label>
@@ -1062,6 +1077,10 @@
                 <div class="form-group">
                   <label class="form-label">Expiry Date</label>
                   <input type="date" id="adminCouponExpiry" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Product Specific IDs (Comma-separated)</label>
+                  <input type="text" id="adminCouponProducts" class="form-input" placeholder="e.g. bat-willow, pads-mrf (Leave blank for all)">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Status *</label>
@@ -1121,6 +1140,294 @@
           </div>
         </section>
 
+        <!-- Tab: Hall of Fame Manager -->
+        <section class="tab-panel" id="hall-of-fame-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Create / Edit Hall of Fame Player</h3>
+            <form id="adminHallOfFameForm" novalidate>
+              <input type="hidden" id="adminHofId">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Player Name *</label>
+                  <input type="text" id="adminHofName" class="form-input" required placeholder="e.g. Rohan Sharma">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Player Role *</label>
+                  <input type="text" id="adminHofRole" class="form-input" required placeholder="e.g. All-Rounder">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Card Badge *</label>
+                  <input type="text" id="adminHofBadge" class="form-input" required placeholder="e.g. KSCA Division Player">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Photo URL</label>
+                  <input type="text" id="adminHofImage" class="form-input" placeholder="e.g. assets/images/player.jpg or use Media Manager">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Special Achievement</label>
+                  <input type="text" id="adminHofAchievement" class="form-input" placeholder="e.g. Kadamba Cup MVP">
+                </div>
+              </div>
+
+              <h4 style="color:#fff; margin-top:1.5rem; margin-bottom:1rem; font-size:1.1rem; border-bottom: 1px solid var(--border-grey); padding-bottom: 0.5rem;">Player Statistics (Up to 4)</h4>
+              <div class="form-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="form-group">
+                  <label class="form-label">Stat 1 Label</label>
+                  <input type="text" id="adminHofStatLbl1" class="form-input" placeholder="e.g. Runs" value="Runs">
+                  <label class="form-label" style="margin-top:0.5rem;">Stat 1 Value</label>
+                  <input type="text" id="adminHofStatVal1" class="form-input" placeholder="e.g. 450">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Stat 2 Label</label>
+                  <input type="text" id="adminHofStatLbl2" class="form-input" placeholder="e.g. Wickets" value="Wkts">
+                  <label class="form-label" style="margin-top:0.5rem;">Stat 2 Value</label>
+                  <input type="text" id="adminHofStatVal2" class="form-input" placeholder="e.g. 18">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Stat 3 Label</label>
+                  <input type="text" id="adminHofStatLbl3" class="form-input" placeholder="e.g. S/R" value="S/R">
+                  <label class="form-label" style="margin-top:0.5rem;">Stat 3 Value</label>
+                  <input type="text" id="adminHofStatVal3" class="form-input" placeholder="e.g. 135.2">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Stat 4 Label</label>
+                  <input type="text" id="adminHofStatLbl4" class="form-input" placeholder="e.g. Matches" value="Matches">
+                  <label class="form-label" style="margin-top:0.5rem;">Stat 4 Value</label>
+                  <input type="text" id="adminHofStatVal4" class="form-input" placeholder="e.g. 24">
+                </div>
+              </div>
+
+              <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn-save-master" style="flex:2;">Save Player</button>
+                <button type="button" class="btn-save-master" id="adminCancelHofBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3>Hall of Fame Database</h3>
+            <div class="table-responsive" style="margin-top:1rem;">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Badge</th>
+                    <th>Achievement</th>
+                    <th>Stats Summary</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminHofTableBody">
+                  <!-- Loaded dynamically from config -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab: Renegades Queens Manager -->
+        <section class="tab-panel" id="queens-cms-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Create / Edit Renegades Queens Player</h3>
+            <form id="adminQueensPlayerForm" novalidate>
+              <input type="hidden" id="adminQueenId">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Player Name *</label>
+                  <input type="text" id="adminQueenName" class="form-input" required placeholder="e.g. Priyanka Sen">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Designation / Role *</label>
+                  <input type="text" id="adminQueenRole" class="form-input" required placeholder="e.g. Top-Order Batter">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Card Badge *</label>
+                  <input type="text" id="adminQueenBadge" class="form-input" required placeholder="e.g. State Selector Camp">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Photo URL</label>
+                  <input type="text" id="adminQueenImage" class="form-input" placeholder="e.g. assets/images/player.jpg or use Media Manager">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                  <label class="form-label">Achievements Summary</label>
+                  <input type="text" id="adminQueenAchievement" class="form-input" placeholder="e.g. Kadamba Cup MVP / Highest Run-Scorer">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                  <label class="form-label">Player Description *</label>
+                  <textarea id="adminQueenDesc" class="form-input" rows="3" required placeholder="Enter player bio and details..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Instagram Link</label>
+                  <input type="text" id="adminQueenInstagram" class="form-input" placeholder="e.g. https://instagram.com/profile">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Twitter Link</label>
+                  <input type="text" id="adminQueenTwitter" class="form-input" placeholder="e.g. https://twitter.com/profile">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Facebook Link</label>
+                  <input type="text" id="adminQueenFacebook" class="form-input" placeholder="e.g. https://facebook.com/profile">
+                </div>
+              </div>
+              <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn-save-master" style="flex:2;">Save Queen Player</button>
+                <button type="button" class="btn-save-master" id="adminCancelQueenBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3>Queens Squad Database</h3>
+            <div class="table-responsive" style="margin-top:1rem;">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Badge</th>
+                    <th>Achievements</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminQueensTableBody">
+                  <!-- Loaded dynamically from config -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab: Background Audio Manager -->
+        <section class="tab-panel" id="audio-cms-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Background Audio Configuration</h3>
+            <form id="adminAudioForm" novalidate>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Global Audio Status *</label>
+                  <select id="adminAudioGlobalEnabled" class="form-input">
+                    <option value="true">Enabled</option>
+                    <option value="false">Disabled / Muted by Default</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Default Global Volume (0 to 100) *</label>
+                  <input type="number" id="adminAudioVolume" class="form-input" required min="0" max="100" placeholder="e.g. 50">
+                </div>
+              </div>
+              <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn-save-master">Save Global Audio Settings</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3 style="color:var(--accent);">Upload / Manage Background Audio Tracks</h3>
+            <form id="adminAudioTrackForm" novalidate>
+              <input type="hidden" id="adminTrackId">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Track Title *</label>
+                  <input type="text" id="adminTrackTitle" class="form-input" required placeholder="e.g. Main Arena Theme">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Track Audio File URL *</label>
+                  <input type="text" id="adminTrackUrl" class="form-input" required placeholder="e.g. assets/audio/theme.mp3 or paste Media Manager link">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Track Volume Level (0 to 100) *</label>
+                  <input type="number" id="adminTrackVolumeVal" class="form-input" required min="0" max="100" placeholder="e.g. 50" value="50">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Track Status *</label>
+                  <select id="adminTrackActive" class="form-input">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                  </select>
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                  <label class="form-label">Play On Pages (Select all that apply) *</label>
+                  <div style="display:flex; gap:1.5rem; margin-top:0.5rem; background: var(--bg-input); padding: 0.8rem; border-radius:6px; border:1px solid var(--border-grey);">
+                    <label style="display:flex; align-items:center; gap:0.5rem; color:#fff; cursor:pointer;">
+                      <input type="checkbox" class="audio-page-cb" value="index.html"> Homepage (index)
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; color:#fff; cursor:pointer;">
+                      <input type="checkbox" class="audio-page-cb" value="queens.html"> Queens Page
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; color:#fff; cursor:pointer;">
+                      <input type="checkbox" class="audio-page-cb" value="portal.html"> Member Portal
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; color:#fff; cursor:pointer;">
+                      <input type="checkbox" class="audio-page-cb" value="admin.html"> Admin Panel
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn-save-master" style="flex:2;">Save Track</button>
+                <button type="button" class="btn-save-master" id="adminCancelTrackBtn" style="flex:1; background:var(--border-grey); box-shadow:none;">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3>Active Audio Playlist</h3>
+            <div class="table-responsive" style="margin-top:1rem;">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>URL</th>
+                    <th>Volume</th>
+                    <th>Target Pages</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAudioPlaylistTableBody">
+                  <!-- Loaded dynamically from config -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab: Media Manager -->
+        <section class="tab-panel" id="media-manager-tab">
+          <div class="form-section-card">
+            <h3 style="color:var(--accent);">Media Uploader</h3>
+            <p style="color:var(--text-grey); font-size:0.85rem; margin-bottom:1.5rem;">Upload images, audio files, or video clips to Supabase storage. Once uploaded, you can copy the URL to paste into player profiles, coupon scopes, or background audio configurations.</p>
+            <div class="form-group">
+              <label class="form-label">Select File to Upload</label>
+              <input type="file" id="mediaUploadInput" class="form-input" style="padding:0.5rem;">
+            </div>
+            <div style="margin-top: 1.5rem;">
+              <button type="button" class="btn-save-master" id="btnUploadMediaFile">Upload File</button>
+            </div>
+          </div>
+
+          <div class="form-section-card" style="margin-top: 2rem;">
+            <h3>Uploaded Files Library</h3>
+            <div class="table-responsive" style="margin-top:1rem;">
+              <table class="bookings-table">
+                <thead>
+                  <tr>
+                    <th>File Preview</th>
+                    <th>File Name</th>
+                    <th>Type</th>
+                    <th>Public URL</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminMediaLibraryTableBody">
+                  <!-- Loaded dynamically from storage -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
       </div>
     </main>
 
@@ -1174,6 +1481,7 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/email.js"></script>
   <script src="assets/js/notifications_services.js"></script>
+  <script src="assets/js/audio_manager.js"></script>
   <script src="assets/js/admin.js"></script>
   <script src="assets/js/admin_extensions.js"></script>
 

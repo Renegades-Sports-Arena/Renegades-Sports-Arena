@@ -399,8 +399,7 @@ const DEFAULT_CONFIG = {
       name: "Rohan Sharma",
       role: "All-Rounder",
       badge: "KSCA Division Player",
-      scholarship: "100% Scholarship",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80",
+      image: "",
       achievement: "Kadamba Cup MVP",
       stats: [
         { val: "450", lbl: "Runs" },
@@ -413,8 +412,7 @@ const DEFAULT_CONFIG = {
       name: "Harshith",
       role: "Leg Spinner",
       badge: "Under-16 Star",
-      scholarship: "50% Scholarship",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80",
+      image: "",
       achievement: "Best Bowler U-16",
       stats: [
         { val: "85", lbl: "Runs" },
@@ -427,8 +425,7 @@ const DEFAULT_CONFIG = {
       name: "Priyanka Sen",
       role: "Top-Order Batter",
       badge: "State Selector Camp",
-      scholarship: "Elite Athlete",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=80",
+      image: "",
       achievement: "Highest Run-Scorer",
       stats: [
         { val: "620", lbl: "Runs" },
@@ -437,7 +434,27 @@ const DEFAULT_CONFIG = {
         { val: "18", lbl: "Matches" }
       ]
     }
-  ]
+  ],
+  queensPlayers: [
+    {
+      name: "Priyanka Sen",
+      role: "Top-Order Batter",
+      badge: "State Selector Camp",
+      image: "assets/images/logo_women.png",
+      achievement: "Highest Run-Scorer",
+      description: "Priyanka Sen is a top-order batter known for her technical precision and aggressive stroke-play. She represents the franchise with distinction.",
+      social: {
+        instagram: "#",
+        twitter: "#",
+        facebook: "#"
+      }
+    }
+  ],
+  audio: {
+    enabled: false,
+    volume: 50,
+    tracks: []
+  }
 };
 
 // Expose default config globally for self-healing fallbacks
@@ -506,31 +523,32 @@ async function loadSupabaseConfig() {
     window.RENEGADES_CONFIG = deepMergeConfig(DEFAULT_CONFIG, data.data);
     console.log("Loaded from Supabase");
 
-    /* setTimeout(() => {
-       // Re-initialize all sections to dynamically reflect Supabase changes
-       if (typeof initAnnouncement === "function") initAnnouncement(window.RENEGADES_CONFIG.general);
-       if (typeof initGeneral === "function") initGeneral(window.RENEGADES_CONFIG.general);
-       if (typeof initHero === "function") initHero(window.RENEGADES_CONFIG.hero);
-       if (typeof initWhyChooseUs === "function") initWhyChooseUs(window.RENEGADES_CONFIG.whyChooseUs);
-       if (typeof initFutureArena === "function") initFutureArena(window.RENEGADES_CONFIG.futureArena);
-       if (typeof initClubs === "function") initClubs(window.RENEGADES_CONFIG.clubs);
-       if (typeof initPrograms === "function") initPrograms(window.RENEGADES_CONFIG.programs);
-       if (typeof initPathway === "function") initPathway(window.RENEGADES_CONFIG.renegadesPathway);
-       if (typeof initParentsChoose === "function") initParentsChoose(window.RENEGADES_CONFIG.whyParentsChoose);
-       if (typeof initVisionMission === "function") initVisionMission(window.RENEGADES_CONFIG.visionMission);
-       if (typeof initFacilities === "function") initFacilities(window.RENEGADES_CONFIG.facilities);
-       if (typeof initGallery === "function") initGallery(window.RENEGADES_CONFIG.gallery);
-       if (typeof initReviews === "function") initReviews(window.RENEGADES_CONFIG.reviews);
-       if (typeof initAchievements === "function") initAchievements(window.RENEGADES_CONFIG.achievements);
-       if (typeof initHallOfFame === "function") initHallOfFame(window.getHallOfFameData());
-       if (typeof initProShop === "function") initProShop(window.RENEGADES_CONFIG.shop);
-       if (typeof initCoaches === "function") {
-         const coachData = window.RENEGADES_CONFIG?.coaches?.list?.length
-           ? window.RENEGADES_CONFIG.coaches
-           : DEFAULT_CONFIG.coaches;
-         initCoaches(coachData);
-       }
-     }, 500);*/
+    setTimeout(() => {
+      // Re-initialize all sections to dynamically reflect Supabase changes
+      if (typeof initAnnouncement === "function") initAnnouncement(window.RENEGADES_CONFIG.general);
+      if (typeof initGeneral === "function") initGeneral(window.RENEGADES_CONFIG.general);
+      if (typeof initHero === "function") initHero(window.RENEGADES_CONFIG.hero);
+      if (typeof initWhyChooseUs === "function") initWhyChooseUs(window.RENEGADES_CONFIG.whyChooseUs);
+      if (typeof initFutureArena === "function") initFutureArena(window.RENEGADES_CONFIG.futureArena);
+      if (typeof initClubs === "function") initClubs(window.RENEGADES_CONFIG.clubs);
+      if (typeof initPrograms === "function") initPrograms(window.RENEGADES_CONFIG.programs);
+      if (typeof initPathway === "function") initPathway(window.RENEGADES_CONFIG.renegadesPathway);
+      if (typeof initParentsChoose === "function") initParentsChoose(window.RENEGADES_CONFIG.whyParentsChoose);
+      if (typeof initVisionMission === "function") initVisionMission(window.RENEGADES_CONFIG.visionMission);
+      if (typeof initFacilities === "function") initFacilities(window.RENEGADES_CONFIG.facilities);
+      if (typeof initGallery === "function") initGallery(window.RENEGADES_CONFIG.gallery);
+      if (typeof initReviews === "function") initReviews(window.RENEGADES_CONFIG.reviews);
+      if (typeof initAchievements === "function") initAchievements(window.RENEGADES_CONFIG.achievements);
+      if (typeof initHallOfFame === "function") initHallOfFame(window.getHallOfFameData());
+      if (typeof initQueensRoster === "function") initQueensRoster();
+      if (typeof initProShop === "function") initProShop(window.RENEGADES_CONFIG.shop);
+      if (typeof initCoaches === "function") {
+        const coachData = window.RENEGADES_CONFIG?.coaches?.list?.length
+          ? window.RENEGADES_CONFIG.coaches
+          : DEFAULT_CONFIG.coaches;
+        initCoaches(coachData);
+      }
+    }, 500);
   } else {
     console.log("Using localStorage/default config");
   }
@@ -561,6 +579,41 @@ if (configSource && loadedConfig && loadedConfig.gallery && Array.isArray(loaded
     }
   }
 }
+
+// Global Media Load Error Fallback Handler
+window.addEventListener("error", function (e) {
+  const target = e.target;
+  if (!target) return;
+
+  if (target.tagName === "IMG") {
+    if (!target.dataset.fallbackApplied) {
+      target.dataset.fallbackApplied = "true";
+      const isQueens = document.body.classList.contains("queens-theme") || window.location.pathname.includes("queens.html");
+      target.src = isQueens ? "assets/images/logo_women.png" : "assets/images/logo.png";
+      console.warn("Image load failed, using logo fallback:", target.src);
+    }
+  } else if (target.tagName === "VIDEO") {
+    if (!target.dataset.fallbackApplied) {
+      target.dataset.fallbackApplied = "true";
+      if (target.classList.contains("hero-video-bg")) {
+        console.warn("Hero video failed to load, removing src to show poster.");
+        target.removeAttribute("src");
+        target.load();
+      } else if (target.classList.contains("gallery-media")) {
+        console.warn("Gallery video failed to load, showing placeholder.");
+        const wrapper = target.closest(".gallery-media-wrapper");
+        if (wrapper) {
+          wrapper.innerHTML = `
+            <div style="background: rgba(30, 30, 30, 0.9); border: 1px solid var(--glass-border); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; color: var(--text-grey); font-size: 0.8rem; padding: 1rem; text-align: center;">
+              <span style="font-size: 1.5rem; margin-bottom: 0.5rem;">🎬</span>
+              <span>Video Unavailable</span>
+            </div>
+          `;
+        }
+      }
+    }
+  }
+}, true);
 
 
 

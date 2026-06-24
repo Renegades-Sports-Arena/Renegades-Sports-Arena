@@ -43,6 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
   initAdminNavigation();
   initActions();
   initNotificationsTab();
+
+  // Custom CMS Managers Extensions
+  if (typeof initHallOfFameCMS === "function") initHallOfFameCMS();
+  if (typeof initQueensCMS === "function") initQueensCMS();
+  if (typeof initAudioCMS === "function") initAudioCMS();
+  if (typeof initMediaManagerCMS === "function") initMediaManagerCMS();
 });
 
 // ==========================================================================
@@ -1417,7 +1423,14 @@ function gatherFormData() {
     gallery,
     reviews,
     achievements,
-    shop
+    shop,
+    hallOfFame: window.RENEGADES_CONFIG.hallOfFame || [],
+    queensPlayers: window.RENEGADES_CONFIG.queensPlayers || [],
+    audio: {
+      enabled: document.getElementById("adminAudioGlobalEnabled") ? (document.getElementById("adminAudioGlobalEnabled").value === "true") : false,
+      volume: document.getElementById("adminAudioVolume") ? parseInt(document.getElementById("adminAudioVolume").value) || 50 : 50,
+      tracks: window.RENEGADES_CONFIG.audio ? (window.RENEGADES_CONFIG.audio.tracks || []) : []
+    }
   };
 }
 

@@ -1123,7 +1123,8 @@ async function initCouponCMS() {
 
       if (coupons) {
         coupons.forEach(c => {
-          totalClaims += c.uses_count || 0;
+          const count = (c.uses_count !== undefined) ? c.uses_count : (c.usage_count || 0);
+          totalClaims += count;
         });
       }
 
@@ -1152,11 +1153,15 @@ async function initCouponCMS() {
           ? `<span class="badge-status paid" style="cursor:pointer;" onclick="toggleCouponStatus('${c.id}', false)">Active</span>`
           : `<span class="badge-status cancelled" style="cursor:pointer;" onclick="toggleCouponStatus('${c.id}', true)">Inactive</span>`;
 
+        const typeStr = c.discount_type || 'percentage';
+        const valueStr = typeStr === 'fixed' ? `₹${c.discount_amount || 0}` : `${c.discount_percent || 0}%`;
+        const currentUses = (c.uses_count !== undefined) ? c.uses_count : (c.usage_count || 0);
+
         tr.innerHTML = `
           <td><strong>${c.code}</strong></td>
-          <td>${c.discount_percent}%</td>
+          <td>${valueStr}</td>
           <td>${expiryStr}</td>
-          <td>${c.uses_count} / ${limitStr}</td>
+          <td>${currentUses} / ${limitStr}</td>
           <td>${statusBadge}</td>
           <td>
             <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem;" onclick="editCoupon('${c.id}')">Edit</button>
@@ -1175,24 +1180,35 @@ async function initCouponCMS() {
 
     const id = document.getElementById("adminCouponId").value;
     const code = document.getElementById("adminCouponCode").value.trim().toUpperCase();
-    const discount = parseFloat(document.getElementById("adminCouponDiscount").value);
+    const type = document.getElementById("adminCouponType").value;
+    const val = parseFloat(document.getElementById("adminCouponDiscount").value);
     const limitInput = document.getElementById("adminCouponLimit").value.trim();
     const expiryInput = document.getElementById("adminCouponExpiry").value;
+    const minPurchaseInput = document.getElementById("adminCouponMinPurchase").value.trim();
+    const productsInput = document.getElementById("adminCouponProducts").value.trim();
     const is_active = document.getElementById("adminCouponActive").value === "true";
 
-    if (!code || isNaN(discount)) {
-      alert("Please fill in coupon code and discount percentage.");
+    if (!code || isNaN(val)) {
+      alert("Please fill in coupon code and discount value.");
       return;
     }
 
+    const discount_percent = type === 'percentage' ? val : 0;
+    const discount_amount = type === 'fixed' ? val : 0;
     const usage_limit = limitInput ? parseInt(limitInput) : null;
     const expiry_date = expiryInput ? new Date(expiryInput).toISOString() : null;
+    const min_purchase_amount = minPurchaseInput ? parseFloat(minPurchaseInput) : 0;
+    const product_ids = productsInput ? productsInput.split(',').map(p => p.trim()).filter(p => p.length > 0) : [];
 
     const payload = {
       code,
-      discount_percent: discount,
+      discount_type: type,
+      discount_percent,
+      discount_amount,
       usage_limit,
       expiry_date,
+      min_purchase_amount,
+      product_ids,
       is_active
     };
 
@@ -1237,9 +1253,14 @@ async function initCouponCMS() {
 
       document.getElementById("adminCouponId").value = data.id;
       document.getElementById("adminCouponCode").value = data.code;
-      document.getElementById("adminCouponDiscount").value = data.discount_percent;
+      
+      const type = data.discount_type || 'percentage';
+      document.getElementById("adminCouponType").value = type;
+      document.getElementById("adminCouponDiscount").value = type === 'fixed' ? (data.discount_amount || 0) : (data.discount_percent || 0);
+      document.getElementById("adminCouponMinPurchase").value = data.min_purchase_amount || "";
       document.getElementById("adminCouponLimit").value = data.usage_limit || "";
       document.getElementById("adminCouponActive").value = String(data.is_active);
+      document.getElementById("adminCouponProducts").value = data.product_ids ? data.product_ids.join(', ') : "";
       
       if (data.expiry_date) {
         const d = new Date(data.expiry_date);
@@ -1286,4 +1307,611 @@ async function initCouponCMS() {
   };
 
   renderCoupons();
+}
+
+/* ==========================================================================
+   HALL OF FAME CMS MANAGER
+   ========================================================================== */
+async function initHallOfFameCMS() {
+  const form = document.getElementById("adminHallOfFameForm");
+  const tbody = document.getElementById("adminHofTableBody");
+  
+  if (!form || !tbody) return;
+
+  function renderHof() {
+    tbody.innerHTML = "";
+    const list = window.RENEGADES_CONFIG.hallOfFame || [];
+    
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-grey);">No Hall of Fame members found. Add one above!</td></tr>`;
+      return;
+    }
+
+    list.forEach((p, idx) => {
+      const tr = document.createElement("tr");
+      
+      const statsSummary = p.stats ? p.stats.map(s => `${s.lbl}: ${s.val}`).join(", ") : "None";
+      
+      tr.innerHTML = `
+        <td><strong>${p.name}</strong></td>
+        <td>${p.role}</td>
+        <td><span class="badge-status paid">${p.badge || 'PROSPECT'}</span></td>
+        <td>${p.achievement || 'Rising Star'}</td>
+        <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${statsSummary}</td>
+        <td>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem;" onclick="editHof(${idx})">Edit</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:#EF4444; box-shadow:none;" onclick="deleteHof(${idx})">Delete</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:var(--border-grey); box-shadow:none;" onclick="moveHof(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:var(--border-grey); box-shadow:none;" onclick="moveHof(${idx}, 1)" ${idx === list.length - 1 ? 'disabled' : ''}>↓</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    
+    const idxVal = document.getElementById("adminHofId").value;
+    const name = document.getElementById("adminHofName").value.trim();
+    const role = document.getElementById("adminHofRole").value.trim();
+    const badge = document.getElementById("adminHofBadge").value.trim();
+    const image = document.getElementById("adminHofImage").value.trim();
+    const achievement = document.getElementById("adminHofAchievement").value.trim();
+
+    if (!name || !role || !badge) {
+      alert("Please fill in player name, role, and card badge.");
+      return;
+    }
+
+    const stats = [];
+    for (let i = 1; i <= 4; i++) {
+      const lbl = document.getElementById(`adminHofStatLbl${i}`).value.trim();
+      const val = document.getElementById(`adminHofStatVal${i}`).value.trim();
+      if (lbl && val) {
+        stats.push({ lbl, val });
+      }
+    }
+
+    const playerObj = {
+      name,
+      role,
+      badge,
+      image,
+      achievement,
+      stats
+    };
+
+    if (!window.RENEGADES_CONFIG.hallOfFame) {
+      window.RENEGADES_CONFIG.hallOfFame = [];
+    }
+
+    if (idxVal !== "") {
+      const idx = parseInt(idxVal);
+      window.RENEGADES_CONFIG.hallOfFame[idx] = playerObj;
+    } else {
+      window.RENEGADES_CONFIG.hallOfFame.push(playerObj);
+    }
+
+    form.reset();
+    document.getElementById("adminHofId").value = "";
+    // Reset labels defaults
+    document.getElementById("adminHofStatLbl1").value = "Runs";
+    document.getElementById("adminHofStatLbl2").value = "Wkts";
+    document.getElementById("adminHofStatLbl3").value = "S/R";
+    document.getElementById("adminHofStatLbl4").value = "Matches";
+    
+    renderHof();
+  });
+
+  document.getElementById("adminCancelHofBtn").addEventListener("click", () => {
+    form.reset();
+    document.getElementById("adminHofId").value = "";
+    document.getElementById("adminHofStatLbl1").value = "Runs";
+    document.getElementById("adminHofStatLbl2").value = "Wkts";
+    document.getElementById("adminHofStatLbl3").value = "S/R";
+    document.getElementById("adminHofStatLbl4").value = "Matches";
+  });
+
+  window.editHof = (idx) => {
+    const list = window.RENEGADES_CONFIG.hallOfFame || [];
+    const p = list[idx];
+    if (!p) return;
+
+    document.getElementById("adminHofId").value = idx;
+    document.getElementById("adminHofName").value = p.name;
+    document.getElementById("adminHofRole").value = p.role;
+    document.getElementById("adminHofBadge").value = p.badge || "";
+    document.getElementById("adminHofImage").value = p.image || "";
+    document.getElementById("adminHofAchievement").value = p.achievement || "";
+
+    // Clear stats fields first
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById(`adminHofStatLbl${i}`).value = "";
+      document.getElementById(`adminHofStatVal${i}`).value = "";
+    }
+
+    // Populate stats fields
+    if (p.stats && Array.isArray(p.stats)) {
+      p.stats.forEach((s, sIdx) => {
+        if (sIdx < 4) {
+          document.getElementById(`adminHofStatLbl${sIdx + 1}`).value = s.lbl;
+          document.getElementById(`adminHofStatVal${sIdx + 1}`).value = s.val;
+        }
+      });
+    }
+  };
+
+  window.deleteHof = (idx) => {
+    if (!confirm("Are you sure you want to delete this player?")) return;
+    const list = window.RENEGADES_CONFIG.hallOfFame || [];
+    list.splice(idx, 1);
+    renderHof();
+  };
+
+  window.moveHof = (idx, direction) => {
+    const list = window.RENEGADES_CONFIG.hallOfFame || [];
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+
+    const temp = list[idx];
+    list[idx] = list[targetIdx];
+    list[targetIdx] = temp;
+    renderHof();
+  };
+
+  renderHof();
+}
+
+/* ==========================================================================
+   RENEGADES QUEENS CMS MANAGER
+   ========================================================================== */
+async function initQueensCMS() {
+  const form = document.getElementById("adminQueensPlayerForm");
+  const tbody = document.getElementById("adminQueensTableBody");
+  
+  if (!form || !tbody) return;
+
+  function renderQueens() {
+    tbody.innerHTML = "";
+    const list = window.RENEGADES_CONFIG.queensPlayers || [];
+    
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-grey);">No Renegades Queens players found. Add one above!</td></tr>`;
+      return;
+    }
+
+    list.forEach((p, idx) => {
+      const tr = document.createElement("tr");
+      
+      tr.innerHTML = `
+        <td><strong>${p.name}</strong></td>
+        <td>${p.role}</td>
+        <td><span class="badge-status paid">${p.badge}</span></td>
+        <td>${p.achievement || 'Rising Queen'}</td>
+        <td>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem;" onclick="editQueen(${idx})">Edit</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:#EF4444; box-shadow:none;" onclick="deleteQueen(${idx})">Delete</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:var(--border-grey); box-shadow:none;" onclick="moveQueen(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:var(--border-grey); box-shadow:none;" onclick="moveQueen(${idx}, 1)" ${idx === list.length - 1 ? 'disabled' : ''}>↓</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    
+    const idxVal = document.getElementById("adminQueenId").value;
+    const name = document.getElementById("adminQueenName").value.trim();
+    const role = document.getElementById("adminQueenRole").value.trim();
+    const badge = document.getElementById("adminQueenBadge").value.trim();
+    const image = document.getElementById("adminQueenImage").value.trim();
+    const achievement = document.getElementById("adminQueenAchievement").value.trim();
+    const description = document.getElementById("adminQueenDesc").value.trim();
+    
+    const instagram = document.getElementById("adminQueenInstagram").value.trim();
+    const twitter = document.getElementById("adminQueenTwitter").value.trim();
+    const facebook = document.getElementById("adminQueenFacebook").value.trim();
+
+    if (!name || !role || !badge || !description) {
+      alert("Please fill in player name, role, badge, and description.");
+      return;
+    }
+
+    const playerObj = {
+      name,
+      role,
+      badge,
+      image,
+      achievement,
+      description,
+      social: {
+        instagram: instagram || "#",
+        twitter: twitter || "#",
+        facebook: facebook || "#"
+      }
+    };
+
+    if (!window.RENEGADES_CONFIG.queensPlayers) {
+      window.RENEGADES_CONFIG.queensPlayers = [];
+    }
+
+    if (idxVal !== "") {
+      const idx = parseInt(idxVal);
+      window.RENEGADES_CONFIG.queensPlayers[idx] = playerObj;
+    } else {
+      window.RENEGADES_CONFIG.queensPlayers.push(playerObj);
+    }
+
+    form.reset();
+    document.getElementById("adminQueenId").value = "";
+    renderQueens();
+  });
+
+  document.getElementById("adminCancelQueenBtn").addEventListener("click", () => {
+    form.reset();
+    document.getElementById("adminQueenId").value = "";
+  });
+
+  window.editQueen = (idx) => {
+    const list = window.RENEGADES_CONFIG.queensPlayers || [];
+    const p = list[idx];
+    if (!p) return;
+
+    document.getElementById("adminQueenId").value = idx;
+    document.getElementById("adminQueenName").value = p.name;
+    document.getElementById("adminQueenRole").value = p.role;
+    document.getElementById("adminQueenBadge").value = p.badge || "";
+    document.getElementById("adminQueenImage").value = p.image || "";
+    document.getElementById("adminQueenAchievement").value = p.achievement || "";
+    document.getElementById("adminQueenDesc").value = p.description || "";
+    
+    document.getElementById("adminQueenInstagram").value = p.social?.instagram === "#" ? "" : (p.social?.instagram || "");
+    document.getElementById("adminQueenTwitter").value = p.social?.twitter === "#" ? "" : (p.social?.twitter || "");
+    document.getElementById("adminQueenFacebook").value = p.social?.facebook === "#" ? "" : (p.social?.facebook || "");
+  };
+
+  window.deleteQueen = (idx) => {
+    if (!confirm("Are you sure you want to delete this Queens player?")) return;
+    const list = window.RENEGADES_CONFIG.queensPlayers || [];
+    list.splice(idx, 1);
+    renderQueens();
+  };
+
+  window.moveQueen = (idx, direction) => {
+    const list = window.RENEGADES_CONFIG.queensPlayers || [];
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+
+    const temp = list[idx];
+    list[idx] = list[targetIdx];
+    list[targetIdx] = temp;
+    renderQueens();
+  };
+
+  renderQueens();
+}
+
+/* ==========================================================================
+   BACKGROUND AUDIO MANAGER
+   ========================================================================== */
+async function initAudioCMS() {
+  const configForm = document.getElementById("adminAudioForm");
+  const trackForm = document.getElementById("adminAudioTrackForm");
+  const tbody = document.getElementById("adminAudioPlaylistTableBody");
+  
+  if (!configForm || !trackForm || !tbody) return;
+
+  // Initialize global settings
+  const audioCfg = window.RENEGADES_CONFIG.audio || { enabled: false, volume: 50, tracks: [] };
+  if (!window.RENEGADES_CONFIG.audio) {
+    window.RENEGADES_CONFIG.audio = audioCfg;
+  }
+
+  document.getElementById("adminAudioGlobalEnabled").value = String(audioCfg.enabled);
+  document.getElementById("adminAudioVolume").value = audioCfg.volume || 50;
+
+  function renderAudioPlaylist() {
+    tbody.innerHTML = "";
+    const tracks = window.RENEGADES_CONFIG.audio.tracks || [];
+
+    if (tracks.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-grey);">No audio tracks registered. Add one above!</td></tr>`;
+      return;
+    }
+
+    tracks.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      
+      const statusBadge = t.enabled 
+        ? `<span class="badge-status paid" style="cursor:pointer;" onclick="toggleTrackActive(${idx}, false)">Active</span>`
+        : `<span class="badge-status cancelled" style="cursor:pointer;" onclick="toggleTrackActive(${idx}, true)">Inactive</span>`;
+      
+      const pagesStr = t.pages ? t.pages.join(", ") : "None";
+
+      tr.innerHTML = `
+        <td><strong>${t.title}</strong></td>
+        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${t.url}</td>
+        <td>${t.volume}%</td>
+        <td>${pagesStr}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem;" onclick="editAudioTrack(${idx})">Edit</button>
+          <button type="button" class="btn-save-master" style="padding: 0.4rem 0.6rem; font-size:0.75rem; background:#EF4444; box-shadow:none;" onclick="deleteAudioTrack(${idx})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  configForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    window.RENEGADES_CONFIG.audio.enabled = (document.getElementById("adminAudioGlobalEnabled").value === "true");
+    window.RENEGADES_CONFIG.audio.volume = parseInt(document.getElementById("adminAudioVolume").value) || 50;
+    alert("Global audio configurations updated in local draft.");
+  });
+
+  trackForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const idxVal = document.getElementById("adminTrackId").value;
+    const title = document.getElementById("adminTrackTitle").value.trim();
+    const url = document.getElementById("adminTrackUrl").value.trim();
+    const volume = parseInt(document.getElementById("adminTrackVolumeVal").value) || 50;
+    const enabled = document.getElementById("adminTrackActive").value === "true";
+
+    // Gather checkboxes
+    const pages = [];
+    document.querySelectorAll(".audio-page-cb:checked").forEach(cb => {
+      pages.push(cb.value);
+    });
+
+    if (!title || !url || pages.length === 0) {
+      alert("Please fill in track title, URL, and select at least one page.");
+      return;
+    }
+
+    const trackObj = {
+      id: idxVal || "track-" + Date.now(),
+      title,
+      url,
+      volume,
+      pages,
+      enabled
+    };
+
+    if (!window.RENEGADES_CONFIG.audio.tracks) {
+      window.RENEGADES_CONFIG.audio.tracks = [];
+    }
+
+    if (idxVal !== "") {
+      // Find index by id
+      const trackIndex = window.RENEGADES_CONFIG.audio.tracks.findIndex(t => t.id === idxVal);
+      if (trackIndex !== -1) {
+        window.RENEGADES_CONFIG.audio.tracks[trackIndex] = trackObj;
+      }
+    } else {
+      window.RENEGADES_CONFIG.audio.tracks.push(trackObj);
+    }
+
+    trackForm.reset();
+    document.getElementById("adminTrackId").value = "";
+    document.querySelectorAll(".audio-page-cb").forEach(cb => cb.checked = false);
+    renderAudioPlaylist();
+  });
+
+  document.getElementById("adminCancelTrackBtn").addEventListener("click", () => {
+    trackForm.reset();
+    document.getElementById("adminTrackId").value = "";
+    document.querySelectorAll(".audio-page-cb").forEach(cb => cb.checked = false);
+  });
+
+  window.editAudioTrack = (idx) => {
+    const list = window.RENEGADES_CONFIG.audio.tracks || [];
+    const t = list[idx];
+    if (!t) return;
+
+    document.getElementById("adminTrackId").value = t.id;
+    document.getElementById("adminTrackTitle").value = t.title;
+    document.getElementById("adminTrackUrl").value = t.url;
+    document.getElementById("adminTrackVolumeVal").value = t.volume;
+    document.getElementById("adminTrackActive").value = String(t.enabled);
+
+    document.querySelectorAll(".audio-page-cb").forEach(cb => {
+      cb.checked = t.pages ? t.pages.includes(cb.value) : false;
+    });
+  };
+
+  window.deleteAudioTrack = (idx) => {
+    if (!confirm("Are you sure you want to delete this track?")) return;
+    const list = window.RENEGADES_CONFIG.audio.tracks || [];
+    list.splice(idx, 1);
+    renderAudioPlaylist();
+  };
+
+  window.toggleTrackActive = (idx, makeActive) => {
+    const list = window.RENEGADES_CONFIG.audio.tracks || [];
+    if (list[idx]) {
+      list[idx].enabled = makeActive;
+      renderAudioPlaylist();
+    }
+  };
+
+  renderAudioPlaylist();
+}
+
+/* ==========================================================================
+   MEDIA MANAGER CMS
+   ========================================================================== */
+async function initMediaManagerCMS() {
+  const fileInput = document.getElementById("mediaUploadInput");
+  const uploadBtn = document.getElementById("btnUploadMediaFile");
+  const tbody = document.getElementById("adminMediaLibraryTableBody");
+
+  if (!tbody || !fileInput || !uploadBtn) return;
+
+  async function renderLibrary() {
+    tbody.innerHTML = "";
+    try {
+      const client = window.supabaseClient;
+      if (!client || window.isMockSession) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-grey);">Supabase Storage is not connected (Mock Session). Upload files below to simulate.</td></tr>`;
+        
+        // Show mock assets if any
+        const mockFiles = JSON.parse(localStorage.getItem("rsa_mock_media") || "[]");
+        if (mockFiles.length > 0) {
+          mockFiles.forEach((file, idx) => {
+            const tr = document.createElement("tr");
+            const preview = file.type.startsWith("image") 
+              ? `<img src="${file.url}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">`
+              : `🎵`;
+
+            tr.innerHTML = `
+              <td>${preview}</td>
+              <td><strong>${file.name}</strong></td>
+              <td>${file.type}</td>
+              <td><input type="text" readonly value="${file.url}" class="form-input" style="font-size:0.75rem; padding:0.25rem;" onclick="this.select()"></td>
+              <td>
+                <button type="button" class="btn-save-master" style="padding:0.4rem 0.6rem; font-size:0.75rem; background:#EF4444; box-shadow:none;" onclick="deleteMockMedia(${idx})">Delete</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+        return;
+      }
+
+      // Read files from media bucket
+      const { data, error } = await client.storage.from("media").list("", {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: "created_at", order: "desc" }
+      });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-grey);">No files found in the media library. Upload a file above!</td></tr>`;
+        return;
+      }
+
+      data.forEach((file) => {
+        const { data: { publicUrl } } = client.storage.from("media").getPublicUrl(file.name);
+        const fileType = file.metadata ? file.metadata.mimetype : "unknown";
+
+        const tr = document.createElement("tr");
+
+        let preview = "📁";
+        if (fileType.startsWith("image/")) {
+          preview = `<img src="${publicUrl}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">`;
+        } else if (fileType.startsWith("audio/")) {
+          preview = "🎵";
+        } else if (fileType.startsWith("video/")) {
+          preview = "🎬";
+        }
+
+        tr.innerHTML = `
+          <td>${preview}</td>
+          <td><strong>${file.name}</strong></td>
+          <td>${fileType}</td>
+          <td><input type="text" readonly value="${publicUrl}" class="form-input" style="font-size:0.75rem; padding:0.25rem;" onclick="this.select(); document.execCommand('copy'); alert('Link copied to clipboard!')"></td>
+          <td>
+            <button type="button" class="btn-save-master" style="padding:0.4rem 0.6rem; font-size:0.75rem; background:#EF4444; box-shadow:none;" onclick="deleteMediaFile('${file.name}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+    } catch (err) {
+      console.error("Error rendering media library:", err);
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-grey);">Error loading library: ${err.message}</td></tr>`;
+    }
+  }
+
+  uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a file to upload first.");
+      return;
+    }
+
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "Uploading...";
+
+    const client = window.supabaseClient;
+    if (!client || window.isMockSession) {
+      // Simulate file upload as base64
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        const mockFiles = JSON.parse(localStorage.getItem("rsa_mock_media") || "[]");
+        mockFiles.push({
+          name: file.name,
+          type: file.type,
+          url: base64
+        });
+        localStorage.setItem("rsa_mock_media", JSON.stringify(mockFiles));
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "Upload File";
+        fileInput.value = "";
+        alert("Mock upload complete!");
+        renderLibrary();
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    try {
+      // Upload file to Supabase storage bucket "media"
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 5)}.${fileExt}`;
+
+      const { data, error } = await client.storage
+        .from("media")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = "Upload File";
+      fileInput.value = "";
+      alert("File uploaded successfully!");
+      renderLibrary();
+
+    } catch (err) {
+      alert("Upload failed: " + err.message);
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = "Upload File";
+    }
+  });
+
+  window.deleteMediaFile = async (name) => {
+    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+    try {
+      const { error } = await window.supabaseClient.storage
+        .from("media")
+        .remove([name]);
+
+      if (error) throw error;
+      alert("File deleted successfully!");
+      renderLibrary();
+    } catch (err) {
+      alert("Failed to delete file: " + err.message);
+    }
+  };
+
+  window.deleteMockMedia = (idx) => {
+    if (!confirm("Delete mock media file?")) return;
+    const mockFiles = JSON.parse(localStorage.getItem("rsa_mock_media") || "[]");
+    mockFiles.splice(idx, 1);
+    localStorage.setItem("rsa_mock_media", JSON.stringify(mockFiles));
+    renderLibrary();
+  };
+
+  renderLibrary();
 }

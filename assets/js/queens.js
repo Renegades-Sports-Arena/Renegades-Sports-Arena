@@ -6,6 +6,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   initLoader();
   initMobileNav();
+  initQueensRoster();
   initScrollEffects();
   initMagneticButtons();
   initQueensGallery();
@@ -158,5 +159,61 @@ function initQueensGallery() {
   }
   lightbox.addEventListener("click", (e) => {
     if (e.target === lightbox) closeLightbox();
+  });
+}
+
+// ==========================================================================
+// 6. DYNAMIC QUEENS ROSTER CARD RENDERER
+// ==========================================================================
+function initQueensRoster() {
+  const grid = document.getElementById("queensSquadGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  const data = window.RENEGADES_CONFIG?.queensPlayers || [];
+
+  if (data.length === 0) {
+    grid.innerHTML = `
+      <div class="premium-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; background: rgba(18, 18, 18, 0.6); border: 1px dashed var(--queens-glass-border); border-radius: 8px; box-shadow: var(--queens-glow);">
+        <div class="empty-state-icon" style="font-size: 4rem; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px var(--queens-violet));">👑</div>
+        <h3 style="font-size: 1.8rem; margin-bottom: 0.75rem; color: #fff; font-family: var(--font-display); font-weight: 800;">No squad roster registered</h3>
+        <p style="color: var(--queens-text-secondary); max-width: 500px; margin: 0 auto; line-height: 1.6; font-size: 1.05rem;">Our team stars will be showcased here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  data.forEach((player, index) => {
+    const card = document.createElement("div");
+    card.className = `queens-player-card reveal-element delay-${(index % 3) + 1}`;
+
+    const social = player.social || { instagram: "#", twitter: "#", facebook: "#" };
+    
+    let socialHTML = "";
+    if (social.instagram && social.instagram !== "#") {
+      socialHTML += `<a href="${social.instagram}" target="_blank" rel="noopener" class="queens-player-social-link" aria-label="${player.name} Instagram">📸</a>`;
+    }
+    if (social.twitter && social.twitter !== "#") {
+      socialHTML += `<a href="${social.twitter}" target="_blank" rel="noopener" class="queens-player-social-link" aria-label="${player.name} Twitter">🐦</a>`;
+    }
+    if (social.facebook && social.facebook !== "#") {
+      socialHTML += `<a href="${social.facebook}" target="_blank" rel="noopener" class="queens-player-social-link" aria-label="${player.name} Facebook">👤</a>`;
+    }
+
+    card.innerHTML = `
+      <div class="queens-player-img-wrapper">
+        <img class="queens-player-img" src="${player.image || 'assets/images/logo_women.png'}" alt="${player.name}" style="cursor: zoom-in;" onclick="window.openQueensLightbox('${player.image || 'assets/images/logo_women.png'}', '${player.name} - ${player.role}')">
+      </div>
+      <div class="queens-player-card-inner">
+        <span class="queens-player-badge">${player.badge || 'PROSPECT'}</span>
+        <h3 class="queens-player-name">${player.name}</h3>
+        <span class="queens-player-role">${player.role}</span>
+        <p class="queens-player-desc">${player.description || ''}</p>
+        ${player.achievement ? `<div class="queens-player-achievement"><span>🏆</span> ${player.achievement}</div>` : ""}
+        ${socialHTML ? `<div class="queens-player-socials">${socialHTML}</div>` : ""}
+      </div>
+    `;
+
+    grid.appendChild(card);
   });
 }

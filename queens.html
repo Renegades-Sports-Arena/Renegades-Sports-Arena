@@ -221,6 +221,21 @@
     </div>
   </section>
 
+  <!-- Squad Roster Section -->
+  <section class="section" id="squad" style="background: var(--queens-bg-primary); border-top: 1px solid rgba(139,92,246,0.1);">
+    <div class="container">
+      <div class="section-header reveal-element">
+        <span class="queens-badge">THE QUEEN roster</span>
+        <h2 class="section-title text-gradient-queens" style="margin-top: 1.5rem;">MEET THE SQUAD</h2>
+        <p class="section-desc" style="color: var(--queens-text-secondary);">Our lineup of elite female cricketers representing the franchise across tournaments.</p>
+      </div>
+
+      <div class="queens-squad-grid" id="queensSquadGrid">
+        <!-- Loaded dynamically from configuration -->
+      </div>
+    </div>
+  </section>
+
   <!-- Achievements Section -->
   <section class="section" id="achievements" style="background: var(--queens-bg-secondary); border-top: 1px solid rgba(139,92,246,0.1);">
     <div class="container">
@@ -401,6 +416,11 @@
   </footer>
 
   <!-- Script Files -->
+  <script src="assets/js/env.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/audio_manager.js"></script>
   <script src="assets/js/queens.js"></script>
   <script>
     function handleQueensFormSubmit(e) {

@@ -553,22 +553,23 @@ function initProShop(data) {
       container.appendChild(card);
     });
 
-    // Bind enquire button click handler to fill in the contact form
+    // Bind buy now click handler to open WhatsApp in a new tab
+    container.querySelectorAll(".product-buy-btn").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const prodName = this.getAttribute("data-product-name");
+        const waText = encodeURIComponent(`Hello Renegades Sports Arena, I want to buy: ${prodName}. Please share payment and delivery details.`);
+        const waLink = `https://wa.me/919731134665?text=${waText}`;
+        window.open(waLink, '_blank');
+      });
+    });
+
+    // Bind enquire button click handler to open WhatsApp in a new tab
     container.querySelectorAll(".product-enquire-btn").forEach(btn => {
       btn.addEventListener("click", function () {
         const prodName = this.getAttribute("data-product-name");
-        const contactSection = document.getElementById("contact");
-        if (contactSection) {
-          const formMessage = document.getElementById("formMessage");
-          if (formMessage) {
-            formMessage.value = `I am interested in enquiring about the product: ${prodName}. Please provide details.`;
-          }
-          const headerHeight = document.querySelector(".header").clientHeight;
-          window.scrollTo({
-            top: contactSection.offsetTop - headerHeight,
-            behavior: "smooth"
-          });
-        }
+        const waText = encodeURIComponent(`Hello Renegades Sports Arena, I have an enquiry regarding: ${prodName}. Please provide more information.`);
+        const waLink = `https://wa.me/919731134665?text=${waText}`;
+        window.open(waLink, '_blank');
       });
     });
   }
@@ -2122,10 +2123,10 @@ function initMagneticButtons() {
 let selectedProductForCheckout = null;
 let appliedCheckoutCoupon = null;
 
-async function validateCouponCode(code, originalPrice) {
+async function validateCouponCode(code, originalPrice, productId) {
   if (window.isMockSession || !window.supabaseClient) {
     if (code.toUpperCase() === 'WELCOME8') {
-      return { valid: true, discountPercent: 8, message: "Welcome Coupon Applied! (8% Off)" };
+      return { valid: true, discountType: 'percentage', discountValue: 8, message: "Welcome Coupon Applied! (8% Off)" };
     } else {
       return { valid: false, message: "Invalid coupon code." };
     }
@@ -2150,14 +2151,33 @@ async function validateCouponCode(code, originalPrice) {
       return { valid: false, message: "This coupon has expired." };
     }
 
-    if (data.usage_limit !== null && data.uses_count >= data.usage_limit) {
+    const currentUses = (data.uses_count !== undefined) ? data.uses_count : (data.usage_count || 0);
+    if (data.usage_limit !== null && currentUses >= data.usage_limit) {
       return { valid: false, message: "This coupon usage limit has been reached." };
     }
 
+    // Minimum purchase check
+    if (data.min_purchase_amount && originalPrice < data.min_purchase_amount) {
+      return { valid: false, message: `Minimum purchase of ₹${data.min_purchase_amount} required.` };
+    }
+
+    // Product-specific check
+    if (data.product_ids && Array.isArray(data.product_ids) && data.product_ids.length > 0) {
+      if (!productId || !data.product_ids.includes(productId)) {
+        return { valid: false, message: "This coupon is not valid for this product." };
+      }
+    }
+
+    const discountType = data.discount_type || 'percentage';
+    const discountVal = discountType === 'fixed' ? (data.discount_amount || 0) : (data.discount_percent || 0);
+
     return {
       valid: true,
-      discountPercent: data.discount_percent,
-      message: `Coupon Applied! (${data.discount_percent}% Off)`
+      discountType: discountType,
+      discountValue: discountVal,
+      message: discountType === 'fixed'
+        ? `Coupon Applied! (₹${discountVal} Off)`
+        : `Coupon Applied! (${discountVal}% Off)`
     };
   } catch (err) {
     console.error("Coupon validation error:", err);
@@ -2234,7 +2254,7 @@ function initProShopCheckout() {
     applyCouponBtn.disabled = true;
     applyCouponBtn.textContent = "Verifying...";
 
-    const res = await validateCouponCode(code, selectedProductForCheckout.price);
+    const res = await validateCouponCode(code, selectedProductForCheckout.price, selectedProductForCheckout.id);
     
     applyCouponBtn.disabled = false;
     applyCouponBtn.textContent = "Apply";
@@ -2242,10 +2262,16 @@ function initProShopCheckout() {
     if (res.valid) {
       appliedCheckoutCoupon = {
         code: code,
-        discountPercent: res.discountPercent
+        discountType: res.discountType,
+        discountValue: res.discountValue
       };
       
-      const discAmt = Math.round(selectedProductForCheckout.price * (res.discountPercent / 100));
+      let discAmt = 0;
+      if (res.discountType === 'fixed') {
+        discAmt = Math.min(res.discountValue, selectedProductForCheckout.price);
+      } else {
+        discAmt = Math.round(selectedProductForCheckout.price * (res.discountValue / 100));
+      }
       const totalAmt = selectedProductForCheckout.price - discAmt;
       
       document.getElementById("checkoutDiscount").textContent = `₹${discAmt.toLocaleString('en-IN')}`;
@@ -2279,7 +2305,14 @@ function initProShopCheckout() {
     }
 
     const price = selectedProductForCheckout.price;
-    const discAmt = appliedCheckoutCoupon ? Math.round(price * (appliedCheckoutCoupon.discountPercent / 100)) : 0;
+    let discAmt = 0;
+    if (appliedCheckoutCoupon) {
+      if (appliedCheckoutCoupon.discountType === 'fixed') {
+        discAmt = Math.min(appliedCheckoutCoupon.discountValue, price);
+      } else {
+        discAmt = Math.round(price * (appliedCheckoutCoupon.discountValue / 100));
+      }
+    }
     const finalAmount = price - discAmt;
     const orderId = 'RSA-SHOP-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 
@@ -2347,7 +2380,14 @@ function initProShopCheckout() {
     const email = document.getElementById("checkoutEmail").value.trim();
     const phone = document.getElementById("checkoutPhone").value.trim();
     const price = selectedProductForCheckout.price;
-    const discAmt = appliedCheckoutCoupon ? Math.round(price * (appliedCheckoutCoupon.discountPercent / 100)) : 0;
+    let discAmt = 0;
+    if (appliedCheckoutCoupon) {
+      if (appliedCheckoutCoupon.discountType === 'fixed') {
+        discAmt = Math.min(appliedCheckoutCoupon.discountValue, price);
+      } else {
+        discAmt = Math.round(price * (appliedCheckoutCoupon.discountValue / 100));
+      }
+    }
     const finalAmount = price - discAmt;
     const orderId = 'RSA-SHOP-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 
@@ -2396,9 +2436,15 @@ function initProShopCheckout() {
             .maybeSingle();
 
           if (couponData) {
+            const usesColumn = (couponData.uses_count !== undefined) ? "uses_count" : "usage_count";
+            const currentCount = couponData.uses_count !== undefined ? couponData.uses_count : (couponData.usage_count || 0);
+            
+            const updatePayload = {};
+            updatePayload[usesColumn] = currentCount + 1;
+
             await window.supabaseClient
               .from("coupon_codes")
-              .update({ uses_count: couponData.uses_count + 1 })
+              .update(updatePayload)
               .eq("id", couponData.id);
 
             await window.supabaseClient
